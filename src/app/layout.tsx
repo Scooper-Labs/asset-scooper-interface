@@ -10,8 +10,6 @@ import {
 import localFont from "next/font/local";
 import AppHome from ".";
 
-import "./globals.css";
-
 const myFont = localFont({
   src: [
     {
