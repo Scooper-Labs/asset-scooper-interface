@@ -14,10 +14,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { memo } from "react";
 import { nanoid } from "@reduxjs/toolkit";
 import Link from "next/link";
-import { tabs } from "@/app/(main)/sweep/components/pathLinks";
 import Image from "next/image";
 
 import LogoSvg from "@/assets/icons/LogoSVG.svg";
+import { tabs } from "@/assets/site";
 
 const NavBar = () => {
   let toast = useToast();
@@ -31,7 +31,7 @@ const NavBar = () => {
   return (
     <Box
       bg="white"
-      border="1px solid red"
+      // border="1px solid red"
       pos={"fixed"}
       w="100%"
       py="10px"
