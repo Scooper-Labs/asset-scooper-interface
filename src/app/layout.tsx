@@ -8,7 +8,7 @@ import {
   SOCIAL_TWITTER,
 } from "@/utils/site";
 import localFont from "next/font/local";
-import AppHome from ".";
+import AppHome from "@/components/HomeView/appview";
 
 const myFont = localFont({
   src: [
