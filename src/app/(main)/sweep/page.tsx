@@ -8,7 +8,15 @@ import SweepWidget from "./components/sweep-widget";
 const Sweep: React.FC = () => {
   return (
     <ContainerWrapper>
-      <Flex pt={"6rem"}>
+      <Flex
+        pt={"6rem"}
+        width="100%"
+        height="100%"
+        alignItems="center"
+        justify="center"
+        border="1px solid green"
+        minHeight="100vh"
+      >
         <SweepWidget />
       </Flex>
     </ContainerWrapper>
