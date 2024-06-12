@@ -1,65 +1,41 @@
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 
+import { TOKEN_LISTS } from "@/constants/token-lists";
+import { tokenListValidator } from "@/utils/tokenListValidator";
 
-// fetches token lists on base
-
-import { getAddress } from "viem";
-
-interface UseTokensParams {
-  chainId: number;
+interface UseOtherTokenListsParams {
+  chainId?: 8453 | 84532;
 }
 
-type Data = {
-  id: string;
-  address: string;
-  name: string;
-  symbol: string;
-  logoUrl: string;
-  decimals: number;
-};
+export const isPromiseFulfilled = <T>(
+  input: PromiseSettledResult<T>,
+): input is PromiseFulfilledResult<T> => input.status === "fulfilled";
 
-export const fetchTokensQueryFn = async () => {
-  const resp = await fetch("https://tokenlist-apis.vercel.app/v0");
-  if (resp.status === 200) {
-    const data: Data[] = await resp.json();
-
-    return data.reduce<Record<number, Record<string, Token>>>(
-      (acc, { id, name, symbol, decimals, logoUrl }) => {
-        const [_chainId, _address] = id.split(":");
-
-        const chainId = Number(_chainId);
-        const address = String(_address);
-
-        if (!acc?.[chainId]) acc[chainId] = {};
-
-        const map = acc[chainId] as Record<string, Token>;
-
-        map[getAddress(address)] = new Token({
-          chainId,
-          name,
-          decimals,
-          symbol,
-          logoUrl,
-          address,
+export const useTokenLists = ({ chainId }: UseOtherTokenListsParams) => {
+  const tokenListQuery = useQuery({
+    queryKey: ["TokenLists", { chainId }],
+    queryFn: async () => {
+      const res = await Promise.allSettled(
+        TOKEN_LISTS.map((el) => fetch(el).then((res) => res.json())),
+      ).then((res) => {
+        return res.filter(isPromiseFulfilled).map((el) => {
+          el.value;
+          // console.log("this is other tokens", el.value);
         });
-
-        return acc;
-      },
-      {},
-    );
-  }
-
-  throw new Error("Could not fetch tokens");
-};
-
-export const useTokens = ({ chainId }: UseTokensParams) => {
-  const { data: customTokenMap } = useCustomTokens();
-  return useQuery({
-    queryKey: ["tokens", Object.keys(customTokenMap).length],
-    queryFn: () => fetchTokensQueryFn({ customTokenMap }),
-    select: (data) => data[chainId],
+      });
+      return res
+        .map((el) => tokenListValidator.parse(el))
+        .flatMap((el) => el.tokens);
+    },
     // keepPreviousData: true,
     placeholderData: keepPreviousData,
-    staleTime: ms("15m"), // 15 mins
-    gcTime: ms("24h"), // 24hs
+    staleTime: 900000, // 15 mins
+    gcTime: 86400000, // 24hs
+    enabled: Boolean(chainId),
+    refetchOnWindowFocus: true,
   });
+
+  return {
+    data: tokenListQuery,
+  };
 };

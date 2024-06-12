@@ -18,6 +18,8 @@ import Image from "next/image";
 
 import LogoSvg from "@/assets/icons/LogoSVG.svg";
 import { tabs } from "@/assets/site";
+import { ConnectKitButton } from "connectkit";
+import { CustomConnectButton } from "../Buttons/SmartWalletButton";
 
 const NavBar = () => {
   let toast = useToast();
@@ -82,8 +84,9 @@ const NavBar = () => {
               ))}
             </HStack>
           </HStack>
-
-          <Button>Connect wallet</Button>
+          <ConnectKitButton />
+          <CustomConnectButton />
+          {/* <Button>Connect wallet</Button> */}
         </HStack>
       </ContainerWrapper>
     </Box>
