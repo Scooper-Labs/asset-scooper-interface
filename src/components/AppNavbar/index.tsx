@@ -9,6 +9,7 @@ import {
   Center,
   Divider,
 } from "@chakra-ui/react";
+import { useRef } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/rtkHooks";
 import { usePathname, useRouter } from "next/navigation";
 import { memo } from "react";
@@ -16,6 +17,8 @@ import { nanoid } from "@reduxjs/toolkit";
 import Link from "next/link";
 import { tabs } from "@/app/(main)/sweep/components/pathLinks";
 import Image from "next/image";
+import ActivitiesModal from "../ActivitiesModal";
+import { COLORS } from "@/constants/theme";
 
 import LogoSvg from "@/assets/icons/LogoSVG.svg";
 
@@ -27,17 +30,10 @@ const NavBar = () => {
 
   const pathname = usePathname();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const btnRef = useRef<HTMLButtonElement>(null);
 
   return (
-    <Box
-      bg="white"
-      border="1px solid red"
-      pos={"fixed"}
-      w="100%"
-      py="10px"
-      zIndex={1000}
-      top={0}
-    >
+    <Box bg="white" pos={"fixed"} w="100%" py="10px" zIndex={1000} top={0}>
       <ContainerWrapper>
         <HStack h={"55px"} justify={"space-between"}>
           <HStack>
@@ -45,7 +41,7 @@ const NavBar = () => {
               <Image alt="Logo" src={LogoSvg} />
             </Link>
             <Center height="20px">
-              <Divider orientation="vertical" colorScheme="" />
+              <Divider orientation="vertical" border="1px solid #EB65D566" />
             </Center>
             <HStack>
               {tabs?.map((e, i) => (
@@ -83,8 +79,23 @@ const NavBar = () => {
             </HStack>
           </HStack>
 
-          <Button>Connect wallet</Button>
+          <Button
+            bg={COLORS.btnGradient}
+            boxShadow="0px 3px 5.8px -2.5px #E443CA66"
+            color="white"
+            fontSize="14px"
+            fontWeight={400}
+            _hover={{
+              bg: `${COLORS.btnGradient}`,
+            }}
+            ref={btnRef}
+            onClick={onOpen}
+          >
+            Connect wallet
+          </Button>
         </HStack>
+
+        <ActivitiesModal isOpen={isOpen} onClose={onClose} btnRef={btnRef} />
       </ContainerWrapper>
     </Box>
   );
