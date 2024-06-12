@@ -38,6 +38,7 @@ const ModalComponent: FC<ModalComponentProps> = ({
         motionPreset="scale"
         {...props}
       >
+        <ModalOverlay bg="#00000020" backdropFilter="auto" backdropBlur="2px" />
         <ModalContent
           w={{ base: "90vw", md: "60vw" }}
           borderRadius={10}

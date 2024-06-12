@@ -14,7 +14,18 @@ function SweepWidget() {
     <VStack gap="12px">
       <Flex justify="end" fontSize="small" width="100%">
         <HStack>
-          <Button>Refresh</Button>
+          <Button
+            borderRadius="8px"
+            background="linear-gradient(180deg, #FFFFFF 0%, #FAFCFC 100%)"
+            border="1px solid #E1C9E1"
+            _hover={{
+              bg: "linear-gradient(180deg, #FFFFFF 0%, #FAFCFC 100%)",
+            }}
+            fontWeight={400}
+            color="#917193"
+          >
+            Refresh
+          </Button>
           <SwapSettings />
         </HStack>
       </Flex>
@@ -95,5 +106,5 @@ function SweepWidget() {
     </VStack>
   );
 }
-// InfoOutlineIcon
+
 export default SweepWidget;

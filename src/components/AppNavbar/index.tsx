@@ -21,8 +21,8 @@ import { COLORS } from "@/constants/theme";
 
 import LogoSvg from "@/assets/icons/LogoSVG.svg";
 import { tabs } from "@/assets/site";
-import { ConnectKitButton } from "connectkit";
 import { CustomConnectButton } from "../Buttons/SmartWalletButton";
+import ConnectButton from "../Buttons/connectButton";
 
 const NavBar = () => {
   let toast = useToast();
@@ -53,11 +53,7 @@ const NavBar = () => {
                   prefetch={false}
                 >
                   <HStack
-                    opacity={i === 4 ? 0.3 : 1}
-                    _hover={{
-                      fontWeight: 800,
-                      color: "#006DED",
-                    }}
+                    // opacity={i === 4 ? 0.3 : 1}
                     px="10px"
                     py="5px"
                     borderRadius={"50px"}
@@ -80,9 +76,11 @@ const NavBar = () => {
               ))}
             </HStack>
           </HStack>
-          <ConnectKitButton />
-          <CustomConnectButton />
-          {/* <Button>Connect wallet</Button> */}
+
+          <HStack>
+            <ConnectButton />
+            <CustomConnectButton />
+          </HStack>
         </HStack>
 
         <ActivitiesModal isOpen={isOpen} onClose={onClose} btnRef={btnRef} />
