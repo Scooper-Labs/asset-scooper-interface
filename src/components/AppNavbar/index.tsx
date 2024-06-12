@@ -15,12 +15,14 @@ import { usePathname, useRouter } from "next/navigation";
 import { memo } from "react";
 import { nanoid } from "@reduxjs/toolkit";
 import Link from "next/link";
-import { tabs } from "@/app/(main)/sweep/components/pathLinks";
 import Image from "next/image";
 import ActivitiesModal from "../ActivitiesModal";
 import { COLORS } from "@/constants/theme";
 
 import LogoSvg from "@/assets/icons/LogoSVG.svg";
+import { tabs } from "@/assets/site";
+import { ConnectKitButton } from "connectkit";
+import { CustomConnectButton } from "../Buttons/SmartWalletButton";
 
 const NavBar = () => {
   let toast = useToast();
@@ -78,21 +80,9 @@ const NavBar = () => {
               ))}
             </HStack>
           </HStack>
-
-          <Button
-            bg={COLORS.btnGradient}
-            boxShadow="0px 3px 5.8px -2.5px #E443CA66"
-            color="white"
-            fontSize="14px"
-            fontWeight={400}
-            _hover={{
-              bg: `${COLORS.btnGradient}`,
-            }}
-            ref={btnRef}
-            onClick={onOpen}
-          >
-            Connect wallet
-          </Button>
+          <ConnectKitButton />
+          <CustomConnectButton />
+          {/* <Button>Connect wallet</Button> */}
         </HStack>
 
         <ActivitiesModal isOpen={isOpen} onClose={onClose} btnRef={btnRef} />
