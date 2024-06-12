@@ -1,4 +1,3 @@
-import RootProviders from "@/components/Providers";
 import type { Metadata, Viewport } from "next";
 import {
   SITE_DESCRIPTION,
@@ -9,6 +8,7 @@ import {
 } from "@/utils/site";
 import localFont from "next/font/local";
 import AppHome from "@/components/HomeView/appview";
+import { RootProvider } from "@/provider";
 
 const myFont = localFont({
   src: [
@@ -78,9 +78,9 @@ export default function RootLayout({
     <html lang="en">
       <head />
       <body className={myFont.className}>
-        <RootProviders>
+        <RootProvider>
           <AppHome> {children}</AppHome>
-        </RootProviders>
+        </RootProvider>
       </body>
     </html>
   );
