@@ -15,4 +15,5 @@ export const COLORS = {
   btnBGGradient: "linear-gradient(180deg, #FFFFFF 0%, #FAFCFC 100%)",
   settingIconColor: "#018FE9",
   footerBGColor: "#F9F9FB",
+  boxShadowColor: "0px 3px 5.8px -2.5px #E443CA66",
 };
