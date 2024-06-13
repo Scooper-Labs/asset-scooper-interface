@@ -7,9 +7,7 @@ import ReduxProviders from "./redux";
 export const RootProvider = ({ children }: { children: ReactNode }) => {
   return (
     <ReduxProviders>
-      <ChakraProvider>
-       {children}
-      </ChakraProvider>
+      <ChakraProvider>{children}</ChakraProvider>
     </ReduxProviders>
   );
 };

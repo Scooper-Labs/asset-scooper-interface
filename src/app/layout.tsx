@@ -16,7 +16,6 @@ import { cookieToInitialState } from "wagmi";
 import { headers } from "next/headers";
 import { WALLETCONNECT_CONFIG } from "@/constants/config";
 
-
 const myFont = localFont({
   src: [
     {
