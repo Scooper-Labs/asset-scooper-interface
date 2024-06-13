@@ -20,7 +20,7 @@ import { COLORS } from "@/constants/theme";
 
 import LogoSvg from "@/assets/icons/LogoSVG.svg";
 import { tabs } from "@/assets/site";
-import { ConnectKitButton } from "connectkit";
+import ConnectButton from "../Buttons/connectButton";
 import { CustomConnectButton } from "../Buttons/SmartWalletButton";
 
 const NavBar = () => {
@@ -83,9 +83,10 @@ const NavBar = () => {
               ))}
             </HStack>
           </HStack>
-          <ConnectKitButton />
-          <CustomConnectButton />
-          {/* <Button>Connect wallet</Button> */}
+          <HStack>
+            <ConnectButton />
+            <CustomConnectButton />
+          </HStack>
         </HStack>
 
         <ActivitiesModal isOpen={isOpen} onClose={onClose} btnRef={btnRef} />

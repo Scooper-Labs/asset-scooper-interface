@@ -8,13 +8,31 @@ import { Box, Button, Flex, HStack, Text, VStack } from "@chakra-ui/react";
 import Image from "next/image";
 import React from "react";
 import { SwapSettings } from "./swap-settings";
+import { COLORS } from "@/constants/theme";
 
 function SweepWidget() {
   return (
     <VStack gap="12px">
       <Flex justify="end" fontSize="small" width="100%">
         <HStack>
-          <Button>Refresh</Button>
+          <Button
+            fontWeight="500"
+            bg={COLORS.btnBGGradient}
+            borderRadius="8px"
+            color={COLORS.tabTextColor}
+            style={{
+              border: "1px solid",
+              borderImage: `${COLORS.borderImageColor}`,
+              borderRadius: "8px",
+            }}
+            _hover={{
+              bg: `${COLORS.btnBGGradient}`,
+              border: "1px solid",
+              borderImage: `${COLORS.borderImageColor}`,
+            }}
+          >
+            Refresh
+          </Button>
           <SwapSettings />
         </HStack>
       </Flex>
