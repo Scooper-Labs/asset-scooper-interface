@@ -46,4 +46,3 @@ export function Web3Modal({
     </WagmiProvider>
   );
 }
-
