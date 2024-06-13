@@ -10,6 +10,12 @@ import localFont from "next/font/local";
 import AppHome from "@/components/HomeView/appview";
 import { RootProvider } from "@/provider";
 
+import { cookieToInitialState } from "wagmi";
+
+import { headers } from "next/headers";
+import { WALLETCONNECT_CONFIG } from "@/constants/config";
+import { Web3Modal } from "@/provider/web3-provider";
+
 const myFont = localFont({
   src: [
     {
@@ -74,12 +80,19 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const initialState = cookieToInitialState(
+    WALLETCONNECT_CONFIG,
+    headers().get("cookie")
+  );
+
   return (
     <html lang="en">
       <head />
       <body className={myFont.className}>
         <RootProvider>
-          <AppHome> {children}</AppHome>
+          <Web3Modal initialState={initialState}>
+            <AppHome> {children}</AppHome>
+          </Web3Modal>
         </RootProvider>
       </body>
     </html>

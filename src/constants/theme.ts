@@ -10,4 +10,8 @@ export const COLORS = {
   inputBgcolor: "#B5B4C6",
   balTextColor: "#006DED",
   tabTextColor: "#9E829F",
+  borderImageColor:
+    "linear-gradient(180deg, rgba(212, 205, 224, 0.5) 0%, rgba(177, 144, 235, 0.5) 100%) 1",
+  btnBGGradient: "linear-gradient(180deg, #FFFFFF 0%, #FAFCFC 100%)",
+  settingIconColor: "#018FE9",
 };
