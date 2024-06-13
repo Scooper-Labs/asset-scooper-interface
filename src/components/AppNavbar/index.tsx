@@ -9,14 +9,13 @@ import {
   Divider,
 } from "@chakra-ui/react";
 import { useRef } from "react";
-import { useAppDispatch, useAppSelector } from "@/hooks/rtkHooks";
+import { useAppDispatch } from "@/hooks/rtkHooks";
 import { usePathname, useRouter } from "next/navigation";
 import { memo } from "react";
 import { nanoid } from "@reduxjs/toolkit";
 import Link from "next/link";
 import Image from "next/image";
 import ActivitiesModal from "../ActivitiesModal";
-import { COLORS } from "@/constants/theme";
 
 import LogoSvg from "@/assets/icons/LogoSVG.svg";
 import { tabs } from "@/assets/site";
@@ -34,15 +33,7 @@ const NavBar = () => {
   const btnRef = useRef<HTMLButtonElement>(null);
 
   return (
-    <Box
-      bg="white"
-      // border="1px solid red"
-      pos={"fixed"}
-      w="100%"
-      py="10px"
-      zIndex={1000}
-      top={0}
-    >
+    <Box bg="white" pos={"fixed"} w="100%" py="10px" zIndex={1000} top={0}>
       <ContainerWrapper>
         <HStack h={"55px"} justify={"space-between"}>
           <HStack>

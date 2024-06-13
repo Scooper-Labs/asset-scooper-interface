@@ -1,6 +1,6 @@
-export const SITE_EMOJI = "";
+export const SITE_EMOJI = "©";
 export const SITE_NAME = "Assetscooper";
-export const SITE_INFO = "Quickly ship Web3 Apps";
+export const SITE_INFO = "Asset Scooper";
 export const SITE_DESCRIPTION = "Efficiently manage your crypto tokens";
 export const SITE_URL = "https://assetscooper.xyz";
 
