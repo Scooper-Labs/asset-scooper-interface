@@ -9,12 +9,15 @@ import {
 import localFont from "next/font/local";
 import AppHome from "@/components/HomeView/appview";
 import { RootProvider } from "@/provider";
+<<<<<<< HEAD
 import { Web3Modal } from "@/provider/web3-provider";
 
 import { cookieToInitialState } from "wagmi";
 
 import { headers } from "next/headers";
 import { WALLETCONNECT_CONFIG } from "@/constants/config";
+=======
+>>>>>>> d8a93a91b2556175dfa3352b58f5baa7a72d5a60
 
 const myFont = localFont({
   src: [
@@ -90,9 +93,13 @@ export default function RootLayout({
       <head />
       <body className={myFont.className}>
         <RootProvider>
+<<<<<<< HEAD
           <Web3Modal initialState={initialState}>
             <AppHome> {children}</AppHome>
           </Web3Modal>
+=======
+          <AppHome> {children}</AppHome>
+>>>>>>> d8a93a91b2556175dfa3352b58f5baa7a72d5a60
         </RootProvider>
       </body>
     </html>

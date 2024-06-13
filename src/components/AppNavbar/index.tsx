@@ -20,8 +20,13 @@ import { COLORS } from "@/constants/theme";
 
 import LogoSvg from "@/assets/icons/LogoSVG.svg";
 import { tabs } from "@/assets/site";
+<<<<<<< HEAD
 import { CustomConnectButton } from "../Buttons/SmartWalletButton";
 import ConnectButton from "../Buttons/connectButton";
+=======
+import { ConnectKitButton } from "connectkit";
+import { CustomConnectButton } from "../Buttons/SmartWalletButton";
+>>>>>>> d8a93a91b2556175dfa3352b58f5baa7a72d5a60
 
 const NavBar = () => {
   let toast = useToast();
@@ -34,7 +39,19 @@ const NavBar = () => {
   const btnRef = useRef<HTMLButtonElement>(null);
 
   return (
+<<<<<<< HEAD
     <Box bg="white" pos={"fixed"} w="100%" py="10px" zIndex={1000} top={0}>
+=======
+    <Box
+      bg="white"
+      // border="1px solid red"
+      pos={"fixed"}
+      w="100%"
+      py="10px"
+      zIndex={1000}
+      top={0}
+    >
+>>>>>>> d8a93a91b2556175dfa3352b58f5baa7a72d5a60
       <ContainerWrapper>
         <HStack h={"55px"} justify={"space-between"}>
           <HStack>
@@ -75,10 +92,16 @@ const NavBar = () => {
               ))}
             </HStack>
           </HStack>
+<<<<<<< HEAD
           <HStack>
             <ConnectButton />
             <CustomConnectButton />
           </HStack>
+=======
+          <ConnectKitButton />
+          <CustomConnectButton />
+          {/* <Button>Connect wallet</Button> */}
+>>>>>>> d8a93a91b2556175dfa3352b58f5baa7a72d5a60
         </HStack>
 
         <ActivitiesModal isOpen={isOpen} onClose={onClose} btnRef={btnRef} />

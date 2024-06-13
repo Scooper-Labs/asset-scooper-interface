@@ -4,7 +4,10 @@ import { base } from "viem/chains";
 
 import { Button } from "@chakra-ui/react";
 import { reloadIfNeeded } from "@/utils/reload";
+<<<<<<< HEAD
 import { COLORS } from "@/constants/theme";
+=======
+>>>>>>> d8a93a91b2556175dfa3352b58f5baa7a72d5a60
 
 export function CustomConnectButton({
   className,
@@ -41,6 +44,7 @@ export function CustomConnectButton({
   return (
     <Button
       onClick={handleConnect}
+<<<<<<< HEAD
       borderRadius="8px"
       color="black"
       fontWeight={400}
@@ -53,6 +57,16 @@ export function CustomConnectButton({
       //   type="button"
     >
       {buttonContent ?? "Create wallet"}
+=======
+      //   type="button"
+      //   className={
+      //     className ??
+      //     'inline-flex h-10 flex-grow items-center justify-center gap-2 rounded-3xl bg-white px-4 py-2'
+      //   }
+      //   buttonContent=
+    >
+      {buttonContent ?? "Connect"}
+>>>>>>> d8a93a91b2556175dfa3352b58f5baa7a72d5a60
     </Button>
   );
 }
