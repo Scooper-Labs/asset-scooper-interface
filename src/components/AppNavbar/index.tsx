@@ -24,6 +24,7 @@ import { tabs } from "@/assets/site";
 import { CustomConnectButton } from "../Buttons/SmartWalletButton";
 import ConnectButton from "../Buttons/connectButton";
 
+
 const NavBar = () => {
   let toast = useToast();
 
@@ -76,11 +77,11 @@ const NavBar = () => {
               ))}
             </HStack>
           </HStack>
-
           <HStack>
             <ConnectButton />
             <CustomConnectButton />
           </HStack>
+
         </HStack>
 
         <ActivitiesModal isOpen={isOpen} onClose={onClose} btnRef={btnRef} />
