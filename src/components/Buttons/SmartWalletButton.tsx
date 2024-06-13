@@ -40,14 +40,17 @@ export function CustomConnectButton({
   return (
     <Button
       onClick={handleConnect}
-      //   type="button"
-      //   className={
-      //     className ??
-      //     'inline-flex h-10 flex-grow items-center justify-center gap-2 rounded-3xl bg-white px-4 py-2'
-      //   }
-      //   buttonContent=
+      borderRadius="8px"
+      color="black"
+      fontWeight={400}
+      boxShadow="0px 3px 5.8px -2.5px #E443CA66"
+      style={{
+        background: "#fff",
+        boxShadow: "0 0 0 1px rgba(0, 0, 0, .06), 0 2px 3px rgba(0, 0, 0, .06)",
+        borderRadius: "8px",
+      }}
     >
-      {buttonContent ?? "Connect"}
+      {buttonContent ?? "Create a wallet"}
     </Button>
   );
 }
