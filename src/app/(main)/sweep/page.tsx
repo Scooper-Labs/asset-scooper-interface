@@ -14,6 +14,7 @@ const Sweep: React.FC = () => {
         height="100%"
         alignItems="center"
         justify="center"
+        border="1px solid green"
         minHeight="100vh"
       >
         <SweepWidget />
