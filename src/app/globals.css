@@ -1,0 +1,12 @@
+body {
+  color: #0000;
+  background: #ffff;
+}
+
+@font-face {
+  font-family: "Dellamor";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/public/fonts/Dellamor.otf") format("opentype");
+}
