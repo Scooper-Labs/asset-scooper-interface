@@ -30,11 +30,12 @@ function TokenSelectList() {
       padding="1rem"
       overflowY="scroll"
       ref={vStackRef}
+      gap="12px"
     >
       {/* <Button onClick={handleHeightCheck}>{_height ? _height : "e"}</Button> */}
       {tokenList.slice(0, 10).map((token, i) => {
         return (
-          <Box key={i}>
+          <Box key={i}  width="100%">
             <TokenSelectListRow token={token} />
           </Box>
         );
