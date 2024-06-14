@@ -5,20 +5,21 @@ import {
   HStack,
   useDisclosure,
   useToast,
-  Button,
   Center,
   Divider,
 } from "@chakra-ui/react";
-import { useAppDispatch, useAppSelector } from "@/hooks/rtkHooks";
+import { useRef } from "react";
+import { useAppDispatch } from "@/hooks/rtkHooks";
 import { usePathname, useRouter } from "next/navigation";
 import { memo } from "react";
 import { nanoid } from "@reduxjs/toolkit";
 import Link from "next/link";
 import Image from "next/image";
+import ActivitiesModal from "../ActivitiesModal";
 
 import LogoSvg from "@/assets/icons/LogoSVG.svg";
 import { tabs } from "@/assets/site";
-import { ConnectKitButton } from "connectkit";
+import ConnectButton from "../Buttons/connectButton";
 import { CustomConnectButton } from "../Buttons/SmartWalletButton";
 
 const NavBar = () => {
@@ -29,17 +30,10 @@ const NavBar = () => {
 
   const pathname = usePathname();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const btnRef = useRef<HTMLButtonElement>(null);
 
   return (
-    <Box
-      bg="white"
-      // border="1px solid red"
-      pos={"fixed"}
-      w="100%"
-      py="10px"
-      zIndex={1000}
-      top={0}
-    >
+    <Box bg="white" pos={"fixed"} w="100%" py="10px" zIndex={1000} top={0}>
       <ContainerWrapper>
         <HStack h={"55px"} justify={"space-between"}>
           <HStack>
@@ -47,7 +41,7 @@ const NavBar = () => {
               <Image alt="Logo" src={LogoSvg} />
             </Link>
             <Center height="20px">
-              <Divider orientation="vertical" colorScheme="" />
+              <Divider orientation="vertical" border="1px solid #EB65D566" />
             </Center>
             <HStack>
               {tabs?.map((e, i) => (
@@ -57,11 +51,7 @@ const NavBar = () => {
                   prefetch={false}
                 >
                   <HStack
-                    opacity={i === 4 ? 0.3 : 1}
-                    _hover={{
-                      fontWeight: 800,
-                      color: "#006DED",
-                    }}
+                    // opacity={i === 4 ? 0.3 : 1}
                     px="10px"
                     py="5px"
                     borderRadius={"50px"}
@@ -84,10 +74,13 @@ const NavBar = () => {
               ))}
             </HStack>
           </HStack>
-          <ConnectKitButton />
-          <CustomConnectButton />
-          {/* <Button>Connect wallet</Button> */}
+          <HStack>
+            <ConnectButton />
+            <CustomConnectButton />
+          </HStack>
         </HStack>
+
+        <ActivitiesModal isOpen={isOpen} onClose={onClose} btnRef={btnRef} />
       </ContainerWrapper>
     </Box>
   );
