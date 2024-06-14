@@ -20,14 +20,14 @@ export const useTokenLists = ({ chainId }: UseOtherTokenListsParams) => {
       ).then((res) => {
         return res.filter(isPromiseFulfilled).map((el) => {
           el.value;
-          // console.log("this is other tokens", el.value);
+          console.log("this is other tokens", el.value);
         });
       });
+      console.log("this is tokens returned", res)
       return res
         .map((el) => tokenListValidator.parse(el))
         .flatMap((el) => el.tokens);
     },
-    // keepPreviousData: true,
     placeholderData: keepPreviousData,
     staleTime: 900000, // 15 mins
     gcTime: 86400000, // 24hs

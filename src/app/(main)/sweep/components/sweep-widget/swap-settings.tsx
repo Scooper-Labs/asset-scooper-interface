@@ -26,17 +26,12 @@ export function SwapSettings() {
         onClick={onOpen}
         fontWeight="500"
         bg={COLORS.btnBGGradient}
-        borderRadius="8px"
+        borderRadius={10}
         color={COLORS.tabTextColor}
-        style={{
-          border: "1px solid",
-          borderImage: `${COLORS.borderImageColor}`,
-          borderRadius: "8px",
-        }}
+        shadow="small"
+        border="1px solid #B190EB"
         _hover={{
           bg: `${COLORS.btnBGGradient}`,
-          border: "1px solid",
-          borderImage: `${COLORS.borderImageColor}`,
         }}
       >
         <RiListSettingsLine color={COLORS.settingIconColor} size="15px" />
