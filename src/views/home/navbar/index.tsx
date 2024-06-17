@@ -4,9 +4,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Box,
-  Flex,
   Link as ChakraLink,
-  useColorModeValue,
   Center,
   Divider,
   HStack,
@@ -15,7 +13,7 @@ import Action from "./appAction";
 import { NavLink } from "./type";
 import Menu from "./menu";
 import useScreenSize from "@/hooks/useScreenSize";
-import Hamburger from "../hamburger";
+import Hamburger from "@/components/hamburger";
 import { SCOOPER_SVG } from "@/assets/svg";
 
 const LandingHeader = () => {
@@ -79,7 +77,7 @@ const LandingHeader = () => {
             !isTop || isMobile || isTablet ? "white" : "#FFFFFF33",
           borderRadius: !isTop || isMobile || isTablet ? "16px" : "0px",
           border: !isTop || isMobile || isTablet ? "1px solid" : "1px solid",
-          borderColor: !isTop || isMobile || isTablet ? "#FFFFFF" : "#FFFFFF",
+          borderColor: !isTop || isMobile || isTablet ? "#FFFFFF" : "#FFFFFF33",
           backdropFilter:
             !isTop || isMobile || isTablet ? "blur(5px)" : "blur(10px)",
         }}
