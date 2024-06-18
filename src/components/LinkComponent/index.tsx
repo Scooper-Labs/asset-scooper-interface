@@ -21,6 +21,7 @@ export function LinkComponent(props: Props) {
         className={className}
         href={props.href}
         isExternal
+        style={{ textDecoration: "none" }}
       >
         {props.children}
       </ChakraLink>
@@ -28,7 +29,12 @@ export function LinkComponent(props: Props) {
   }
 
   return (
-    <ChakraLink as={NextLink} className={className} href={props.href}>
+    <ChakraLink
+      as={NextLink}
+      className={className}
+      href={props.href}
+      style={{ textDecoration: "none" }}
+    >
       {props.children}
     </ChakraLink>
   );

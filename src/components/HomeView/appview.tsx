@@ -30,7 +30,7 @@ const AppHome = ({ children }: { children: ReactNode }) => {
           </Center>
         </div>
       ) : (
-        <>{children}</>
+        <div>{children}</div>
       )}
     </main>
   );
