@@ -18,17 +18,12 @@ function SweepWidget() {
           <Button
             fontWeight="500"
             bg={COLORS.btnBGGradient}
-            borderRadius="8px"
+            borderRadius={10}
             color={COLORS.tabTextColor}
-            style={{
-              border: "1px solid",
-              borderImage: `${COLORS.borderImageColor}`,
-              borderRadius: "8px",
-            }}
+            shadow="small"
+            border="1px solid #B190EB"
             _hover={{
               bg: `${COLORS.btnBGGradient}`,
-              border: "1px solid",
-              borderImage: `${COLORS.borderImageColor}`,
             }}
           >
             Refresh
@@ -68,7 +63,7 @@ function SweepWidget() {
               fontSize="small"
               fontWeight="bold"
             >
-              <Text>Select Tokens</Text>
+              <Text color="#000">Select Tokens</Text>
               <ChevronDownIcon />
             </Flex>
           </TokenSelector>
