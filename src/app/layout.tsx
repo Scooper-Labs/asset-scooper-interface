@@ -16,6 +16,8 @@ import { headers } from "next/headers";
 import { WALLETCONNECT_CONFIG } from "@/constants/config";
 import { Web3Modal } from "@/provider/web3-provider";
 
+import "./globals.css";
+
 const myFont = localFont({
   src: [
     {
@@ -91,7 +93,7 @@ export default function RootLayout({
       <body className={myFont.className}>
         <RootProvider>
           <Web3Modal initialState={initialState}>
-            <AppHome> {children}</AppHome>
+            <AppHome>{children}</AppHome>
           </Web3Modal>
         </RootProvider>
       </body>
