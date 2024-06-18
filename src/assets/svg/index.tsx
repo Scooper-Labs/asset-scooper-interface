@@ -3,6 +3,385 @@ import { SvgProps } from "@/lib/components/types";
 export function SCOOPER_SVG() {
   return {
     //**-------------------- Transaction ICON here ------------------------- */
+
+    Scooper_Logo: (props?: SvgProps) => {
+      return (
+        <svg
+          width={38}
+          height={38}
+          viewBox="0 0 38 38"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          {...props}
+        >
+          <g filter="url(#filter0_d_2511_218984)">
+            <rect x={3} width={32} height={32} rx={8} fill="#fff" />
+            <rect
+              x={3.33333}
+              y={0.333333}
+              width={31.3333}
+              height={31.3333}
+              rx={7.66667}
+              stroke="#EB65D5"
+              strokeOpacity={0.4}
+              strokeWidth={0.666667}
+            />
+            <path
+              d="M12.6 10.057l3.8 6.582 2.6 4.504"
+              stroke="#E443CA"
+              strokeWidth={0.666667}
+            />
+            <path
+              d="M25.4 10.057l-3.8 6.582-2.6 4.504M25.4 10H12.6"
+              stroke="#E443CA"
+              strokeWidth={0.666667}
+            />
+            <g filter="url(#filter1_d_2511_218984)">
+              <circle
+                cx={4}
+                cy={4}
+                r={4}
+                transform="matrix(0 1 1 0 15.01 18.011)"
+                fill="url(#paint0_radial_2511_218984)"
+              />
+              <g filter="url(#filter2_di_2511_218984)">
+                <circle
+                  cx={3.01887}
+                  cy={3.01887}
+                  r={3.01887}
+                  transform="matrix(0 1 1 0 15.992 18.992)"
+                  fill="#006DED"
+                />
+              </g>
+            </g>
+            <g filter="url(#filter3_d_2511_218984)">
+              <circle
+                cx={4}
+                cy={4}
+                r={4}
+                transform="matrix(0 1 1 0 8.6 5.992)"
+                fill="url(#paint1_radial_2511_218984)"
+              />
+              <g filter="url(#filter4_di_2511_218984)">
+                <circle
+                  cx={3.01887}
+                  cy={3.01887}
+                  r={3.01887}
+                  transform="matrix(0 1 1 0 9.581 6.973)"
+                  fill="#006DED"
+                />
+              </g>
+            </g>
+            <g filter="url(#filter5_d_2511_218984)">
+              <circle
+                cx={4}
+                cy={4}
+                r={4}
+                transform="matrix(0 1 1 0 21.4 5.992)"
+                fill="url(#paint2_radial_2511_218984)"
+              />
+              <g filter="url(#filter6_di_2511_218984)">
+                <circle
+                  cx={3.01887}
+                  cy={3.01887}
+                  r={3.01887}
+                  transform="matrix(0 1 1 0 22.38 6.973)"
+                  fill="#006DED"
+                />
+              </g>
+            </g>
+          </g>
+          <defs>
+            <filter
+              id="filter0_d_2511_218984"
+              x={0.8}
+              y={0}
+              width={36.4}
+              height={37.5333}
+              filterUnits="userSpaceOnUse"
+              colorInterpolationFilters="sRGB"
+            >
+              <feFlood floodOpacity={0} result="BackgroundImageFix" />
+              <feColorMatrix
+                in="SourceAlpha"
+                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                result="hardAlpha"
+              />
+              <feMorphology
+                radius={1.66667}
+                in="SourceAlpha"
+                result="effect1_dropShadow_2511_218984"
+              />
+              <feOffset dy={3.33333} />
+              <feGaussianBlur stdDeviation={1.93333} />
+              <feComposite in2="hardAlpha" operator="out" />
+              <feColorMatrix values="0 0 0 0 0.894118 0 0 0 0 0.262745 0 0 0 0 0.792157 0 0 0 0.4 0" />
+              <feBlend
+                in2="BackgroundImageFix"
+                result="effect1_dropShadow_2511_218984"
+              />
+              <feBlend
+                in="SourceGraphic"
+                in2="effect1_dropShadow_2511_218984"
+                result="shape"
+              />
+            </filter>
+            <filter
+              id="filter1_d_2511_218984"
+              x={12.3441}
+              y={16.3446}
+              width={13.3333}
+              height={13.3333}
+              filterUnits="userSpaceOnUse"
+              colorInterpolationFilters="sRGB"
+            >
+              <feFlood floodOpacity={0} result="BackgroundImageFix" />
+              <feColorMatrix
+                in="SourceAlpha"
+                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                result="hardAlpha"
+              />
+              <feOffset dy={1} />
+              <feGaussianBlur stdDeviation={1.33333} />
+              <feComposite in2="hardAlpha" operator="out" />
+              <feColorMatrix values="0 0 0 0 0.894118 0 0 0 0 0.262745 0 0 0 0 0.792157 0 0 0 0.4 0" />
+              <feBlend
+                in2="BackgroundImageFix"
+                result="effect1_dropShadow_2511_218984"
+              />
+              <feBlend
+                in="SourceGraphic"
+                in2="effect1_dropShadow_2511_218984"
+                result="shape"
+              />
+            </filter>
+            <filter
+              id="filter2_di_2511_218984"
+              x={15.6148}
+              y={18.766}
+              width={6.7928}
+              height={6.79256}
+              filterUnits="userSpaceOnUse"
+              colorInterpolationFilters="sRGB"
+            >
+              <feFlood floodOpacity={0} result="BackgroundImageFix" />
+              <feColorMatrix
+                in="SourceAlpha"
+                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                result="hardAlpha"
+              />
+              <feOffset dy={0.150943} />
+              <feGaussianBlur stdDeviation={0.188679} />
+              <feComposite in2="hardAlpha" operator="out" />
+              <feColorMatrix values="0 0 0 0 0.401937 0 0 0 0 0.681033 0 0 0 0 1 0 0 0 0.8 0" />
+              <feBlend
+                in2="BackgroundImageFix"
+                result="effect1_dropShadow_2511_218984"
+              />
+              <feBlend
+                in="SourceGraphic"
+                in2="effect1_dropShadow_2511_218984"
+                result="shape"
+              />
+              <feColorMatrix
+                in="SourceAlpha"
+                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                result="hardAlpha"
+              />
+              <feOffset dy={0.490566} />
+              <feGaussianBlur stdDeviation={0.249057} />
+              <feComposite
+                in2="hardAlpha"
+                operator="arithmetic"
+                k2={-1}
+                k3={1}
+              />
+              <feColorMatrix values="0 0 0 0 0.0400405 0 0 0 0 0.355775 0 0 0 0 0.726546 0 0 0 0.8 0" />
+              <feBlend in2="shape" result="effect2_innerShadow_2511_218984" />
+            </filter>
+            <filter
+              id="filter3_d_2511_218984"
+              x={5.93294}
+              y={4.32528}
+              width={13.3333}
+              height={13.3333}
+              filterUnits="userSpaceOnUse"
+              colorInterpolationFilters="sRGB"
+            >
+              <feFlood floodOpacity={0} result="BackgroundImageFix" />
+              <feColorMatrix
+                in="SourceAlpha"
+                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                result="hardAlpha"
+              />
+              <feOffset dy={1} />
+              <feGaussianBlur stdDeviation={1.33333} />
+              <feComposite in2="hardAlpha" operator="out" />
+              <feColorMatrix values="0 0 0 0 0.894118 0 0 0 0 0.262745 0 0 0 0 0.792157 0 0 0 0.4 0" />
+              <feBlend
+                in2="BackgroundImageFix"
+                result="effect1_dropShadow_2511_218984"
+              />
+              <feBlend
+                in="SourceGraphic"
+                in2="effect1_dropShadow_2511_218984"
+                result="shape"
+              />
+            </filter>
+            <filter
+              id="filter4_di_2511_218984"
+              x={9.2037}
+              y={6.74673}
+              width={6.7928}
+              height={6.79256}
+              filterUnits="userSpaceOnUse"
+              colorInterpolationFilters="sRGB"
+            >
+              <feFlood floodOpacity={0} result="BackgroundImageFix" />
+              <feColorMatrix
+                in="SourceAlpha"
+                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                result="hardAlpha"
+              />
+              <feOffset dy={0.150943} />
+              <feGaussianBlur stdDeviation={0.188679} />
+              <feComposite in2="hardAlpha" operator="out" />
+              <feColorMatrix values="0 0 0 0 0.401937 0 0 0 0 0.681033 0 0 0 0 1 0 0 0 0.8 0" />
+              <feBlend
+                in2="BackgroundImageFix"
+                result="effect1_dropShadow_2511_218984"
+              />
+              <feBlend
+                in="SourceGraphic"
+                in2="effect1_dropShadow_2511_218984"
+                result="shape"
+              />
+              <feColorMatrix
+                in="SourceAlpha"
+                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                result="hardAlpha"
+              />
+              <feOffset dy={0.490566} />
+              <feGaussianBlur stdDeviation={0.249057} />
+              <feComposite
+                in2="hardAlpha"
+                operator="arithmetic"
+                k2={-1}
+                k3={1}
+              />
+              <feColorMatrix values="0 0 0 0 0.0400405 0 0 0 0 0.355775 0 0 0 0 0.726546 0 0 0 0.8 0" />
+              <feBlend in2="shape" result="effect2_innerShadow_2511_218984" />
+            </filter>
+            <filter
+              id="filter5_d_2511_218984"
+              x={18.7327}
+              y={4.32528}
+              width={13.3333}
+              height={13.3333}
+              filterUnits="userSpaceOnUse"
+              colorInterpolationFilters="sRGB"
+            >
+              <feFlood floodOpacity={0} result="BackgroundImageFix" />
+              <feColorMatrix
+                in="SourceAlpha"
+                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                result="hardAlpha"
+              />
+              <feOffset dy={1} />
+              <feGaussianBlur stdDeviation={1.33333} />
+              <feComposite in2="hardAlpha" operator="out" />
+              <feColorMatrix values="0 0 0 0 0.894118 0 0 0 0 0.262745 0 0 0 0 0.792157 0 0 0 0.4 0" />
+              <feBlend
+                in2="BackgroundImageFix"
+                result="effect1_dropShadow_2511_218984"
+              />
+              <feBlend
+                in="SourceGraphic"
+                in2="effect1_dropShadow_2511_218984"
+                result="shape"
+              />
+            </filter>
+            <filter
+              id="filter6_di_2511_218984"
+              x={22.0025}
+              y={6.74673}
+              width={6.7928}
+              height={6.79256}
+              filterUnits="userSpaceOnUse"
+              colorInterpolationFilters="sRGB"
+            >
+              <feFlood floodOpacity={0} result="BackgroundImageFix" />
+              <feColorMatrix
+                in="SourceAlpha"
+                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                result="hardAlpha"
+              />
+              <feOffset dy={0.150943} />
+              <feGaussianBlur stdDeviation={0.188679} />
+              <feComposite in2="hardAlpha" operator="out" />
+              <feColorMatrix values="0 0 0 0 0.401937 0 0 0 0 0.681033 0 0 0 0 1 0 0 0 0.8 0" />
+              <feBlend
+                in2="BackgroundImageFix"
+                result="effect1_dropShadow_2511_218984"
+              />
+              <feBlend
+                in="SourceGraphic"
+                in2="effect1_dropShadow_2511_218984"
+                result="shape"
+              />
+              <feColorMatrix
+                in="SourceAlpha"
+                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                result="hardAlpha"
+              />
+              <feOffset dy={0.490566} />
+              <feGaussianBlur stdDeviation={0.249057} />
+              <feComposite
+                in2="hardAlpha"
+                operator="arithmetic"
+                k2={-1}
+                k3={1}
+              />
+              <feColorMatrix values="0 0 0 0 0.0400405 0 0 0 0 0.355775 0 0 0 0 0.726546 0 0 0 0.8 0" />
+              <feBlend in2="shape" result="effect2_innerShadow_2511_218984" />
+            </filter>
+            <radialGradient
+              id="paint0_radial_2511_218984"
+              cx={0}
+              cy={0}
+              r={1}
+              gradientUnits="userSpaceOnUse"
+              gradientTransform="matrix(4 0 0 4 4 4)"
+            >
+              <stop offset={0.36} stopColor="#005AE0" />
+              <stop offset={1} stopColor="#006DFB" />
+            </radialGradient>
+            <radialGradient
+              id="paint1_radial_2511_218984"
+              cx={0}
+              cy={0}
+              r={1}
+              gradientUnits="userSpaceOnUse"
+              gradientTransform="matrix(4 0 0 4 4 4)"
+            >
+              <stop offset={0.36} stopColor="#005AE0" />
+              <stop offset={1} stopColor="#006DFB" />
+            </radialGradient>
+            <radialGradient
+              id="paint2_radial_2511_218984"
+              cx={0}
+              cy={0}
+              r={1}
+              gradientUnits="userSpaceOnUse"
+              gradientTransform="matrix(4 0 0 4 4 4)"
+            >
+              <stop offset={0.36} stopColor="#005AE0" />
+              <stop offset={1} stopColor="#006DFB" />
+            </radialGradient>
+          </defs>
+        </svg>
+      );
+    },
     SweepTransactionIcon: (props?: SvgProps) => {
       return (
         <svg
