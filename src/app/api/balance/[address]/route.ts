@@ -29,14 +29,29 @@ export async function GET(
         address
       );
 
-    console.log(data);
-    return Response.json(
-      data,
-      {
-        headers: {
-          "Cache-Control": "s-maxage=1, stale-while-revalidate=59",
-        },
-      }
+    console.log(
+      data.items.map((item) => ({
+        name: item.contract_name,
+        address: item.contract_address,
+        decimals: item.contract_decimals,
+        balance: item.balance,
+        usdPrice: item.quote,
+        logoUrl: item.logo_url,
+        symbol: item.contract_ticker_symbol,
+      }))
+    );
+    return new Response(
+      JSON.stringify(
+        data.items.map((item) => ({
+          name: item.contract_name,
+          address: item.contract_address,
+          decimals: item.contract_decimals,
+          balance: item.balance,
+          usdPrice: item.quote,
+          logoUrl: item.logo_url,
+          symbol: item.contract_ticker_symbol,
+        }))
+      )
     );
   } catch (e) {
     console.error("Couldn't fetch balances from covalent", e);
