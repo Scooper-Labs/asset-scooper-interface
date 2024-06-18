@@ -11,7 +11,9 @@ import {
   Button,
   Flex,
   Text,
+  VStack,
 } from "@chakra-ui/react";
+import { COLORS } from "@/constants/theme";
 import React, {
   FC,
   ReactNode,
@@ -21,6 +23,9 @@ import React, {
   useState,
 } from "react";
 import TokenSelectList from "./token-select-list";
+import ModalComponent from "../ModalComponent";
+import TokenSelectorModalComponent from "./CustomModalComponent";
+import { TokenSelectFooter } from "./TokenSelectorFooter";
 
 export function TokenSelector({ children }: { children?: ReactNode }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -28,49 +33,86 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
   return (
     <>
       <Box
-        backgroundColor="#F6EEFC"
-        padding="8px"
         onClick={onOpen}
-        width="100%"
+        fontWeight="500"
+        // bg={COLORS.btnBGGradient}
+        bg="#FAF6FD"
+        borderRadius={10}
+        color={COLORS.tabTextColor}
+        padding="12px"
+        // style={{
+        //   border: "1px solid #E7BFE7",
+        //   borderImage: `${COLORS.borderImageColor}`,
+        //   borderRadius: "8px",
+        // }}
+        // _hover={{
+        //   bg: `${COLORS.btnBGGradient}`,
+        //   border: "1px solid",
+        //   borderImage: `${COLORS.borderImageColor}`,
+        // }}
         cursor="pointer"
+        width="100%"
       >
         {children}
       </Box>
 
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader backgroundColor="transparent" background="transparent">
-            <Text>Convert Low Balance </Text>
-            <Text fontSize="small" fontWeight="100" color="#9E829F">
-              48 Tokens with balance below 0.004 ETH
-            </Text>
-            <Box
-              border="none"
-              padding="8px"
-              backgroundColor="#E5F2FA"
-              fontSize="small"
-              color="#018FE9"
-              width="fit-content"
-              borderRadius="8px"
-              cursor="pointer"
+      <TokenSelectorModalComponent
+        isOpen={isOpen}
+        onClose={onClose}
+        closeOnOverlayClick={false}
+        modalContentStyle={{
+          background: "rgba(255, 255, 255, 0)",
+          borderRadius: "16px",
+          overflow: "hidden",
+          border: `1px solid ${COLORS.borderColor}`,
+          boxShadow: "#E9C7EA4D",
+        }}
+      >
+        <ModalCloseButton />
+        <VStack
+          justifyContent="space-between"
+          width="100%"
+          height="100%"
+          gap="1rem"
+        >
+          <VStack
+            width="100%"
+            borderRadius={10}
+            height="100%"
+            background="white"
+          >
+            <VStack
+              gap="3px"
+              width="full"
+              alignItems="start"
+              px="1.2rem"
+              pt="1rem"
+              pb="0.7rem"
             >
-              Change ThreshHold
-            </Box>
-          </ModalHeader>
-          <ModalCloseButton />
-          <ModalBody borderTop="1px solid #F7E5F7">
-            <TokenSelectList />
-          </ModalBody>
+              <Text>Convert Low Balance </Text>
+              <Text fontSize="small" fontWeight="100" color="#9E829F">
+                48 Tokens with balance below 0.004 ETH
+              </Text>
+              <Box
+                border="none"
+                padding="8px"
+                backgroundColor="#E5F2FA"
+                fontSize="small"
+                color="#018FE9"
+                width="fit-content"
+                borderRadius="8px"
+                cursor="pointer"
+              >
+                Change ThreshHold
+              </Box>
+            </VStack>
 
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={onClose}>
-              Close
-            </Button>
-            <Button variant="ghost">Secondary Action</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+            <TokenSelectList />
+          </VStack>
+
+          <TokenSelectFooter />
+        </VStack>
+      </TokenSelectorModalComponent>
     </>
   );
 }

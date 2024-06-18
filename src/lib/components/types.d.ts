@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { ContainerProps, PopoverProps } from "@chakra-ui/react";
+import { Address } from "viem";
 
 export interface TabsProps {
   name: string;
@@ -33,4 +34,13 @@ export interface ProvidersProps {
 export interface TruncatedTextProps {
   text: string;
   maxWords: number;
+}
+
+export interface Token {
+  address: string;
+  chainId: number;
+  decimals: number;
+  logoURI: string;
+  name: string;
+  symbol: string;
 }
