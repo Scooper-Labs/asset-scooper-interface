@@ -9,6 +9,9 @@ import {
 import ms from "ms";
 import { base } from "viem/chains";
 import { Token } from "@/lib/components/types";
+import { useAppDispatch, useAppSelector } from "../rtkHooks";
+import { RootState } from "@/store/store";
+import { setUserWalletTokenWithBalance } from "@/store/sweep/sweepSlice";
 
 export const NativeAddress = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
@@ -44,10 +47,15 @@ export const useBalancesQuery = ({ account }: UseBalances) => {
 };
 // Define the schema for LogoUrls
 
-export const useBalances = ({  account }: UseBalances) => {
-  const [walletTokenList, setWalletTokenList] = useState<Token[]>([]);
+export const useBalances = ({ account }: UseBalances) => {
+  const dispatch = useAppDispatch();
+
+  const userWalletTokens = useAppSelector(
+    (state: RootState) => state.SweepTokensSlice.userWalletTokens,
+  );
+  // const [walletTokenList, setWalletTokenList] = useState<Token[]>([]);
   const { data, isLoading, isError, error, isFetched, isSuccess } =
-    useBalancesQuery({  account });
+    useBalancesQuery({ account });
 
   useEffect(() => {
     if (data) {
@@ -66,12 +74,13 @@ export const useBalances = ({  account }: UseBalances) => {
         });
 
         console.log("Validated and transformed data:", transformedData);
-        setWalletTokenList(transformedData);
+        // setWalletTokenList(transformedData);
+        dispatch(setUserWalletTokenWithBalance(transformedData));
       } catch (error) {
         console.error("Error validating data:", error);
       }
     }
   }, [data, isLoading, isError, error, isFetched, isSuccess]);
 
-  return walletTokenList;
+  return { userWalletTokens, isLoading, isError, error, isFetched, isSuccess };
 };
