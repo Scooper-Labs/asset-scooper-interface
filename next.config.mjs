@@ -12,6 +12,14 @@ const nextConfig = {
         protocol: "https",
         hostname: "raw.githubusercontent.com",
       },
+      {
+        protocol: "https",
+        hostname: "www.datocms-assets.com",
+      },
+      {
+        protocol: "https",
+        hostname: "logos.covalenthq.com",
+      },
     ],
   },
 };

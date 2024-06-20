@@ -9,7 +9,9 @@ export interface TokenInfo extends Token {
 }
 
 function TokenSelectListRow({ token }: { token: Token }) {
-  const { address, logoURI, name, symbol, decimals } = token;
+  const { address, logoURI, name, symbol, decimals, quoteUSD, userBalance } =
+    token;
+
   return (
     <HStack justifyContent="space-between" width="100%" whiteSpace="nowrap">
       <Checkbox colorScheme="#fff" iconColor="#7F56D9">
@@ -18,7 +20,9 @@ function TokenSelectListRow({ token }: { token: Token }) {
             <Image src={logoURI} width={25} height={25} alt={name} />
           </Box>
           <VStack gap="0" alignItems="start">
-            <Text fontWeight="700">{symbol}</Text>
+            <Text fontWeight="700">
+              {symbol.length > 6 ? `${symbol.substring(0, 5)}...` : symbol}
+            </Text>
             <Text color="#A8BBD6" fontSize="smaller">
               {name}
             </Text>
@@ -29,9 +33,11 @@ function TokenSelectListRow({ token }: { token: Token }) {
       {/* bALANCE AND price panels*/}
 
       <VStack alignItems="end" gap="0">
-        <Text fontWeight="700">0.002 {symbol}</Text>
+        <Text fontWeight="700">
+          {userBalance.toFixed(3)} {symbol.length > 4 ? `${symbol.substring(0, 3)}...` : symbol}
+        </Text>
         <Text color="#A8BBD6" fontSize="smaller">
-          ~$12.5
+          ~$ {quoteUSD.toFixed(4)}
         </Text>
       </VStack>
     </HStack>
