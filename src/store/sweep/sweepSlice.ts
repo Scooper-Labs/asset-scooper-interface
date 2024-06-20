@@ -1,35 +1,65 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Address } from "viem";
-import { TokenInfo } from "@/components/TokenSelector/token-select-row";
+import { Token } from "@/lib/components/types";
 
 interface SweepStateTypes {
-  SelectedLowBalanceTokens: TokenInfo[]; //list of token selected to be swapped
-  LowBalanceTokens: TokenInfo[]; //list of tokens considered as low balance
+  SelectedLowBalanceTokens: Token[]; //list of token selected to be swappedist of tokens considered as low balance
+  userWalletTokens: Token[]; //current tokens in Userwallet
 }
 const initialState: SweepStateTypes = {
   SelectedLowBalanceTokens: [],
-  LowBalanceTokens: [],
+  userWalletTokens: [],
 };
 
 export const SweepTokensSlice = createSlice({
-  name: "donationToken",
+  name: "sweepTokenSlice",
   initialState,
   reducers: {
-    addLowBalanceToken: (state, action: PayloadAction<TokenInfo>) => {
-      const lowBalanceSet = new Set(state.LowBalanceTokens);
-      lowBalanceSet.add(action.payload);
-      state.LowBalanceTokens = Array.from(lowBalanceSet);
+    setUserWalletTokenWithBalance: (state, action: PayloadAction<Token[]>) => {
+      state.userWalletTokens = [];
+      const tokenAddressSet = new Set();
+      for (const token of action.payload) {
+        if (!tokenAddressSet.has(token.address)) {
+          state.userWalletTokens.push(token);
+          tokenAddressSet.add(token.address);
+        }
+      }
     },
-    removeLowBalanceToken: (state, action: PayloadAction<TokenInfo>) => {
-      state.LowBalanceTokens = state.LowBalanceTokens.filter(
-        (token) => token.address !== action.payload.address
+    selectToken: (state, action: PayloadAction<Token>) => {
+      const tokenExists = state.SelectedLowBalanceTokens.some(
+        (token) => token.address === action.payload.address,
+      );
+      if (!tokenExists) {
+        state.SelectedLowBalanceTokens.push(action.payload);
+      }
+    },
+    selectAllTokens: (state, action: PayloadAction<Token[]>) => {
+      state.SelectedLowBalanceTokens = [];
+      const tokenAddressSet = new Set();
+      for (const token of action.payload) {
+        if (!tokenAddressSet.has(token.address)) {
+          state.SelectedLowBalanceTokens.push(token);
+          tokenAddressSet.add(token.address);
+        }
+      }
+    },
+
+    unSelectToken: (state, action: PayloadAction<Token>) => {
+      state.SelectedLowBalanceTokens = state.SelectedLowBalanceTokens.filter(
+        (token) => token.address !== action.payload.address,
       );
     },
-    clearLowBalanceTokens: (state) => {
-      state.LowBalanceTokens = [];
+    clearAllSelectedTokens: (state) => {
+      state.SelectedLowBalanceTokens = [];
     },
   },
 });
 
-export const {} = SweepTokensSlice.actions;
+export const {
+  selectToken,
+  unSelectToken,
+  clearAllSelectedTokens,
+  selectAllTokens,
+  setUserWalletTokenWithBalance,
+} = SweepTokensSlice.actions;
 export default SweepTokensSlice.reducer;
