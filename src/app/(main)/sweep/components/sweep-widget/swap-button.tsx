@@ -11,12 +11,38 @@ import { SwapSettings } from "./swap-settings";
 import { COLORS } from "@/constants/theme";
 import { useSelectedTokens } from "@/hooks/useSelectTokens";
 import { useAccount } from "wagmi";
+import { useWriteContracts } from "wagmi/experimental";
+import { Address, erc20Abi } from "viem";
+import { useWatchPendingTransactions } from "wagmi";
+import { use1inchSwap } from "@/hooks/swap/use1inchSwap";
+import { ChainId } from "@/constants";
 
-function SweepWidget() {
+function SweepButton() {
   const { isSelected, _selectToken, _unSelectToken, selectedTokens } =
     useSelectedTokens();
 
-  const { isConnected } = useAccount();
+  const { isConnected, chainId, address } = useAccount();
+  // const { writeContracts } = useWriteContracts();
+
+  // useWatchPendingTransactions({
+  //   onTransactions(transactions) {
+  //     console.log('New transactions!', transactions)
+  //   },
+  // })
+
+  const {
+    executeSwap,
+    tokensWithLiquidity,
+    tokensWithNoLiquidity,
+    callDataArray,
+  } = use1inchSwap(chainId as ChainId, address);
+
+  console.log(
+    "swap data",
+    tokensWithLiquidity,
+    tokensWithNoLiquidity,
+    callDataArray,
+  );
 
   return (
     <>
@@ -25,9 +51,11 @@ function SweepWidget() {
       ) : (
         <>
           {selectedTokens.length > 0 ? (
-            <Button>Swap</Button>
+            <Button onClick={executeSwap}>Swap</Button>
           ) : (
-            <Button>Select tokens</Button>
+            <>
+              <Button>Select tokens</Button>
+            </>
           )}
         </>
       )}
@@ -35,4 +63,4 @@ function SweepWidget() {
   );
 }
 // InfoOutlineIcon
-export default SweepWidget;
+export default SweepButton;

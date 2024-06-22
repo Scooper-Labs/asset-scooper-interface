@@ -10,10 +10,14 @@ import React from "react";
 import { SwapSettings } from "./swap-settings";
 import { COLORS } from "@/constants/theme";
 import { useSelectedTokens } from "@/hooks/useSelectTokens";
+import SweepButton from "./swap-button";
+
 
 function SweepWidget() {
   const { isSelected, _selectToken, _unSelectToken, selectedTokens } =
     useSelectedTokens();
+
+
 
   return (
     <VStack gap="12px">
@@ -69,7 +73,7 @@ function SweepWidget() {
             >
               {selectedTokens.length > 0 ? (
                 <Flex>
-                  <Text> {selectedTokens.length}  tokens selected</Text>
+                  <Text> {selectedTokens.length} tokens selected</Text>
                 </Flex>
               ) : (
                 <Text color="#000">Select Tokens</Text>
@@ -112,7 +116,7 @@ function SweepWidget() {
             <Text>__</Text>
           </Flex>
 
-          <Button width="100%"> Connect Wallet</Button>
+          <SweepButton />
         </VStack>
       </VStack>
     </VStack>
