@@ -22,26 +22,20 @@ function SweepButton() {
     useSelectedTokens();
 
   const { isConnected, chainId, address } = useAccount();
-  // const { writeContracts } = useWriteContracts();
-
-  // useWatchPendingTransactions({
-  //   onTransactions(transactions) {
-  //     console.log('New transactions!', transactions)
-  //   },
-  // })
 
   const {
-    executeSwap,
+    fetchSwapData,
+    isLoading,
     tokensWithLiquidity,
     tokensWithNoLiquidity,
-    callDataArray,
+    swapCallDataArray,
   } = use1inchSwap(chainId as ChainId, address);
 
   console.log(
     "swap data",
     tokensWithLiquidity,
     tokensWithNoLiquidity,
-    callDataArray,
+    swapCallDataArray,
   );
 
   return (
@@ -51,7 +45,9 @@ function SweepButton() {
       ) : (
         <>
           {selectedTokens.length > 0 ? (
-            <Button onClick={executeSwap}>Swap</Button>
+            <Button onClick={fetchSwapData}>
+              Swap {isLoading && "Swapp is Loading"}
+            </Button>
           ) : (
             <>
               <Button>Select tokens</Button>
