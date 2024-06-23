@@ -14,12 +14,12 @@ import Link from "next/link";
 
 const SectionOne = () => {
   return (
-    <Box>
-      <ContainerWrapper>
+    <Box as="section" id="features">
+      <ContainerWrapper px="5%">
         <Flex justify="center" flexDir="column">
           <Heading
             color="#ffff"
-            textAlign="center"
+            textAlign={{ base: "left", md: "center" }}
             fontWeight={600}
             fontSize="32px"
             mb="50px"
@@ -27,11 +27,19 @@ const SectionOne = () => {
             Key Features
           </Heading>
 
-          <HStack>
+          <HStack
+            flexDir={{
+              base: "column",
+              md: "row",
+            }}
+          >
             <Box
-              h="full"
-              w="60%"
-              border={`1px solid ${COLORS.borderColorLanding}`}
+              h={{ base: "full", md: "700px" }}
+              w={{ base: "100%", md: "60%" }}
+              border={{
+                base: "none",
+                md: `1px solid ${COLORS.borderColorLanding}`,
+              }}
               borderRadius="16px"
               py="20px"
               px="20px"
@@ -82,9 +90,12 @@ const SectionOne = () => {
             </Box>
 
             <Box
-              h="100%"
-              w="40%"
-              border={`1px solid ${COLORS.borderColorLanding}`}
+              h={{ base: "full", md: "700px" }}
+              w={{ base: "100%", md: "40%" }}
+              border={{
+                base: "none",
+                md: `1px solid ${COLORS.borderColorLanding}`,
+              }}
               borderRadius="16px"
               py="20px"
               px="20px"
@@ -127,8 +138,19 @@ const SectionOne = () => {
                 </Button>
               </Flex>
 
-              <Box mt="10px">
+              {/* -------------- For Mobile -------------- */}
+              <Box
+                mt="70px"
+                display={{ base: "block", md: "none", lg: "none" }}
+              >
                 <Image src="image/Section_right_image.png" alt="left_image" />
+              </Box>
+
+              <Box
+                //   mt="10px"
+                display={{ base: "none", md: "flex", lg: "flex" }}
+              >
+                <Image src="image/Section_right_D_image.png" alt="left_image" />
               </Box>
             </Box>
           </HStack>

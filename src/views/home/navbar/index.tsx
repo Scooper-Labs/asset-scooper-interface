@@ -7,7 +7,9 @@ import {
   Link as ChakraLink,
   Center,
   Divider,
+  Text,
   HStack,
+  Flex,
 } from "@chakra-ui/react";
 import Action from "./appAction";
 import { NavLink } from "./type";
@@ -15,21 +17,24 @@ import Menu from "./menu";
 import useScreenSize from "@/hooks/useScreenSize";
 import Hamburger from "@/components/hamburger";
 import { SCOOPER_SVG } from "@/assets/svg";
+import { COLORS } from "@/constants/theme";
+import { useRouter } from "next/router";
 
 const LandingHeader = () => {
   const [isTop, setIsTop] = useState<boolean>(true);
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+  const [currentHash, setCurrentHash] = useState<string>("");
   const { isDesktop, isTablet, isMobile } = useScreenSize();
 
   let width = "100%";
-  if (isDesktop && !isTop) width = "648px";
+  if (isDesktop && !isTop) width = "800px";
   if (isDesktop && isTop) width = "97vw";
 
   const navLinks: NavLink[] = [
     { name: "Home", href: "#home" },
     {
-      name: "Contact",
-      href: "#contact",
+      name: "Features",
+      href: "#features",
     },
     { name: "Docs", href: "#docs" },
   ];
@@ -43,6 +48,15 @@ const LandingHeader = () => {
     };
 
     window.addEventListener("scroll", handleScroll);
+
+    const handleHashChange = () => {
+      setCurrentHash(window.location.hash || "/");
+    };
+
+    window.addEventListener("hashchange", handleHashChange);
+
+    // Set the initial hash or default to "/"
+    setCurrentHash(window.location.hash || "/");
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
@@ -60,7 +74,87 @@ const LandingHeader = () => {
       pt={3}
       px={4}
     >
-      <motion.div
+      <Flex
+        as="div"
+        width={{ base: "100%", md: "100%", lg: "40%" }}
+        height="64px"
+        border="1px solid white"
+        padding="20px"
+        backdropFilter="blur(10px)"
+        borderRadius="16px"
+        backgroundColor="white"
+      >
+        <Flex
+          as="div"
+          style={{
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+          }}
+        >
+          <HStack>
+            <ChakraLink href="#home">{SCOOPER_SVG().Scooper_Logo()}</ChakraLink>
+
+            <Flex display={{ base: "block", md: "block", lg: "none" }}>
+              <Text
+                fontSize="13px"
+                fontWeight={500}
+                color={COLORS.launchTextColor}
+              >
+                AssetScooper
+              </Text>
+            </Flex>
+
+            <Center
+              height="20px"
+              display={{ base: "none", md: "none", lg: "flex" }}
+            >
+              <Divider orientation="vertical" border="1px solid #020202" />
+            </Center>
+          </HStack>
+
+          <HStack
+            display={{ base: "none", md: "none", lg: "flex" }}
+            // minWidth="250px"
+          >
+            {navLinks.map(({ name, href }, index) => (
+              <ChakraLink
+                key={index}
+                href={href}
+                target={href.startsWith("http") ? "_blank" : "_self"}
+                px={2}
+                py={2}
+                fontWeight={currentHash === href ? 600 : 400}
+                fontSize="16px"
+                color={currentHash === href ? COLORS.balTextColor : "#C9BCCA"}
+                style={{ textDecoration: "none" }}
+              >
+                {name}
+              </ChakraLink>
+            ))}
+          </HStack>
+
+          <HStack>
+            <Center
+              height="20px"
+              display={{ base: "none", md: "none", lg: "flex" }}
+            >
+              <Divider orientation="vertical" border="1px solid #020202" />
+            </Center>
+
+            <Box display={{ base: "block", md: "block" }}>
+              <Action />
+            </Box>
+
+            <Hamburger isOpen={isMenuOpen} onClick={toggleMenu} />
+
+            <Menu menuOpen={isMenuOpen} links={navLinks} />
+          </HStack>
+        </Flex>
+      </Flex>
+      {/* <motion.div
         initial={{ opacity: 1, y: 0 }}
         animate={{ opacity: 1, y: !isTop ? 5 : 0 }}
         transition={{
@@ -150,7 +244,7 @@ const LandingHeader = () => {
             </Center>
           )} */}
 
-          <Box display={{ base: "none", md: "block" }}>
+      {/* <Box display={{ base: "none", md: "block" }}>
             <Action />
           </Box>
 
@@ -158,7 +252,7 @@ const LandingHeader = () => {
 
           <Menu menuOpen={isMenuOpen} links={navLinks} />
         </motion.div>
-      </motion.div>
+      </motion.div> */}
     </Box>
   );
 };

@@ -1,6 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { MenuProps } from "./type";
-import Action from "./appAction";
 import { Box, Link as ChakraLink } from "@chakra-ui/react";
 
 const Menu = ({ menuOpen, links }: MenuProps) => {
@@ -13,7 +12,7 @@ const Menu = ({ menuOpen, links }: MenuProps) => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           position="absolute"
-          top="80%"
+          top="170%"
           right="-1px"
           width="full"
           bg="white"
@@ -36,13 +35,15 @@ const Menu = ({ menuOpen, links }: MenuProps) => {
                 href={href}
                 target={href.startsWith("http") ? "_blank" : "_self"}
                 fontSize="sm"
-                color="purple.700"
+                color="#281629"
+                style={{
+                  textDecoration: "none",
+                }}
               >
                 {name}
               </ChakraLink>
             ))}
           </Box>
-          <Action />
         </Box>
       )}
     </AnimatePresence>

@@ -36,6 +36,20 @@ export async function GET(
         usdPrice: item.quote,
         logoUrl: item.logo_url,
         symbol: item.contract_ticker_symbol,
+      }), "this is data console")
+    );
+    return new Response(
+      JSON.stringify(
+        data.items.map((item) => ({
+          name: item.contract_name,
+          address: item.contract_address,
+          decimals: item.contract_decimals,
+          balance: item.balance,
+          usdPrice: item.quote,
+          logoUrl: item.logo_url,
+          symbol: item.contract_ticker_symbol,
+        }))
+      )
       })),
     );
     return Response.json(data, {
