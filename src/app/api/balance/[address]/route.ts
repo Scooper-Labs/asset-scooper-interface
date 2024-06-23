@@ -1,8 +1,8 @@
 import { ChainID as CovalentChainID } from "@covalenthq/client-sdk";
-import { createConfig, getBalance, readContracts } from "@wagmi/core";
 import { covalentClient } from "@/lib/covalent";
 import { base } from "viem/chains";
 import { z } from "zod";
+import { NextRequest } from 'next/server'
 
 const querySchema = z.object({
   address: z.coerce.string(),
@@ -15,10 +15,8 @@ export const revalidate = 10;
 // const resp = await client.BalanceService.getTokenBalancesForWalletAddress("eth-mainnet");
 
 export async function GET(
-  _req: Request,
-  {
-    params,
-  }: { params: { chainId: string; address: string; tokens?: string[] } }
+  request: Request,
+  { params }: { params: { address: string } }
 ) {
   const { address } = querySchema.parse(params);
 
@@ -26,7 +24,7 @@ export async function GET(
     const { data } =
       await covalentClient.BalanceService.getTokenBalancesForWalletAddress(
         base.id as CovalentChainID,
-        address
+        address,
       );
 
     console.log(
@@ -52,9 +50,17 @@ export async function GET(
           symbol: item.contract_ticker_symbol,
         }))
       )
+      })),
     );
+    return Response.json(data, {
+      headers: {
+        "Cache-Control": "max-age=60, stale-while-revalidate=600",
+      },
+    });
+    // return new Response(JSON.stringify(data), { status: 200 });
   } catch (e) {
     console.error("Couldn't fetch balances from covalent", e);
+    return new Response(JSON.stringify(e), { status: 500 });
     //fetch balance from subgraph
   }
 }

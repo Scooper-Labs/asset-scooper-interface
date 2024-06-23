@@ -43,4 +43,6 @@ export interface Token {
   logoURI: string;
   name: string;
   symbol: string;
+  quoteUSD: number;
+  userBalance: number;
 }

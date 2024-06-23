@@ -18,8 +18,31 @@ import React, {
   useMemo,
   useState,
 } from "react";
+import { useSelectedTokens } from "@/hooks/useSelectTokens";
+import { Token } from "@/lib/components/types";
 
-export function TokenSelectFooter() {
+export function TokenSelectFooter({ onClose }: { onClose: () => void }) {
+  const {
+    _selectAllToken,
+    userWalletTokens,
+    selectedTokens,
+    _clearSelectedTokens,
+  } = useSelectedTokens();
+
+  const isAllSelected = Boolean(
+    userWalletTokens.length == selectedTokens.length,
+  );
+
+  const calculateTotalUSDValue = (tokens: Token[]) => {
+    return tokens.reduce((total, token) => {
+      const tokenUSDValue = token.quoteUSD;
+      return total + tokenUSDValue;
+    }, 0);
+  };
+  const totalUSDValue = useMemo(
+    () => calculateTotalUSDValue(selectedTokens),
+    [selectedTokens],
+  );
   return (
     <Flex
       borderRadius={10}
@@ -30,8 +53,8 @@ export function TokenSelectFooter() {
       justify="space-between"
       padding="1rem"
     >
-      <Text color="#EFE6EF" fontSize="larger">
-        ~0
+      <Text color="#000" fontSize="larger">
+        ~ ${totalUSDValue.toFixed(3)}
       </Text>
 
       <HStack>
@@ -41,11 +64,23 @@ export function TokenSelectFooter() {
           borderRadius={10}
           color="#A8BBD6"
           fontWeight="400"
+          onClick={
+            isAllSelected
+              ? (e) => {
+                  e.preventDefault();
+                  _clearSelectedTokens();
+                }
+              : (e) => {
+                  e.preventDefault();
+                  _selectAllToken(userWalletTokens);
+                }
+          }
         >
-          <Checkbox />
-          <Text marginLeft="5px">Select All</Text>
+          <Checkbox isChecked={isAllSelected}>
+            <Text marginLeft="5px">Select All</Text>
+          </Checkbox>
         </Button>
-        <Button background="#B5B4C6" borderRadius={10}>
+        <Button background="#B5B4C6" borderRadius={10} onClick={onClose}>
           <FaArrowRight size={15} color="#fff" />
         </Button>
       </HStack>
