@@ -20,7 +20,7 @@ export default async function Image() {
         // }}
       >
         <h1 tw="text-8xl">{SITE_NAME}</h1>
-        <p tw="text-4xl">{SITE_INFO}</p>
+        {/* <p tw="text-4xl">{SITE_INFO}</p> */}
       </div>
     )
   );

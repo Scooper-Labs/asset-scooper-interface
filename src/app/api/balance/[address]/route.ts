@@ -38,7 +38,7 @@ export async function GET(
         usdPrice: item.quote,
         logoUrl: item.logo_url,
         symbol: item.contract_ticker_symbol,
-      }))
+      }), "this is data console")
     );
     return new Response(
       JSON.stringify(

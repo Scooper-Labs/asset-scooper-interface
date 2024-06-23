@@ -14,17 +14,35 @@ import Link from "next/link";
 
 const SectionTwo = () => {
   return (
-    <Box>
-      <ContainerWrapper>
-        <Flex alignItems="center" justify="space-between">
+    <Box
+      as="section"
+      mt={{ base: "30px", md: "50px" }}
+      bgImage={{
+        base: "/image/Section_.png",
+        md: "/image/Section_BG_Image.png",
+        lg: "/image/Section_BG_Image.png",
+      }}
+      bgSize={"cover"}
+      bgPos={["inherit", "inherit", "inherit"]}
+    >
+      <ContainerWrapper px="5%">
+        <Flex
+          alignItems={"center"}
+          justify="space-between"
+          flexDir={{ base: "column", md: "row" }}
+        >
           <Box>
-            <Text color="white" fontSize="32px" fontWeight={700}>
+            <Text
+              color="white"
+              fontSize={{ base: "24px", md: "32px" }}
+              fontWeight={600}
+            >
               Get started using Asset Scooper today.
             </Text>
             <Button
               bg={COLORS.launchTextColor}
               as={Link}
-              href="/sweep"
+              href="#home"
               color="white"
               width="102px"
               height="32px"
@@ -36,7 +54,7 @@ const SectionTwo = () => {
                 bg: `${COLORS.launchTextColor}`,
               }}
             >
-              Get Started
+              Launch App
             </Button>
           </Box>
 
