@@ -1,6 +1,5 @@
 import { ChainId, ONE_INCH_BASE_URI } from "@/constants";
 import { useSelectedTokens } from "../useSelectTokens";
-import axios from "axios";
 import { isPromiseFulfilled } from "../useTokens";
 import { useCallback, useState } from "react";
 import { Token } from "@/lib/components/types";
@@ -15,72 +14,114 @@ export const use1inchSwap = (
   const [tokensWithNoLiquidity, setTokensWithNoLiquidity] = useState<Token[]>(
     [],
   );
-  const [callDataArray, setCallDataArray] = useState<string[]>([]);
+  const [shouldFetch, setShouldFetch] = useState<boolean>(false);
+  const [swapCallDataArray, setSwapCallDataArray] = useState<string[]>([]);
 
+  const [isLoading, setIsLoading] = useState(false);
   const swapUrl = `https://1inch-proxy.vercel.app/swap`;
 
-  const executeSwap = useCallback(async () => {
-    const swapParamsConfig = selectedTokens.map((token) => ({
-      params: {
-        src: token.address.toLowerCase(),
-        dst: "0x4200000000000000000000000000000000000006", // wrapped Ethereum
-        amount: token.userBalance,
-        from: "0xB2ad807Ec5Ac97C617734956760dEd85bEd345C1", // asset scooper router
-        origin: originAddress as string,
-        slippage: "10",
-        chainId,
-      },
-    }));
+  const swapParamsConfig = selectedTokens.map((token) => {
+    const params = new URLSearchParams({
+      src: token.address.toLowerCase(),
+      dst: "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2", // wrapped Ethereum
+      amount: Math.floor(token.userBalance).toString(),
+      from: "0xB2ad807Ec5Ac97C617734956760dEd85bEd345C1", // asset scooper router
+      origin: originAddress as string,
+      slippage: "50",
+      chainId: chainId ? chainId.toString() : "", // Assuming chainId is a number, convert to string
+    });
+    const url = `${swapUrl}?${params.toString()}`;
+    return url;
+  });
+
+  // const fetchSwapData = async () => {
+  //   setIsLoading(true);
+  //   const res = await Promise.allSettled(
+  //     swapParamsConfig.map((url) => fetch(url).then((res) => res.json())),
+  //   )
+  //     .then((res) => {
+  //       return res.filter(isPromiseFulfilled).map((el, i) => {
+  //         console.log("this is return vallue 1", el.value);
+  //         return el.value;
+  //       });
+  //     })
+  //     .catch((e) => console.log(e))
+  //     .finally(() => {
+  //       setIsLoading(false);
+  //     });
+
+  //   return res;
+  // };
+
+  // const fetchSwapData = async () => {
+  //   setIsLoading(true);
+  //   // setError(null);
+  //   try {
+  //     const res = await Promise.allSettled(
+  //       swapParamsConfig.map((url) => fetch(url).then((res) => res.json())),
+  //     );
+  //     const filteredRes = res.filter(isPromiseFulfilled).map((el) => el.value);
+  //     console.log("Swap data:", filteredRes);
+  //     return filteredRes;
+  //   } catch (e) {
+  //     console.error("Error fetching swap data:", e);
+  //     // setError("Failed to fetch swap data. Please try again.");
+  //     return null;
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  const fetchSwapData = async () => {
+    setIsLoading(true);
+    // setError(null);
+
+    const delay = (ms: number) =>
+      new Promise((resolve) => setTimeout(resolve, ms));
 
     try {
-      const responses = await Promise.all(
-        swapParamsConfig.map(
-          async (config) => await axios.get(swapUrl, config),
-        ),
-      );
-      console.log("Response from axios0,", responses);
+      const results = [];
+      for (const url of swapParamsConfig) {
+        try {
+          const response = await fetch(url);
+          const data = await response.json();
+          results.push({ status: "fulfilled", value: data });
+        } catch (error) {
+          results.push({ status: "rejected", reason: error });
+        }
+        // Wait for 1 second before the next request
+        await delay(1100);
+      }
 
-      const newTokensWithLiquidity: Token[] = [];
-      const newTokensWithNoLiquidity: Token[] = [];
-      const newCallDataArray: string[] = [];
+      const filteredRes = results
+        .filter(
+          (result): result is PromiseFulfilledResult<any> =>
+            result.status === "fulfilled",
+        )
+        .map((result) => result.value);
 
-      responses.forEach((response, index) => {
-        if (response.data && response.data.tx && response.data.tx.data) {
-          newTokensWithLiquidity.push(selectedTokens[index]);
-          newCallDataArray.push(response.data.tx.data);
-        } else {
-          newTokensWithNoLiquidity.push(selectedTokens[index]);
+      console.log("Swap data:", filteredRes);
+
+      filteredRes.map((result) => {
+        console.log(result?.description);
+
+        if (result.description == "insufficient liquidity") {
         }
       });
-
-      setTokensWithLiquidity(newTokensWithLiquidity);
-      setTokensWithNoLiquidity(newTokensWithNoLiquidity);
-      setCallDataArray(newCallDataArray);
-
-      return {
-        tokensWithLiquidity: newTokensWithLiquidity,
-        tokensWithNoLiquidity: newTokensWithNoLiquidity,
-        callDataArray: newCallDataArray,
-      };
-    } catch (error) {
-      console.error("Error executing swap:", error);
-      throw error;
+      return filteredRes;
+    } catch (e) {
+      console.error("Error fetching swap data:", e);
+      // setError("Failed to fetch swap data. Please try again.");
+      return null;
+    } finally {
+      setIsLoading(false);
     }
-  }, [chainId, originAddress, selectedTokens, swapUrl]);
-
+  };
   return {
-    executeSwap,
+    fetchSwapData,
+    isLoading,
     tokensWithLiquidity,
     tokensWithNoLiquidity,
-    callDataArray,
+    swapCallDataArray,
   };
 };
-
-//   const res = await Promise.allSettled(
-//     TOKEN_LISTS.map((el) => fetch(el).then((res) => res.json())),
-//   ).then((res) => {
-//     return res.filter(isPromiseFulfilled).map((el) => {
-//       el.value;
-//       console.log("this is other tokens", el.value);
-//     });
-//   });
