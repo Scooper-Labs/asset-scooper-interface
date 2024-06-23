@@ -219,7 +219,8 @@ const Footer = () => {
           </Text>
 
           <Text fontSize="sm" mt="10px">
-            Made in Abuja, available to the 🌎
+            {/* Made in Abuja, available to the 🌎 */}©{" "}
+            {new Date().getFullYear()} Asset Scooper. All rights reserved.
           </Text>
         </Stack>
       </ContainerWrapper>
