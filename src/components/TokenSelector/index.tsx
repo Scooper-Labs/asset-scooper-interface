@@ -1,15 +1,7 @@
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
   ModalCloseButton,
   useDisclosure,
   Box,
-  Button,
-  Flex,
   Text,
   VStack,
 } from "@chakra-ui/react";
@@ -35,21 +27,10 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
       <Box
         onClick={onOpen}
         fontWeight="500"
-        // bg={COLORS.btnBGGradient}
         bg="#FAF6FD"
         borderRadius={10}
         color={COLORS.tabTextColor}
         padding="12px"
-        // style={{
-        //   border: "1px solid #E7BFE7",
-        //   borderImage: `${COLORS.borderImageColor}`,
-        //   borderRadius: "8px",
-        // }}
-        // _hover={{
-        //   bg: `${COLORS.btnBGGradient}`,
-        //   border: "1px solid",
-        //   borderImage: `${COLORS.borderImageColor}`,
-        // }}
         cursor="pointer"
         width="100%"
       >
@@ -110,7 +91,7 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
             <TokenSelectList />
           </VStack>
 
-          <TokenSelectFooter />
+          <TokenSelectFooter onClose={onClose} />
         </VStack>
       </TokenSelectorModalComponent>
     </>

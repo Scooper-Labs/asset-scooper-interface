@@ -54,3 +54,6 @@ export function GetNetworkColor(chain?: string, type: 'color' | 'bgVariant' = 'c
 
   return NETWORK_COLORS.other[type]
 }
+
+
+

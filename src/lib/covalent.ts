@@ -1,6 +1,7 @@
+import { CovalentClient } from "@covalenthq/client-sdk";
 
-import { CovalentClient } from '@covalenthq/client-sdk'
+const COVALENT_API_KEY = process.env.COVALENT_API_KEY as string;
 
-const COVALENT_API_KEY = process.env.COVALENT_API_KEY as string
-
-export const covalentClient = new CovalentClient(COVALENT_API_KEY)
+export const covalentClient = new CovalentClient(
+  "cqt_rQMxBtyF7qMDrFXYq6jcrqXmxPyj",
+);

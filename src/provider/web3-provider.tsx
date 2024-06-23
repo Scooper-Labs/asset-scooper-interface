@@ -17,7 +17,7 @@ const queryClient = new QueryClient();
 
 if (!WALLETCONNECT_PROJECT_ID) {
   console.warn(
-    "You need to provide a NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID env variable"
+    "You need to provide a NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID env variable",
   );
 }
 
@@ -41,11 +41,9 @@ export function Web3Modal({
   initialState?: State;
 }) {
   return (
-    <WagmiProvider
-      //@ts-ignore
-      config={WALLETCONNECT_CONFIG}
-      initialState={initialState}
-    >
+    /* tslint:disable */
+    /* @ts-ignore */
+    <WagmiProvider config={WALLETCONNECT_CONFIG} initialState={initialState}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </WagmiProvider>
   );
