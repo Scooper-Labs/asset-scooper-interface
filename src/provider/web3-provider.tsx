@@ -41,7 +41,11 @@ export function Web3Modal({
   initialState?: State;
 }) {
   return (
-    <WagmiProvider config={WALLETCONNECT_CONFIG} initialState={initialState}>
+    <WagmiProvider
+      //@ts-ignore
+      config={WALLETCONNECT_CONFIG}
+      initialState={initialState}
+    >
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </WagmiProvider>
   );

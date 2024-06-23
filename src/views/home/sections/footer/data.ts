@@ -17,7 +17,7 @@ const scooperSocialLinks = [
   },
   {
     icon: SiFarcaster,
-    url: "https://farcaster.com/yourfarcaster",
+    url: "#",
     ariaLabel: "Farcaster",
   },
 ];
