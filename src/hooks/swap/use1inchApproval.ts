@@ -4,7 +4,7 @@ import axios from "axios";
 import { isPromiseFulfilled } from "../useTokens";
 import { useCallback, useState } from "react";
 import { Token } from "@/lib/components/types";
-import { Address, parseUnits } from "viem";
+import { Address } from "viem";
 
 export const use1inchSwap = (
   chainId: ChainId | undefined,
@@ -17,24 +17,20 @@ export const use1inchSwap = (
   );
   const [callDataArray, setCallDataArray] = useState<string[]>([]);
 
-  const swapUrl = `https://1inch-proxy.vercel.app/swap`;
+  const swapUrl = `https://1inch-proxy.vercel.app/approval`;
 
-  const executeSwap = useCallback(async () => {
-    const swapParamsConfig = selectedTokens.map((token) => ({
+  const executeApprovals = useCallback(async () => {
+    const aprrovalParamsConfig = selectedTokens.map((token) => ({
       params: {
-        src: token.address.toLowerCase(),
-        dst: "0x4200000000000000000000000000000000000006", // wrapped Ethereum
-        amount: parseUnits(token.userBalance.toString(), token.decimals),
-        from: "0xB2ad807Ec5Ac97C617734956760dEd85bEd345C1", // asset scooper router
-        origin: originAddress as string,
-        slippage: "10",
+        tokenAddress: token.address, // wrapped Ethereum
+        amount: token.userBalance,
         chainId,
       },
     }));
 
     try {
       const responses = await Promise.all(
-        swapParamsConfig.map(
+        aprrovalParamsConfig.map(
           async (config) => await axios.get(swapUrl, config),
         ),
       );
@@ -69,10 +65,9 @@ export const use1inchSwap = (
   }, [chainId, originAddress, selectedTokens, swapUrl]);
 
   return {
-    executeSwap,
+    executeApprovals,
     tokensWithLiquidity,
     tokensWithNoLiquidity,
     callDataArray,
   };
 };
-
