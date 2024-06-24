@@ -22,6 +22,8 @@ export function LinkComponent(props: Props) {
         href={props.href}
         isExternal
         style={{ textDecoration: "none" }}
+        target="_blank"
+        rel="noopener noreferrer"
       >
         {props.children}
       </ChakraLink>

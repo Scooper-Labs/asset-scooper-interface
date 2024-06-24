@@ -13,10 +13,14 @@ interface IHamburgerProps {
 const Hamburger: React.FC<IHamburgerProps> = ({ isOpen, onClick }) => {
   return (
     <Box
-      display={{ base: "flex", md: "none" }}
+      display={{ base: "block", md: "block", lg: "none" }}
       alignItems="center"
       justifyContent="center"
       cursor="pointer"
+      border="1px solid #D5ECFF"
+      borderRadius="8px"
+      py="5px"
+      px="5px"
     >
       <AnimatePresence mode="popLayout">
         {isOpen ? (

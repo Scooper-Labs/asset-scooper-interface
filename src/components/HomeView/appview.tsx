@@ -17,7 +17,7 @@ const AppHome = ({ children }: { children: ReactNode }) => {
 
   return (
     <main>
-      {widthSizeRef.current < 830 ? (
+      {/* {widthSizeRef.current < 830 ? (
         <div>
           <Center w={"100%"} flexDir="column" py="5%" px="5%">
             <Text fontWeight={600}>Mobile view is coming soon</Text>
@@ -29,9 +29,9 @@ const AppHome = ({ children }: { children: ReactNode }) => {
             </Text>
           </Center>
         </div>
-      ) : (
-        <div>{children}</div>
-      )}
+      ) : ( */}
+      <div>{children}</div>
+      {/* )} */}
     </main>
   );
 };

@@ -12,12 +12,12 @@ const scooperSocialLinks = [
   },
   {
     icon: BiLogoTelegram,
-    url: "https://t.me/yourtelegram",
+    url: "https://t.me/assetscooper",
     ariaLabel: "Telegram",
   },
   {
     icon: SiFarcaster,
-    url: "https://farcaster.com/yourfarcaster",
+    url: "#",
     ariaLabel: "Farcaster",
   },
 ];
