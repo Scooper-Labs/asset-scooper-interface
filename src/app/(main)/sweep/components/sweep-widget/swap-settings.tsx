@@ -15,10 +15,37 @@ import { COLORS } from "@/constants/theme";
 import { GrCircleQuestion } from "react-icons/gr";
 import CustomTooltip from "@/components/CustomTooltip";
 import { RiListSettingsLine } from "react-icons/ri";
+import { useSlippageTolerance } from "@/hooks/settings/slippage/useSlippage";
+import { SlippageToleranceStorageKey } from "@/hooks/settings/slippage/utils";
+import { useSweepThreshhold } from "@/hooks/settings/useThreshold";
 
 export function SwapSettings() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [activeButton, setActiveButton] = useState<string>("auto");
+  const { slippageTolerance, setSlippageTolerance } = useSlippageTolerance(
+    SlippageToleranceStorageKey.Sweep,
+  );
+  const { setSweepThreshold, sweepthreshHold } = useSweepThreshhold();
+  const [slippageError, setSlippageError] = useState<boolean>(false);
+
+  const handleSlippageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    console.log(value);
+    if (Number(value) > 50) {
+      setSlippageError(true);
+      return;
+    } else {
+      setSlippageTolerance(value);
+      setSlippageError(false);
+    }
+  };
+
+  const handeThreshholdChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const value = event.target.value;
+    setSweepThreshold(value);
+  };
 
   return (
     <>
@@ -80,6 +107,7 @@ export function SwapSettings() {
               }}
               placeholder="$30"
               textAlign="right"
+              onChange={(event) => handeThreshholdChange(event)}
             />
           </Box>
 
@@ -115,7 +143,7 @@ export function SwapSettings() {
                   bg={activeButton === "auto" ? "#E2E8EC" : "transparent"}
                   color={activeButton === "auto" ? "black" : "black"}
                   fontWeight={500}
-                  onClick={() => setActiveButton("auto")}
+                  onClick={() => setSlippageTolerance("0.1")}
                   _hover={{ bg: "#E2E8EC" }}
                 >
                   Auto
@@ -139,12 +167,13 @@ export function SwapSettings() {
                 border={`1px solid ${COLORS.borderColor}`}
                 borderRadius="12px"
                 _focus={{
-                  border: `1px solid ${COLORS.borderColor}`,
+                  border: `1px solid blue.400`,
                   outline: "none",
                   boxShadow: "none",
                 }}
                 color="#917193"
                 placeholder="0.5%"
+                onChange={(event) => handleSlippageChange(event)}
               />
             </HStack>
           </Box>

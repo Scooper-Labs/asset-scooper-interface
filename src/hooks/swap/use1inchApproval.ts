@@ -1,12 +1,11 @@
 import { ChainId, ONE_INCH_BASE_URI } from "@/constants";
 import { useSelectedTokens } from "../useSelectTokens";
-import axios from "axios";
 import { isPromiseFulfilled } from "../useTokens";
 import { useCallback, useState } from "react";
 import { Token } from "@/lib/components/types";
-import { Address } from "viem";
+import { Address, parseUnits } from "viem";
 
-export const use1inchSwap = (
+export const use1inchApprovals = (
   chainId: ChainId | undefined,
   originAddress: Address | undefined,
 ) => {
@@ -15,59 +14,74 @@ export const use1inchSwap = (
   const [tokensWithNoLiquidity, setTokensWithNoLiquidity] = useState<Token[]>(
     [],
   );
-  const [callDataArray, setCallDataArray] = useState<string[]>([]);
+  const [shouldFetch, setShouldFetch] = useState<boolean>(false);
+  const [swapCallDataArray, setSwapCallDataArray] = useState<string[]>([]);
 
-  const swapUrl = `https://1inch-proxy.vercel.app/approval`;
+  const [isLoading, setIsLoading] = useState(false);
+  const approvalUrl = `https://1inch-proxy.vercel.app/approval`;
 
-  const executeApprovals = useCallback(async () => {
-    const aprrovalParamsConfig = selectedTokens.map((token) => ({
-      params: {
-        tokenAddress: token.address, // wrapped Ethereum
-        amount: token.userBalance,
-        chainId,
-      },
-    }));
+  const fetchApprovalData = async () => {
+    setIsLoading(true);
+
+    const swapParamsConfig = selectedTokens.map((token) => {
+      const params = new URLSearchParams({
+        tokenAddress: token.address.toLowerCase(),
+        amount: parseUnits(
+          token.userBalance.toString(),
+          token.decimals,
+        ).toString(),
+        chainId: chainId ? chainId.toString() : "", // Assuming chainId is a number, convert to string
+      });
+      const url = `${approvalUrl}?${params.toString()}`;
+      return url;
+    });
+
+    const delay = (ms: number) =>
+      new Promise((resolve) => setTimeout(resolve, ms));
 
     try {
-      const responses = await Promise.all(
-        aprrovalParamsConfig.map(
-          async (config) => await axios.get(swapUrl, config),
-        ),
-      );
-      console.log("Response from axios0,", responses);
+      const results = [];
+      for (const url of swapParamsConfig) {
+        try {
+          const response = await fetch(url);
+          const data = await response.json();
+          results.push({ status: "fulfilled", value: data });
+        } catch (error) {
+          results.push({ status: "rejected", reason: error });
+        }
+        // Wait for 1 second before the next request
+        await delay(1100);
+      }
 
-      const newTokensWithLiquidity: Token[] = [];
-      const newTokensWithNoLiquidity: Token[] = [];
-      const newCallDataArray: string[] = [];
+      const filteredRes = results
+        .filter(
+          (result): result is PromiseFulfilledResult<any> =>
+            result.status === "fulfilled",
+        )
+        .map((result) => result.value);
 
-      responses.forEach((response, index) => {
-        if (response.data && response.data.tx && response.data.tx.data) {
-          newTokensWithLiquidity.push(selectedTokens[index]);
-          newCallDataArray.push(response.data.tx.data);
-        } else {
-          newTokensWithNoLiquidity.push(selectedTokens[index]);
+      console.log("Swap data:", filteredRes);
+
+      filteredRes.map((result) => {
+        console.log(result?.description);
+
+        if (result.description == "insufficient liquidity") {
         }
       });
-
-      setTokensWithLiquidity(newTokensWithLiquidity);
-      setTokensWithNoLiquidity(newTokensWithNoLiquidity);
-      setCallDataArray(newCallDataArray);
-
-      return {
-        tokensWithLiquidity: newTokensWithLiquidity,
-        tokensWithNoLiquidity: newTokensWithNoLiquidity,
-        callDataArray: newCallDataArray,
-      };
-    } catch (error) {
-      console.error("Error executing swap:", error);
-      throw error;
+      return filteredRes;
+    } catch (e) {
+      console.error("Error fetching swap data:", e);
+      // setError("Failed to fetch swap data. Please try again.");
+      return null;
+    } finally {
+      setIsLoading(false);
     }
-  }, [chainId, originAddress, selectedTokens, swapUrl]);
-
+  };
   return {
-    executeApprovals,
+    fetchApprovalData,
+    isLoading,
     tokensWithLiquidity,
     tokensWithNoLiquidity,
-    callDataArray,
+    swapCallDataArray,
   };
 };
