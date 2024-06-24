@@ -41,7 +41,8 @@ const myFont = localFont({
 export const metadata: Metadata = {
   applicationName: SITE_NAME,
   title: {
-    default: `${SITE_NAME} · ${SITE_INFO}`,
+    default: `${SITE_NAME}`,
+    // default: `${SITE_NAME} · ${SITE_INFO}`,
     template: `${SITE_NAME} · %s`,
   },
   metadataBase: new URL(SITE_URL),
