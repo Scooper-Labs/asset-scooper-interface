@@ -16,6 +16,8 @@ import { Address, erc20Abi } from "viem";
 import { useWatchPendingTransactions } from "wagmi";
 import { use1inchSwap } from "@/hooks/swap/use1inchSwap";
 import { ChainId } from "@/constants";
+import ApprovalModal from "../modals/approval";
+import SwapModal from "../modals/swap";
 
 function SweepButton() {
   const { isSelected, _selectToken, _unSelectToken, selectedTokens } =
@@ -45,9 +47,10 @@ function SweepButton() {
       ) : (
         <>
           {selectedTokens.length > 0 ? (
-            <Button onClick={fetchSwapData}>
-              Swap {isLoading && "Swapp is Loading"}
-            </Button>
+            <>
+              <ApprovalModal />
+              <SwapModal />
+            </>
           ) : (
             <>
               <Button>Select tokens</Button>
