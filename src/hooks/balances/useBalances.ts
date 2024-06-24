@@ -74,8 +74,12 @@ export const useBalances = ({ account }: UseBalances) => {
         });
 
         console.log("Validated and transformed data:", transformedData);
+
+        const tokensWithBalance = transformedData.filter(
+          (token) => token.userBalance > 0,
+        );
         // setWalletTokenList(transformedData);
-        dispatch(setUserWalletTokenWithBalance(transformedData));
+        dispatch(setUserWalletTokenWithBalance(tokensWithBalance));
       } catch (error) {
         console.error("Error validating data:", error);
       }
