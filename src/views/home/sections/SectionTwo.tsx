@@ -21,8 +21,9 @@ const SectionTwo = () => {
         base: "/image/Section_.png",
         md: "/image/Section_BG_Image.png",
       }}
-      bgSize={"cover"}
-      bgPos={["inherit", "inherit", "inherit"]}
+      bgSize="cover"
+      // bgPosition="center"
+      bgRepeat="no-repeat"
     >
       <ContainerWrapper px="5%">
         <Flex
