@@ -1,6 +1,14 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { MenuProps } from "./type";
-import { Box, Link as ChakraLink } from "@chakra-ui/react";
+import {
+  Box,
+  Link as ChakraLink,
+  Stack,
+  IconButton,
+  HStack,
+  Text,
+} from "@chakra-ui/react";
+import { scooperSocialLinks } from "../sections/footer/data";
 
 const Menu = ({ menuOpen, links }: MenuProps) => {
   return (
@@ -12,9 +20,10 @@ const Menu = ({ menuOpen, links }: MenuProps) => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           position="absolute"
-          top="170%"
+          top="140%"
           right="-1px"
           width="full"
+          h="100vh"
           bg="white"
           px="18px"
           pb="4"
@@ -25,8 +34,8 @@ const Menu = ({ menuOpen, links }: MenuProps) => {
           borderRadius="0 0 8px 8px"
           backdropFilter="blur(10px)"
           boxShadow="lg"
-          border="1px solid"
-          borderColor="gray.200"
+          alignItems="center"
+          justifyContent="center"
         >
           <Box display="flex" flexDirection="column" gap="8">
             {links.map(({ name, href }, index) => (
@@ -35,6 +44,7 @@ const Menu = ({ menuOpen, links }: MenuProps) => {
                 href={href}
                 target={href.startsWith("http") ? "_blank" : "_self"}
                 fontSize="sm"
+                textAlign="center"
                 color="#281629"
                 style={{
                   textDecoration: "none",
@@ -43,6 +53,29 @@ const Menu = ({ menuOpen, links }: MenuProps) => {
                 {name}
               </ChakraLink>
             ))}
+
+            <Stack justifyContent="flex-end" alignItems="center">
+              <HStack spacing={1}>
+                {scooperSocialLinks.map((link) => (
+                  <IconButton
+                    as="a"
+                    href={link.url}
+                    aria-label={link.ariaLabel}
+                    icon={<link.icon color="black" />}
+                    variant="ghost"
+                    _hover={{
+                      bg: "ghost",
+                    }}
+                    size="lg"
+                    key={link.ariaLabel}
+                  />
+                ))}
+              </HStack>
+
+              <Text color="white" fontSize="13px" fontWeight={400}>
+                BUILT ON BASE
+              </Text>
+            </Stack>
           </Box>
         </Box>
       )}

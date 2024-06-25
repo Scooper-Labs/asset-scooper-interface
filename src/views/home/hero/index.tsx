@@ -24,8 +24,11 @@ const HeroSection = () => {
       justifyContent="center"
       minH="100vh"
       flexDir="column"
-      bgImage={["/image/Hero_BG_image.png"]}
-      bgSize={"cover"}
+      bgImage={{
+        base: "/image/Hero_BGImage_Mobile.png",
+        md: "/image/Hero_BG_image.png",
+      }}
+      bgSize={"unset"}
       bgPos={"inherit"}
       // py={{ base: "18%", md: "12%", lg: "8%" }}
       pt={{ base: "70px", md: "100px", lg: "100px" }}
