@@ -5,6 +5,7 @@ interface NavLink {
 
 interface MenuProps {
   menuOpen: boolean;
+  setMenuOpen: (boolean) => void;
   links: NavLink[];
 }
 
