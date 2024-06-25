@@ -21,7 +21,7 @@ const Action = () => {
         color="white"
         boxShadow={COLORS.boxShadowColor}
         _hover={{
-          bg: `${COLORS.btnBGGradient}`,
+          bg: `${COLORS.btnGradient}`,
         }}
       >
         <Tooltip hasArrow label="coming soon" bg="red.600">

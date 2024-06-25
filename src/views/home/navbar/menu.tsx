@@ -10,7 +10,11 @@ import {
 } from "@chakra-ui/react";
 import { scooperFooterSocialLinks } from "../sections/footer/data";
 
-const Menu = ({ menuOpen, links }: MenuProps) => {
+const Menu = ({ menuOpen, setMenuOpen, links }: MenuProps) => {
+  const handleLinkClick = () => {
+    setMenuOpen(false);
+  };
+
   return (
     <AnimatePresence>
       {menuOpen && (
@@ -55,6 +59,7 @@ const Menu = ({ menuOpen, links }: MenuProps) => {
                 style={{
                   textDecoration: "none",
                 }}
+                onClick={handleLinkClick}
               >
                 {name}
               </ChakraLink>
