@@ -11,7 +11,10 @@ import { base } from "viem/chains";
 import { Token } from "@/lib/components/types";
 import { useAppDispatch, useAppSelector } from "../rtkHooks";
 import { RootState } from "@/store/store";
-import { setUserWalletTokenWithBalance } from "@/store/sweep/sweepSlice";
+import {
+  selectAllTokens,
+  setUserWalletTokenWithBalance,
+} from "@/store/sweep/sweepSlice";
 
 export const NativeAddress = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
@@ -53,6 +56,7 @@ export const useBalances = ({ account }: UseBalances) => {
   const userWalletTokens = useAppSelector(
     (state: RootState) => state.SweepTokensSlice.userWalletTokens,
   );
+
   // const [walletTokenList, setWalletTokenList] = useState<Token[]>([]);
   const { data, isLoading, isError, error, isFetched, isSuccess } =
     useBalancesQuery({ account });
@@ -60,6 +64,8 @@ export const useBalances = ({ account }: UseBalances) => {
   useEffect(() => {
     if (data) {
       try {
+        dispatch(setUserWalletTokenWithBalance([]));
+        dispatch(selectAllTokens([]));
         const transformedData = data.data.items.map((item) => {
           return {
             address: item.contract_address,
@@ -74,8 +80,12 @@ export const useBalances = ({ account }: UseBalances) => {
         });
 
         console.log("Validated and transformed data:", transformedData);
+
+        const tokensWithBalance = transformedData.filter(
+          (token) => token.userBalance > 0,
+        );
         // setWalletTokenList(transformedData);
-        dispatch(setUserWalletTokenWithBalance(transformedData));
+        dispatch(setUserWalletTokenWithBalance(tokensWithBalance));
       } catch (error) {
         console.error("Error validating data:", error);
       }

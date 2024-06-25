@@ -16,32 +16,28 @@ import { Address, erc20Abi } from "viem";
 import { useWatchPendingTransactions } from "wagmi";
 import { use1inchSwap } from "@/hooks/swap/use1inchSwap";
 import { ChainId } from "@/constants";
+import ApprovalModal from "../modals/approval";
+import SwapModal from "../modals/swap";
 
 function SweepButton() {
   const { isSelected, _selectToken, _unSelectToken, selectedTokens } =
     useSelectedTokens();
 
   const { isConnected, chainId, address } = useAccount();
-  // const { writeContracts } = useWriteContracts();
-
-  // useWatchPendingTransactions({
-  //   onTransactions(transactions) {
-  //     console.log('New transactions!', transactions)
-  //   },
-  // })
 
   const {
-    executeSwap,
+    fetchSwapData,
+    isLoading,
     tokensWithLiquidity,
     tokensWithNoLiquidity,
-    callDataArray,
+    swapCallDataArray,
   } = use1inchSwap(chainId as ChainId, address);
 
   console.log(
     "swap data",
     tokensWithLiquidity,
     tokensWithNoLiquidity,
-    callDataArray,
+    swapCallDataArray,
   );
 
   return (
@@ -51,7 +47,10 @@ function SweepButton() {
       ) : (
         <>
           {selectedTokens.length > 0 ? (
-            <Button onClick={executeSwap}>Swap</Button>
+            <>
+              <ApprovalModal />
+              <SwapModal />
+            </>
           ) : (
             <>
               <Button>Select tokens</Button>
