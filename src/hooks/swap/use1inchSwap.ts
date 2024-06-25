@@ -1,10 +1,13 @@
 import { ChainId, ONE_INCH_BASE_URI } from "@/constants";
 import { useSelectedTokens } from "../useSelectTokens";
-import axios from "axios";
 import { isPromiseFulfilled } from "../useTokens";
 import { useCallback, useState } from "react";
 import { Token } from "@/lib/components/types";
-import { Address } from "viem";
+import { Address, parseUnits } from "viem";
+
+type SuccessResult = { status: "fulfilled"; value: any; token: Token };
+type ErrorResult = { status: "rejected"; reason: unknown; value: Token };
+type SwapResult = SuccessResult | ErrorResult;
 
 export const use1inchSwap = (
   chainId: ChainId | undefined,
@@ -15,72 +18,96 @@ export const use1inchSwap = (
   const [tokensWithNoLiquidity, setTokensWithNoLiquidity] = useState<Token[]>(
     [],
   );
-  const [callDataArray, setCallDataArray] = useState<string[]>([]);
+  const [shouldFetch, setShouldFetch] = useState<boolean>(false);
+  const [swapCallDataArray, setSwapCallDataArray] = useState<string[]>([]);
 
+  const [isLoading, setIsLoading] = useState(false);
   const swapUrl = `https://1inch-proxy.vercel.app/swap`;
 
-  const executeSwap = useCallback(async () => {
-    const swapParamsConfig = selectedTokens.map((token) => ({
-      params: {
+  const fetchSwapData = async () => {
+    setIsLoading(true);
+
+    const swapParamsConfig = selectedTokens.map((token) => {
+      const params = new URLSearchParams({
         src: token.address.toLowerCase(),
-        dst: "0x4200000000000000000000000000000000000006", // wrapped Ethereum
-        amount: token.userBalance,
-        from: "0xB2ad807Ec5Ac97C617734956760dEd85bEd345C1", // asset scooper router
-        origin: originAddress as string,
-        slippage: "10",
-        chainId,
-      },
-    }));
+        dst: "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2", // wrapped Ethereum
+        amount: parseUnits(
+          token.userBalance.toString(),
+          token.decimals,
+        ).toString(),
+        from: originAddress
+          ? originAddress?.toString()
+          : "0xE3c347cEa95B7BfdB921074bdb39b8571F905f6D",
+        slippage: "50",
+        chainId: chainId ? chainId.toString() : "", // Assuming chainId is a number, convert to string
+      });
+      const url = `${swapUrl}?${params.toString()}`;
+      return { url, token };
+    });
+
+    const delay = (ms: number) =>
+      new Promise((resolve) => setTimeout(resolve, ms));
 
     try {
-      const responses = await Promise.all(
-        swapParamsConfig.map(
-          async (config) => await axios.get(swapUrl, config),
-        ),
-      );
-      console.log("Response from axios0,", responses);
-
-      const newTokensWithLiquidity: Token[] = [];
-      const newTokensWithNoLiquidity: Token[] = [];
-      const newCallDataArray: string[] = [];
-
-      responses.forEach((response, index) => {
-        if (response.data && response.data.tx && response.data.tx.data) {
-          newTokensWithLiquidity.push(selectedTokens[index]);
-          newCallDataArray.push(response.data.tx.data);
-        } else {
-          newTokensWithNoLiquidity.push(selectedTokens[index]);
+      const results = [];
+      for (const config of swapParamsConfig) {
+        try {
+          const response = await fetch(config.url);
+          const data = await response.json();
+          results.push({
+            status: "fulfilled",
+            value: data,
+            token: config.token,
+          });
+        } catch (error) {
+          results.push({
+            status: "rejected",
+            reason: error,
+            token: config.token,
+          });
         }
+        await delay(1100);
+      }
+
+      const filteredRes = results
+        .filter(
+          (result): result is SuccessResult => result.status === "fulfilled",
+        )
+        .map((result) => result);
+
+      console.log("Sweep data:", filteredRes);
+
+      filteredRes.map(async (result) => {
+        console.log(result.status);
+
+        if (result.value.error || result.value.statusCode == 400) {
+          console.log("token address BADDD REQUEST", result.token.address);
+          //push result.token to setTokensWithNoLiquidity
+
+          setTokensWithNoLiquidity((prev) => [...prev, result.token]);
+        } else if (result.value.tx) {
+          console.log("token address", result.token.address);
+          //push result.token to setTokensWithLiquidity
+          setTokensWithLiquidity((prev) => [...prev, result.token]);
+          setSwapCallDataArray((prev) => [...prev, result.value.tx.data]);
+        }
+
+        console.log(tokensWithNoLiquidity, tokensWithLiquidity);
       });
-
-      setTokensWithLiquidity(newTokensWithLiquidity);
-      setTokensWithNoLiquidity(newTokensWithNoLiquidity);
-      setCallDataArray(newCallDataArray);
-
-      return {
-        tokensWithLiquidity: newTokensWithLiquidity,
-        tokensWithNoLiquidity: newTokensWithNoLiquidity,
-        callDataArray: newCallDataArray,
-      };
-    } catch (error) {
-      console.error("Error executing swap:", error);
-      throw error;
+      return filteredRes;
+    } catch (e) {
+      console.error("Error fetching swap data:", e);
+      // setError("Failed to fetch swap data. Please try again.");
+      return null;
+    } finally {
+      setIsLoading(false);
     }
-  }, [chainId, originAddress, selectedTokens, swapUrl]);
-
+  };
   return {
-    executeSwap,
+    fetchSwapData,
+    isLoading,
     tokensWithLiquidity,
     tokensWithNoLiquidity,
-    callDataArray,
+    swapCallDataArray,
   };
 };
-
-//   const res = await Promise.allSettled(
-//     TOKEN_LISTS.map((el) => fetch(el).then((res) => res.json())),
-//   ).then((res) => {
-//     return res.filter(isPromiseFulfilled).map((el) => {
-//       el.value;
-//       console.log("this is other tokens", el.value);
-//     });
-//   });
