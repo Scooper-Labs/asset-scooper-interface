@@ -20,6 +20,9 @@ const Action = () => {
         border="1px solid #007BE0"
         color="white"
         boxShadow={COLORS.boxShadowColor}
+        _hover={{
+          bg: `${COLORS.btnBGGradient}`,
+        }}
       >
         <Tooltip hasArrow label="coming soon" bg="red.600">
           <Text fontSize={{ base: "13px", md: "14px" }} fontWeight="500">
