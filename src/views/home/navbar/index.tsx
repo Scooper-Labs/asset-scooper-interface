@@ -154,7 +154,11 @@ const LandingHeader = () => {
 
             <Hamburger isOpen={isMenuOpen} onClick={toggleMenu} />
 
-            <Menu menuOpen={isMenuOpen} links={navLinks} />
+            <Menu
+              menuOpen={isMenuOpen}
+              setMenuOpen={setIsMenuOpen}
+              links={navLinks}
+            />
           </HStack>
         </Flex>
       </Flex>
