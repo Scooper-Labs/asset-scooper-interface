@@ -37,7 +37,7 @@ export const useBalancesQuery = ({ account }: UseBalances) => {
       const resp =
         await covalentClient.BalanceService.getTokenBalancesForWalletAddress(
           "base-mainnet",
-          account,
+          account
         );
       console.log(resp.data);
       const xxx: BalancesResponse = resp.data;
@@ -54,7 +54,7 @@ export const useBalances = ({ account }: UseBalances) => {
   const dispatch = useAppDispatch();
 
   const userWalletTokens = useAppSelector(
-    (state: RootState) => state.SweepTokensSlice.userWalletTokens,
+    (state: RootState) => state.SweepTokensSlice.userWalletTokens
   );
 
   // const [walletTokenList, setWalletTokenList] = useState<Token[]>([]);
@@ -82,7 +82,7 @@ export const useBalances = ({ account }: UseBalances) => {
         console.log("Validated and transformed data:", transformedData);
 
         const tokensWithBalance = transformedData.filter(
-          (token) => token.userBalance > 0,
+          (token) => token.userBalance > 0
         );
         // setWalletTokenList(transformedData);
         dispatch(setUserWalletTokenWithBalance(tokensWithBalance));
