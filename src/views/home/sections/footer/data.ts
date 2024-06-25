@@ -22,4 +22,18 @@ const scooperSocialLinks = [
   },
 ];
 
-export { scooperSocialLinks };
+const scooperFooterSocialLinks = [
+  { icon: FaXTwitter, url: "https://x.com/assetscooper", ariaLabel: "X" },
+  {
+    icon: FaGithub,
+    url: "https://github.com/scooper-labs",
+    ariaLabel: "GitHub",
+  },
+  {
+    icon: SiFarcaster,
+    url: "#",
+    ariaLabel: "Farcaster",
+  },
+];
+
+export { scooperSocialLinks, scooperFooterSocialLinks };
