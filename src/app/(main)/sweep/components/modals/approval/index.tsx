@@ -10,13 +10,20 @@ import {
   Button,
   Text,
   useDisclosure,
+  Box,
+  VStack,
 } from "@chakra-ui/react";
 import { use1inchApprovals } from "@/hooks/swap/use1inchApproval";
 import { ChainId } from "@/constants";
 
 import { useSelectedTokens } from "@/hooks/useSelectTokens";
 import { useAccount } from "wagmi";
-function ApprovalModal() {
+import TokenRow from "./token-row";
+function ApprovalModal({
+  tokensAllowanceStatus,
+}: {
+  tokensAllowanceStatus: boolean;
+}) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isConnected, chainId, address } = useAccount();
 
@@ -25,13 +32,14 @@ function ApprovalModal() {
   const { isSelected, _selectToken, _unSelectToken, selectedTokens } =
     useSelectedTokens();
 
-
-  
   return (
     <>
       <Button
+        disabled={tokensAllowanceStatus}
+        color="#fff"
+        bg={tokensAllowanceStatus ? "#B5B4C6" : "#0099FB"}
+        width="100%"
         onClick={() => {
-          fetchApprovalData();
           onOpen();
         }}
       >
@@ -40,18 +48,21 @@ function ApprovalModal() {
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Modal Title</ModalHeader>
+          <ModalHeader>Approve Tokens</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-         
+            <VStack>
+              {selectedTokens.map((token) => {
+                return (
+                  <Box key={token.address}>
+                    <TokenRow token={token} />
+                  </Box>
+                );
+              })}
+            </VStack>
           </ModalBody>
 
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={onClose}>
-              Close
-            </Button>
-            <Button variant="ghost">Secondary Action</Button>
-          </ModalFooter>
+          <ModalFooter></ModalFooter>
         </ModalContent>
       </Modal>
     </>
