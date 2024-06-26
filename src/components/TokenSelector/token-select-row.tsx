@@ -1,6 +1,14 @@
 import { useSelectedTokens } from "@/hooks/useSelectTokens";
 import { Token } from "@/lib/components/types";
-import { Box, Checkbox, HStack, Text, VStack } from "@chakra-ui/react";
+import {
+  Box,
+  Checkbox,
+  HStack,
+  Text,
+  VStack,
+  WrapItem,
+  Avatar,
+} from "@chakra-ui/react";
 import Image from "next/image";
 import React from "react";
 
@@ -19,9 +27,7 @@ function TokenSelectListRow({ token }: { token: Token }) {
       borderRadius="12px"
       padding="8px"
       cursor="pointer"
-      _hover={
-        {bg: "gray.50"}
-      }
+      _hover={{ bg: "gray.50" }}
       transition="color"
       transitionDuration="500ms"
       onClick={
@@ -47,9 +53,12 @@ function TokenSelectListRow({ token }: { token: Token }) {
         iconColor={"#7F56D9"}
       >
         <HStack alignItems="center">
-          <Box overflow="hidden" rounded="100%">
+          {/* <Box overflow="hidden" rounded="100%">
             <Image src={logoURI} width={25} height={25} alt={name} />
-          </Box>
+          </Box> */}
+          <WrapItem>
+            <Avatar size="md" name={name} src={logoURI} />
+          </WrapItem>
           <VStack gap="0" alignItems="start">
             <Text fontWeight="700">
               {symbol.length > 6 ? `${symbol.substring(0, 5)}...` : symbol}
