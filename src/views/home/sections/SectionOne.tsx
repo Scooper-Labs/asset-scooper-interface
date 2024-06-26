@@ -66,7 +66,7 @@ const SectionOne = () => {
                 <Button
                   bg={COLORS.launchTextColor}
                   as={Link}
-                  href="/sweep"
+                  href="#home"
                   color="white"
                   width="102px"
                   height="32px"
@@ -122,7 +122,7 @@ const SectionOne = () => {
                 <Button
                   bg={COLORS.launchTextColor}
                   as={Link}
-                  href="/sweep"
+                  href="#home"
                   color="white"
                   width="102px"
                   height="32px"
@@ -138,7 +138,7 @@ const SectionOne = () => {
                 </Button>
               </Flex>
 
-              {/* -------------- For Mobile -------------- */}
+              {/* -------------- For Desktop and Mobile screen -------------- */}
               <Box
                 mt="70px"
                 display={{ base: "block", md: "none", lg: "none" }}
