@@ -3,7 +3,7 @@ import { useSelectedTokens } from "@/hooks/useSelectTokens";
 import React, { useEffect, useState, Dispatch, SetStateAction } from "react";
 import { use1inchSwap } from "@/hooks/swap/use1inchSwap";
 import { ChainId } from "@/constants";
-import SwapModal from "../modals/swap";
+import SwapModal from "../modals/confirmation";
 import {
   useAccount,
   useWriteContract,
@@ -12,6 +12,7 @@ import {
 import ApprovalModal from "../modals/approval";
 import { useReadContracts } from "wagmi";
 import { erc20Abi, Address } from "viem";
+import ConfirmationModal from "../modals/confirmation";
 
 const spenderAddress = "0x111111125421ca6dc452d289314280a0f8842a65";
 
@@ -26,17 +27,17 @@ function SweepButton() {
     args: [address, spenderAddress as Address], // You'll need to provide these
   }));
 
-  const {data, isLoading} = useReadContracts({
+  const { data, isLoading, refetch } = useReadContracts({
     contracts,
   });
 
-  const balancesMatch =
-    data &&
-   data.map((balance, index) => {
-      const userBalance = selectedTokens[index].userBalance;
-      return balance.toString() === userBalance.toString();
-    });
-    
+  const tokensAllowanceStatus = data
+    ? data.every((balance, index) => {
+        const userBalance = selectedTokens[index].userBalance;
+        return balance.toString() === userBalance.toString();
+      })
+    : false;
+
   useEffect(() => {});
 
   return (
@@ -47,9 +48,9 @@ function SweepButton() {
         <>
           {selectedTokens.length > 0 ? (
             <>
-              <Button width="100%" bg="#B5B4C6" color="#fff">
-                Sweep
-              </Button>
+              <ConfirmationModal
+                tokensAllowanceStatus={tokensAllowanceStatus}
+              />
             </>
           ) : (
             <>
