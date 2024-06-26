@@ -57,7 +57,7 @@ function TokenSelectListRow({ token }: { token: Token }) {
             <Image src={logoURI} width={25} height={25} alt={name} />
           </Box> */}
           <WrapItem>
-            <Avatar size="md" name={name} src={logoURI} />
+            <Avatar size="xs" name={name} src={logoURI} />
           </WrapItem>
           <VStack gap="0" alignItems="start">
             <Text fontWeight="700">
