@@ -13,17 +13,9 @@ import {
 } from "@chakra-ui/react";
 import { use1inchApprovals } from "@/hooks/swap/use1inchApproval";
 import { ChainId } from "@/constants";
-import {
-  useAccount,
-  useWriteContract,
-  useWaitForTransactionReceipt,
-} from "wagmi";
-import assetscooperAbi from "@/constants/abi/assetscooper.json";
-import { assetscooper_contract } from "@/constants/contractAddress";
 
 import { useSelectedTokens } from "@/hooks/useSelectTokens";
-import { Address, erc20Abi, parseUnits } from "viem";
-import { useReadContract } from "wagmi";
+import { useAccount } from "wagmi";
 function ApprovalModal() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isConnected, chainId, address } = useAccount();
@@ -32,24 +24,7 @@ function ApprovalModal() {
     use1inchApprovals(chainId as ChainId, address);
   const { isSelected, _selectToken, _unSelectToken, selectedTokens } =
     useSelectedTokens();
-  const {
-    data: hash,
-    isPending,
-    isSuccess: isTrxSubmitted,
-    isError: isWriteContractError,
-    writeContract,
-    error: WriteContractError,
-    reset,
-  } = useWriteContract();
 
-  const {
-    isLoading: isConfirming,
-    isSuccess: isConfirmed,
-    isError: isWaitTrxError,
-    error: WaitForTransactionReceiptError,
-  } = useWaitForTransactionReceipt({
-    hash,
-  });
 
   
   return (
@@ -68,10 +43,7 @@ function ApprovalModal() {
           <ModalHeader>Modal Title</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {isConfirming && <Text>isConfirming...</Text>}
-            {isPending && <Text>pending... confirm in wallet</Text>}
-            <Button onClick={approveAllNew}>APPPROVE ALL</Button>
-            <Button onClick={getAllowance}>Check Allowance</Button>
+         
           </ModalBody>
 
           <ModalFooter>
