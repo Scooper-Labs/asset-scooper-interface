@@ -24,14 +24,15 @@ const HeroSection = () => {
       justifyContent="center"
       minH="100vh"
       flexDir="column"
-      bgImage={["/image/Hero_BG_image.png"]}
-      bgSize={"cover"}
-      bgPos={"inherit"}
-      // py={{ base: "18%", md: "12%", lg: "8%" }}
+      bgImage={{
+        base: "/image/Hero_BGImage_Mobile.png",
+        md: "/image/Hero_BG_image.png",
+      }}
+      bgSize="cover"
+      bgPosition="center"
+      bgRepeat="no-repeat"
+      bgAttachment="fixed"
       pt={{ base: "70px", md: "100px", lg: "100px" }}
-      //   minH={{ md: "94.5vh" }}
-      //   mx={{ md: "25px" }}
-      //   mb={{ md: "25px" }}
       color="white"
     >
       <ContainerWrapper px="5%">

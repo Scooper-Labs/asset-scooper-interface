@@ -76,13 +76,13 @@ const LandingHeader = () => {
     >
       <Flex
         as="div"
-        width={{ base: "100%", md: "100%", lg: "40%" }}
-        height="64px"
+        width={{ base: "100%", md: "100%", lg: "430px" }}
+        height={{ base: "56px", md: "52px" }}
         border="1px solid white"
-        padding="20px"
-        backdropFilter="blur(10px)"
+        padding={{ base: "12px", md: "10px 12px" }}
         borderRadius="16px"
         backgroundColor="white"
+        backdropFilter="blur(3px)"
       >
         <Flex
           as="div"
@@ -95,7 +95,11 @@ const LandingHeader = () => {
           }}
         >
           <HStack>
-            <ChakraLink href="#home">{SCOOPER_SVG().Scooper_Logo()}</ChakraLink>
+            <Box>
+              <ChakraLink href="#home">
+                {SCOOPER_SVG().Scooper_Logo()}
+              </ChakraLink>
+            </Box>
 
             <Flex display={{ base: "block", md: "block", lg: "none" }}>
               <Text
@@ -150,7 +154,11 @@ const LandingHeader = () => {
 
             <Hamburger isOpen={isMenuOpen} onClick={toggleMenu} />
 
-            <Menu menuOpen={isMenuOpen} links={navLinks} />
+            <Menu
+              menuOpen={isMenuOpen}
+              setMenuOpen={setIsMenuOpen}
+              links={navLinks}
+            />
           </HStack>
         </Flex>
       </Flex>

@@ -20,10 +20,10 @@ const SectionTwo = () => {
       bgImage={{
         base: "/image/Section_.png",
         md: "/image/Section_BG_Image.png",
-        lg: "/image/Section_BG_Image.png",
       }}
-      bgSize={"cover"}
-      bgPos={["inherit", "inherit", "inherit"]}
+      bgSize="cover"
+      // bgPosition="center"
+      bgRepeat="no-repeat"
     >
       <ContainerWrapper px="5%">
         <Flex
@@ -58,10 +58,20 @@ const SectionTwo = () => {
             </Button>
           </Box>
 
-          <Box>
+          {/* -------------- For Mobile -------------- */}
+          <Box display={{ base: "none", md: "flex", lg: "flex" }}>
             <Image
               src="image/CTASection_illustration_image.png"
               alt="CTA_illustration_image"
+            />
+          </Box>
+
+          <Box display={{ base: "block", md: "none", lg: "none" }}>
+            <Image
+              src="image/CTASection_illustration_mobile_image.png"
+              alt="CTA_illustration_image"
+              // w={"600px"}
+              // h={"400px"}
             />
           </Box>
         </Flex>

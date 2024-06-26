@@ -21,7 +21,7 @@ export const NotFound = () => {
       icon: <RiGithubLine color="white" />,
     },
     {
-      href: "/#",
+      href: "https://t.me/assetscooper",
       label: "Telegram",
       icon: <BiLogoTelegram color="white" />,
     },
@@ -30,15 +30,25 @@ export const NotFound = () => {
   const { root, home } = useStyles();
 
   return (
-    <Flex {...root} flexDir="column">
-      <Image
-        src="/image/404_image.png"
-        alt="404-page_image"
-        width={600}
-        height={600}
-        // fill
-        // style={{ objectFit: "contain" }}
-      />
+    <Flex {...root} flexDir="column" py="20%" px="5%">
+      {/* -------------- For Desktop and Mobile screen -------------- */}
+      <Box display={{ base: "none", md: "flex", lg: "flex" }}>
+        <Image
+          src="/image/404_image.png"
+          alt="404-page_image"
+          width={600}
+          height={600}
+        />
+      </Box>
+
+      <Box display={{ base: "block", md: "none", lg: "none" }}>
+        <Image
+          src="/image/404_mobile_image.png"
+          alt="404-page_image"
+          width={600}
+          height={600}
+        />
+      </Box>
 
       <Flex
         // position="absolute"
@@ -50,7 +60,7 @@ export const NotFound = () => {
         pt={{ base: "100px", md: "120px" }}
       >
         <Text fontSize="18px" fontWeight={500}>
-          Opps........ Something went wrong
+          Something went wrong
         </Text>
 
         <Text fontWeight={500} fontSize="14px" mt="8px">
@@ -68,7 +78,7 @@ export const NotFound = () => {
           color="black"
           cursor="pointer"
           py="10px"
-          px="20px"
+          px="10px"
           mt={{ base: "20px", md: "30px" }}
           border="1px solid #000"
           href="/"
@@ -79,7 +89,7 @@ export const NotFound = () => {
         <Flex
           flexDir="column"
           alignItems="center"
-          // pt={{ base: "60px", md: "100px" }}
+          pt={{ base: "60px", md: "20px" }}
         >
           <HStack
             mt={{ base: "16px", md: "24px" }}
