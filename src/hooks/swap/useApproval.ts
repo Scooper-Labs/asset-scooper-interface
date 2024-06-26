@@ -9,38 +9,34 @@ export type SuccessResult = { status: "fulfilled"; value: any; token: Token };
 export type ErrorResult = { status: "rejected"; reason: unknown; value: Token };
 export type SwapResult = SuccessResult | ErrorResult;
 
-export const use1inchSwap = (
+export const use1inchApprovals = (
   chainId: ChainId | undefined,
   originAddress: Address | undefined,
 ) => {
   const { selectedTokens } = useSelectedTokens();
-  const [tokensWithLiquidity, setTokensWithLiquidity] = useState<Token[]>([]);
-  const [tokensWithNoLiquidity, setTokensWithNoLiquidity] = useState<Token[]>(
+
+  const [shouldFetch, setShouldFetch] = useState<boolean>(false);
+  const [approvalCallDataArray, setApprovalCallDataArray] = useState<string[]>(
     [],
   );
-  const [shouldFetch, setShouldFetch] = useState<boolean>(false);
-  const [swapCallDataArray, setSwapCallDataArray] = useState<string[]>([]);
 
   const [isLoading, setIsLoading] = useState(false);
-  const swapUrl = `https://1inch-proxy.vercel.app/swap`;
+  const approvalUrl = `https://1inch-proxy.vercel.app/approval`;
 
-  const fetchSwapData = async () => {
+  const fetchApprovalData = async () => {
     setIsLoading(true);
 
     const swapParamsConfig = selectedTokens.map((token) => {
       const params = new URLSearchParams({
-        src: token.address.toLowerCase(),
-        dst: "0x4200000000000000000000000000000000000006", // wrapped Ethereum
+        tokenAddress: token.address.toLowerCase(),
         amount: parseUnits(
           token.userBalance.toString(),
           token.decimals,
         ).toString(),
-        from: "0xE3c347cEa95B7BfdB921074bdb39b8571F905f6D",
-        slippage: "50",
-        origin: "",
-        chainId: chainId ? chainId.toString() : "",
+        chainId: chainId ? chainId.toString() : "", // Assuming chainId is a number, convert to string
       });
-      const url = `${swapUrl}?${params.toString()}`;
+      const url = `${approvalUrl}?${params.toString()}`;
+
       return { url, token };
     });
 
@@ -49,6 +45,7 @@ export const use1inchSwap = (
 
     try {
       const results = [];
+      const callDataArray = [];
       for (const config of swapParamsConfig) {
         try {
           const response = await fetch(config.url);
@@ -58,6 +55,7 @@ export const use1inchSwap = (
             value: data,
             token: config.token,
           });
+          data.tx.data && callDataArray.push(data);
         } catch (error) {
           results.push({
             status: "rejected",
@@ -65,6 +63,7 @@ export const use1inchSwap = (
             token: config.token,
           });
         }
+        // Wait for 1 second before the next request
         await delay(1100);
       }
 
@@ -72,28 +71,14 @@ export const use1inchSwap = (
         .filter(
           (result): result is SuccessResult => result.status === "fulfilled",
         )
-        .map((result) => result);
+        .map((result) => result.value);
 
-      console.log("Sweep data:", filteredRes);
+      console.log("Approval data data:", filteredRes);
 
-      filteredRes.map(async (result) => {
-        console.log(result.status);
-
-        if (result.value.error || result.value.statusCode == 400) {
-          console.log("token address BADDD REQUEST", result.token.address);
-          //push result.token to setTokensWithNoLiquidity
-
-          setTokensWithNoLiquidity((prev) => [...prev, result.token]);
-        } else if (result.value.tx) {
-          console.log("token address", result.token.address);
-          //push result.token to setTokensWithLiquidity
-          setTokensWithLiquidity((prev) => [...prev, result.token]);
-          setSwapCallDataArray((prev) => [...prev, result.value.tx.data]);
-        }
-
-        console.log(tokensWithNoLiquidity, tokensWithLiquidity);
+      filteredRes.map((result) => {
+        console.log("setting approval calldata");
+        setApprovalCallDataArray((prev) => [...prev, result.data]);
       });
-
       return filteredRes;
     } catch (e) {
       console.error("Error fetching swap data:", e);
@@ -104,10 +89,10 @@ export const use1inchSwap = (
     }
   };
   return {
-    fetchSwapData,
+    fetchApprovalData,
     isLoading,
     tokensWithLiquidity,
     tokensWithNoLiquidity,
-    swapCallDataArray,
+    approvalCallDataArray,
   };
 };

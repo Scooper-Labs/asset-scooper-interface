@@ -5,6 +5,10 @@ import { useCallback, useState } from "react";
 import { Token } from "@/lib/components/types";
 import { Address, parseUnits } from "viem";
 
+export type SuccessResult = { status: "fulfilled"; value: any; token: Token };
+export type ErrorResult = { status: "rejected"; reason: unknown; value: Token };
+export type SwapResult = SuccessResult | ErrorResult;
+
 export const use1inchApprovals = (
   chainId: ChainId | undefined,
   originAddress: Address | undefined,
@@ -15,7 +19,9 @@ export const use1inchApprovals = (
     [],
   );
   const [shouldFetch, setShouldFetch] = useState<boolean>(false);
-  const [swapCallDataArray, setSwapCallDataArray] = useState<string[]>([]);
+  const [approvalCallDataArray, setApprovalCallDataArray] = useState<string[]>(
+    [],
+  );
 
   const [isLoading, setIsLoading] = useState(false);
   const approvalUrl = `https://1inch-proxy.vercel.app/approval`;
@@ -33,7 +39,8 @@ export const use1inchApprovals = (
         chainId: chainId ? chainId.toString() : "", // Assuming chainId is a number, convert to string
       });
       const url = `${approvalUrl}?${params.toString()}`;
-      return url;
+
+      return { url, token };
     });
 
     const delay = (ms: number) =>
@@ -41,13 +48,23 @@ export const use1inchApprovals = (
 
     try {
       const results = [];
-      for (const url of swapParamsConfig) {
+      const callDataArray = [];
+      for (const config of swapParamsConfig) {
         try {
-          const response = await fetch(url);
+          const response = await fetch(config.url);
           const data = await response.json();
-          results.push({ status: "fulfilled", value: data });
+          results.push({
+            status: "fulfilled",
+            value: data,
+            token: config.token,
+          });
+          data.tx.data && callDataArray.push(data);
         } catch (error) {
-          results.push({ status: "rejected", reason: error });
+          results.push({
+            status: "rejected",
+            reason: error,
+            token: config.token,
+          });
         }
         // Wait for 1 second before the next request
         await delay(1100);
@@ -55,18 +72,15 @@ export const use1inchApprovals = (
 
       const filteredRes = results
         .filter(
-          (result): result is PromiseFulfilledResult<any> =>
-            result.status === "fulfilled",
+          (result): result is SuccessResult => result.status === "fulfilled",
         )
         .map((result) => result.value);
 
-      console.log("Swap data:", filteredRes);
+      console.log("Approval data data:", filteredRes);
 
       filteredRes.map((result) => {
-        console.log(result?.description);
-
-        if (result.description == "insufficient liquidity") {
-        }
+        console.log("setting approval calldata");
+        setApprovalCallDataArray((prev) => [...prev, result.data]);
       });
       return filteredRes;
     } catch (e) {
@@ -82,6 +96,6 @@ export const use1inchApprovals = (
     isLoading,
     tokensWithLiquidity,
     tokensWithNoLiquidity,
-    swapCallDataArray,
+    approvalCallDataArray,
   };
 };

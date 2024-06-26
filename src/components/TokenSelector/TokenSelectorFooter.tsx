@@ -53,16 +53,18 @@ export function TokenSelectFooter({ onClose }: { onClose: () => void }) {
       justify="space-between"
       padding="1rem"
     >
-      <Text color="#000" fontSize="larger">
+      <Text color="#0099FB" fontSize="larger">
         ~ ${totalUSDValue.toFixed(3)}
       </Text>
 
       <HStack>
         <Button
           alignContent="center"
-          border="1px solid #D0D5DD"
+          border={`1px solid ${
+            selectedTokens.length > 0 ? "#0099FB" : "#D0D5DD"
+          }`}
           borderRadius={10}
-          color="#A8BBD6"
+          color={selectedTokens.length > 0 ? "#0099FB" : "#A8BBD6"}
           fontWeight="400"
           onClick={
             isAllSelected
@@ -80,7 +82,11 @@ export function TokenSelectFooter({ onClose }: { onClose: () => void }) {
             <Text marginLeft="5px">Select All</Text>
           </Checkbox>
         </Button>
-        <Button background="#B5B4C6" borderRadius={10} onClick={onClose}>
+        <Button
+          background={selectedTokens.length > 0 ? "#0099FB" : "#B5B4C6"}
+          borderRadius={10}
+          onClick={onClose}
+        >
           <FaArrowRight size={15} color="#fff" />
         </Button>
       </HStack>
