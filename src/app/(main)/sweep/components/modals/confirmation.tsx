@@ -21,23 +21,43 @@ import { use1inchSwap } from "@/hooks/swap/use1inchSwap";
 import { useSelectedTokens } from "@/hooks/useSelectTokens";
 import { GoInfo } from "react-icons/go";
 import ApprovalModal from "./approval";
+
+import assetscooperAbi from "@/constants/abi/assetscooper.json";
+import { assetscooper_contract } from "@/constants/contractAddress";
+import { useAssetScooperContractWrite } from "@/hooks/useAssetScooperWriteContract";
+import { Address, parseUnits } from "viem";
+
 function ConfirmationModal({
   tokensAllowanceStatus,
+  refetch,
 }: {
   tokensAllowanceStatus: boolean;
+  refetch: () => void;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isConnected, chainId, address } = useAccount();
 
   const { selectedTokens } = useSelectedTokens();
 
+  const { fetchSwapData, isLoading, swapCallDataArray } = use1inchSwap(
+    chainId as ChainId,
+    address,
+  );
+
   const {
-    fetchSwapData,
-    isLoading,
-    tokensWithLiquidity,
-    tokensWithNoLiquidity,
-    swapCallDataArray,
-  } = use1inchSwap(chainId as ChainId, address);
+    write: swap,
+    isPending: isApprovalPending,
+    isConfirmed: isConfirmed,
+    isWriteContractError: isApprovalError,
+  } = useAssetScooperContractWrite({
+    fn: "swap",
+    args: [parseUnits("0", 18), swapCallDataArray],
+    abi: assetscooperAbi,
+    contractAddress: assetscooper_contract as Address,
+  });
+  const handlesweep = async () => {
+    swap();
+  };
 
   return (
     <>
@@ -100,10 +120,22 @@ function ConfirmationModal({
               </VStack>
 
               <HStack width="100%">
-                <ApprovalModal tokensAllowanceStatus={tokensAllowanceStatus} />
+                <ApprovalModal
+                  tokensAllowanceStatus={tokensAllowanceStatus}
+                  refetch={refetch}
+                />
                 <Button
                   width="100%"
                   color="#fff"
+                  onClick={fetchSwapData}
+                  bg={tokensAllowanceStatus ? "#0099FB" : "#B5B4C6"}
+                >
+                  fetch calldata
+                </Button>
+                <Button
+                  width="100%"
+                  color="#fff"
+                  onClick={handlesweep}
                   bg={tokensAllowanceStatus ? "#0099FB" : "#B5B4C6"}
                 >
                   Sweep
@@ -111,7 +143,6 @@ function ConfirmationModal({
               </HStack>
             </VStack>
           </ModalBody>
-
           <ModalFooter></ModalFooter>
         </ModalContent>
       </Modal>

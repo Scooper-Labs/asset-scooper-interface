@@ -1,2 +1,2 @@
 export const assetscooper_contract =
-  "0x2f638E797054BF54BE09C02aDa91318b1550b58c";
+  "0xCe4663cdA409F30db1835Bbc9AB9C77ddB6B2970";

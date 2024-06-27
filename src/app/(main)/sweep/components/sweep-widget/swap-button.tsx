@@ -11,13 +11,15 @@ import {
 } from "wagmi";
 import ApprovalModal from "../modals/approval";
 import { useReadContracts } from "wagmi";
-import { erc20Abi, Address } from "viem";
+import { erc20Abi, Address, parseUnits, formatUnits } from "viem";
 import ConfirmationModal from "../modals/confirmation";
 
 const spenderAddress = "0x111111125421ca6dc452d289314280a0f8842a65";
 
 function SweepButton() {
   const { selectedTokens } = useSelectedTokens();
+
+  const [tokensAllowance, setTokensAllowance] = useState(false);
 
   const { isConnected, chainId, address } = useAccount();
   const contracts = selectedTokens.map((token) => ({
@@ -27,18 +29,34 @@ function SweepButton() {
     args: [address, spenderAddress as Address], // You'll need to provide these
   }));
 
-  const { data, isLoading, refetch } = useReadContracts({
+  const { data, isLoading, refetch, isSuccess, isError } = useReadContracts({
     contracts,
   });
 
-  const tokensAllowanceStatus = data
-    ? data.every((balance, index) => {
-        const userBalance = selectedTokens[index].userBalance;
-        return balance.toString() === userBalance.toString();
-      })
-    : false;
+  const computeTokenAllowances = () =>
+    data
+      ? data.every((allowance, index) => {
+          const userBalance = selectedTokens[index].userBalance;
+          const decimals = selectedTokens[index].decimals;
+          const _allowance = allowance.result ?? 0n;
+          console.log(typeof _allowance);
 
-  useEffect(() => {});
+          /* @ts-ignore */
+          return Number(formatUnits(_allowance, decimals)) === userBalance;
+        })
+      : false;
+
+  useEffect(() => {
+    console.log("computeTokenAllowances", data);
+    isSuccess && setTokensAllowance(computeTokenAllowances);
+  }, [isSuccess, isLoading, data]);
+
+  console.log("tokensAllowanceStatus", computeTokenAllowances, data);
+
+  useEffect(() => {
+    refetch();
+    setTokensAllowance(computeTokenAllowances);
+  }, [chainId, isLoading]);
 
   return (
     <>
@@ -49,8 +67,10 @@ function SweepButton() {
           {selectedTokens.length > 0 ? (
             <>
               <ConfirmationModal
-                tokensAllowanceStatus={tokensAllowanceStatus}
+                tokensAllowanceStatus={tokensAllowance}
+                refetch={refetch}
               />
+              {/* <Button onClick={() => refetch()}>Reftch Allowances</Button> */}
             </>
           ) : (
             <>
