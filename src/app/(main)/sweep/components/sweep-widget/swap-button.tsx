@@ -1,44 +1,44 @@
-import { TokenSelector } from "@/components/TokenSelector";
-import {
-  ChevronDownIcon,
-  InfoOutlineIcon,
-  SettingsIcon,
-} from "@chakra-ui/icons";
 import { Box, Button, Flex, HStack, Text, VStack } from "@chakra-ui/react";
-import Image from "next/image";
-import React from "react";
-import { SwapSettings } from "./swap-settings";
-import { COLORS } from "@/constants/theme";
 import { useSelectedTokens } from "@/hooks/useSelectTokens";
-import { useAccount } from "wagmi";
-import { useWriteContracts } from "wagmi/experimental";
-import { Address, erc20Abi } from "viem";
-import { useWatchPendingTransactions } from "wagmi";
+import React, { useEffect, useState, Dispatch, SetStateAction } from "react";
 import { use1inchSwap } from "@/hooks/swap/use1inchSwap";
 import { ChainId } from "@/constants";
+import SwapModal from "../modals/confirmation";
+import {
+  useAccount,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+} from "wagmi";
 import ApprovalModal from "../modals/approval";
-import SwapModal from "../modals/swap";
+import { useReadContracts } from "wagmi";
+import { erc20Abi, Address } from "viem";
+import ConfirmationModal from "../modals/confirmation";
+
+const spenderAddress = "0x111111125421ca6dc452d289314280a0f8842a65";
 
 function SweepButton() {
-  const { isSelected, _selectToken, _unSelectToken, selectedTokens } =
-    useSelectedTokens();
+  const { selectedTokens } = useSelectedTokens();
 
   const { isConnected, chainId, address } = useAccount();
+  const contracts = selectedTokens.map((token) => ({
+    abi: erc20Abi,
+    address: token.address as Address,
+    functionName: "allowance",
+    args: [address, spenderAddress as Address], // You'll need to provide these
+  }));
 
-  const {
-    fetchSwapData,
-    isLoading,
-    tokensWithLiquidity,
-    tokensWithNoLiquidity,
-    swapCallDataArray,
-  } = use1inchSwap(chainId as ChainId, address);
+  const { data, isLoading, refetch } = useReadContracts({
+    contracts,
+  });
 
-  console.log(
-    "swap data",
-    tokensWithLiquidity,
-    tokensWithNoLiquidity,
-    swapCallDataArray,
-  );
+  const tokensAllowanceStatus = data
+    ? data.every((balance, index) => {
+        const userBalance = selectedTokens[index].userBalance;
+        return balance.toString() === userBalance.toString();
+      })
+    : false;
+
+  useEffect(() => {});
 
   return (
     <>
@@ -48,12 +48,15 @@ function SweepButton() {
         <>
           {selectedTokens.length > 0 ? (
             <>
-              <ApprovalModal />
-              <SwapModal />
+              <ConfirmationModal
+                tokensAllowanceStatus={tokensAllowanceStatus}
+              />
             </>
           ) : (
             <>
-              <Button>Select tokens</Button>
+              <Button width="100%" bg="#B5B4C6" color="#fff">
+                Select tokens
+              </Button>
             </>
           )}
         </>
