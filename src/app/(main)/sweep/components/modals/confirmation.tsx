@@ -23,8 +23,10 @@ import { GoInfo } from "react-icons/go";
 import ApprovalModal from "./approval";
 function ConfirmationModal({
   tokensAllowanceStatus,
+  refetch,
 }: {
   tokensAllowanceStatus: boolean;
+  refetch: () => void;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isConnected, chainId, address } = useAccount();
@@ -39,6 +41,8 @@ function ConfirmationModal({
     swapCallDataArray,
   } = use1inchSwap(chainId as ChainId, address);
 
+
+  
   return (
     <>
       <Button
@@ -100,7 +104,10 @@ function ConfirmationModal({
               </VStack>
 
               <HStack width="100%">
-                <ApprovalModal tokensAllowanceStatus={tokensAllowanceStatus} />
+                <ApprovalModal
+                  tokensAllowanceStatus={tokensAllowanceStatus}
+                  refetch={refetch}
+                />
                 <Button
                   width="100%"
                   color="#fff"
@@ -111,7 +118,6 @@ function ConfirmationModal({
               </HStack>
             </VStack>
           </ModalBody>
-
           <ModalFooter></ModalFooter>
         </ModalContent>
       </Modal>

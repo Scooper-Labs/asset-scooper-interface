@@ -21,8 +21,10 @@ import { useAccount } from "wagmi";
 import TokenRow from "./token-row";
 function ApprovalModal({
   tokensAllowanceStatus,
+  refetch,
 }: {
   tokensAllowanceStatus: boolean;
+  refetch: () => void;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isConnected, chainId, address } = useAccount();
@@ -51,18 +53,28 @@ function ApprovalModal({
           <ModalHeader>Approve Tokens</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <VStack>
+            <VStack width="100%" gap="4px">
               {selectedTokens.map((token) => {
                 return (
-                  <Box key={token.address}>
-                    <TokenRow token={token} />
+                  <Box width="100%" key={token.address}>
+                    <TokenRow token={token} refetch={refetch} />
                   </Box>
                 );
               })}
             </VStack>
           </ModalBody>
 
-          <ModalFooter></ModalFooter>
+          <ModalFooter>
+            <Button
+              onClick={() => {
+                console.log("tokensAllowanceStatus  tokensAllowanceStatus", tokensAllowanceStatus);
+                refetch();
+                onClose();
+              }}
+            >
+              Close
+            </Button>
+          </ModalFooter>
         </ModalContent>
       </Modal>
     </>
