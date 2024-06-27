@@ -56,7 +56,7 @@ export const useAssetScooperContractWrite = ({
         title: "Transaction Pending...",
         description: "Transaction Pending, Please confirm in wallet",
         status: "info",
-        duration: 9000,
+        duration: 2000,
         isClosable: true,
       });
     }
@@ -65,7 +65,7 @@ export const useAssetScooperContractWrite = ({
         title: "Transaction Submitted",
         description: "Transaction has been submitted to the network",
         status: "success",
-        duration: 9000,
+        duration: 2000,
         isClosable: true,
       });
     }
@@ -74,7 +74,7 @@ export const useAssetScooperContractWrite = ({
         title: "Transaction Confirmed",
         description: "Transaction has been confirmed on the network",
         status: "success",
-        duration: 9000,
+        duration: 2000,
         isClosable: true,
       });
     }
@@ -86,7 +86,7 @@ export const useAssetScooperContractWrite = ({
           WaitForTransactionReceiptError?.message ||
           "An error occurred",
         status: "error",
-        duration: 9000,
+        duration: 2000,
         isClosable: true,
       });
     }
