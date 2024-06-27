@@ -14,10 +14,7 @@ export const use1inchApprovals = (
   originAddress: Address | undefined,
 ) => {
   const { selectedTokens } = useSelectedTokens();
-  const [tokensWithLiquidity, setTokensWithLiquidity] = useState<Token[]>([]);
-  const [tokensWithNoLiquidity, setTokensWithNoLiquidity] = useState<Token[]>(
-    [],
-  );
+
   const [shouldFetch, setShouldFetch] = useState<boolean>(false);
   const [approvalCallDataArray, setApprovalCallDataArray] = useState<string[]>(
     [],
@@ -94,8 +91,6 @@ export const use1inchApprovals = (
   return {
     fetchApprovalData,
     isLoading,
-    tokensWithLiquidity,
-    tokensWithNoLiquidity,
     approvalCallDataArray,
   };
 };
