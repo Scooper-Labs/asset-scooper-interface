@@ -51,12 +51,11 @@ function ConfirmationModal({
     isWriteContractError: isApprovalError,
   } = useAssetScooperContractWrite({
     fn: "swap",
-    args: [parseUnits("420", 18), swapCallDataArray],
+    args: [parseUnits("0", 18), swapCallDataArray],
     abi: assetscooperAbi,
     contractAddress: assetscooper_contract as Address,
   });
-  const handleApprove = async () => {
-    await fetchSwapData();
+  const handlesweep = async () => {
     swap();
   };
 
@@ -128,7 +127,15 @@ function ConfirmationModal({
                 <Button
                   width="100%"
                   color="#fff"
-                  onClick={handleApprove}
+                  onClick={fetchSwapData}
+                  bg={tokensAllowanceStatus ? "#0099FB" : "#B5B4C6"}
+                >
+                  fetch calldata
+                </Button>
+                <Button
+                  width="100%"
+                  color="#fff"
+                  onClick={handlesweep}
                   bg={tokensAllowanceStatus ? "#0099FB" : "#B5B4C6"}
                 >
                   Sweep
