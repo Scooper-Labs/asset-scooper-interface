@@ -14,11 +14,7 @@ export const use1inchSwap = (
   originAddress: Address | undefined,
 ) => {
   const { selectedTokens } = useSelectedTokens();
-  const [tokensWithLiquidity, setTokensWithLiquidity] = useState<Token[]>([]);
-  const [tokensWithNoLiquidity, setTokensWithNoLiquidity] = useState<Token[]>(
-    [],
-  );
-  const [shouldFetch, setShouldFetch] = useState<boolean>(false);
+
   const [swapCallDataArray, setSwapCallDataArray] = useState<string[]>([]);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -49,6 +45,7 @@ export const use1inchSwap = (
 
     try {
       const results = [];
+      const callDataArray = [];
       for (const config of swapParamsConfig) {
         try {
           const response = await fetch(config.url);
@@ -58,6 +55,7 @@ export const use1inchSwap = (
             value: data,
             token: config.token,
           });
+          callDataArray.push(data.tx.data);
         } catch (error) {
           results.push({
             status: "rejected",
@@ -68,33 +66,16 @@ export const use1inchSwap = (
         await delay(1100);
       }
 
+      console.log("swap data", results);
       const filteredRes = results
         .filter(
           (result): result is SuccessResult => result.status === "fulfilled",
         )
-        .map((result) => result);
+        .map((result) => result.value);
 
-      console.log("Sweep data:", filteredRes);
+      console.log("Sweep data calldata:", filteredRes);
 
-      filteredRes.map(async (result) => {
-        console.log(result.status);
-
-        if (result.value.error || result.value.statusCode == 400) {
-          console.log("token address BADDD REQUEST", result.token.address);
-          //push result.token to setTokensWithNoLiquidity
-
-          setTokensWithNoLiquidity((prev) => [...prev, result.token]);
-        } else if (result.value.tx) {
-          console.log("token address", result.token.address);
-          //push result.token to setTokensWithLiquidity
-          setTokensWithLiquidity((prev) => [...prev, result.token]);
-          setSwapCallDataArray((prev) => [...prev, result.value.tx.data]);
-        }
-
-        console.log(tokensWithNoLiquidity, tokensWithLiquidity);
-      });
-
-      return filteredRes;
+      setSwapCallDataArray(filteredRes.map((data) => data.tx.data));
     } catch (e) {
       console.error("Error fetching swap data:", e);
       // setError("Failed to fetch swap data. Please try again.");
@@ -106,8 +87,6 @@ export const use1inchSwap = (
   return {
     fetchSwapData,
     isLoading,
-    tokensWithLiquidity,
-    tokensWithNoLiquidity,
     swapCallDataArray,
   };
 };

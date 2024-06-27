@@ -21,6 +21,12 @@ import { use1inchSwap } from "@/hooks/swap/use1inchSwap";
 import { useSelectedTokens } from "@/hooks/useSelectTokens";
 import { GoInfo } from "react-icons/go";
 import ApprovalModal from "./approval";
+
+import assetscooperAbi from "@/constants/abi/assetscooper.json";
+import { assetscooper_contract } from "@/constants/contractAddress";
+import { useAssetScooperContractWrite } from "@/hooks/useAssetScooperWriteContract";
+import { Address, parseUnits } from "viem";
+
 function ConfirmationModal({
   tokensAllowanceStatus,
   refetch,
@@ -33,16 +39,27 @@ function ConfirmationModal({
 
   const { selectedTokens } = useSelectedTokens();
 
+  const { fetchSwapData, isLoading, swapCallDataArray } = use1inchSwap(
+    chainId as ChainId,
+    address,
+  );
+
   const {
-    fetchSwapData,
-    isLoading,
-    tokensWithLiquidity,
-    tokensWithNoLiquidity,
-    swapCallDataArray,
-  } = use1inchSwap(chainId as ChainId, address);
+    write: swap,
+    isPending: isApprovalPending,
+    isConfirmed: isConfirmed,
+    isWriteContractError: isApprovalError,
+  } = useAssetScooperContractWrite({
+    fn: "swap",
+    args: [parseUnits("420", 18), swapCallDataArray],
+    abi: assetscooperAbi,
+    contractAddress: assetscooper_contract as Address,
+  });
+  const handleApprove = async () => {
+    await fetchSwapData();
+    swap();
+  };
 
-
-  
   return (
     <>
       <Button
@@ -111,6 +128,7 @@ function ConfirmationModal({
                 <Button
                   width="100%"
                   color="#fff"
+                  onClick={handleApprove}
                   bg={tokensAllowanceStatus ? "#0099FB" : "#B5B4C6"}
                 >
                   Sweep
