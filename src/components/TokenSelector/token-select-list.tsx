@@ -31,7 +31,13 @@ function TokenSelectList() {
       // ref={vStackRef}
       gap="12px"
     >
-      <HStack fontSize="smaller" padding="0.5rem" color="#9E829F" justifyContent="space-between" width="100%">
+      <HStack
+        fontSize="smaller"
+        padding="0.5rem"
+        color="#9E829F"
+        justifyContent="space-between"
+        width="100%"
+      >
         <Text>Tokens</Text> <Text>Value</Text>
       </HStack>
       {/* <Button onClick={handleHeightCheck}>{_height ? _height : "e"}</Button> */}
