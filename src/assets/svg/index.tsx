@@ -1,4 +1,5 @@
 import { SvgProps } from "@/lib/components/types";
+import { SVGProps } from "react";
 
 export function SCOOPER_SVG() {
   return {
@@ -540,3 +541,157 @@ export function SCOOPER_SVG() {
     },
   };
 }
+
+const Avatar = (props: SVGProps<SVGSVGElement>) => (
+  <svg
+    width={20}
+    height={20}
+    viewBox="0 0 20 20"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
+    <g clipPath="url(#clip0_3170_38710)">
+      <rect width={20} height={20} rx={10} fill="#00FFF0" />
+      <rect
+        x={8.88892}
+        y={11.1111}
+        width={2.22222}
+        height={2.22222}
+        fill="#00BFE9"
+      />
+      <rect
+        x={6.66675}
+        y={-1.38892}
+        width={6.66667}
+        height={2.22222}
+        fill="#00BFE9"
+      />
+      <rect
+        x={0.555664}
+        y={3.05566}
+        width={18.8889}
+        height={2.22222}
+        fill="#00BFE9"
+      />
+      <rect
+        x={7.77783}
+        y={13.3333}
+        width={4.44444}
+        height={4.44444}
+        fill="#00BFE9"
+      />
+      <rect
+        x={8.88892}
+        y={6.94434}
+        width={2.22222}
+        height={2.22222}
+        fill="#005E72"
+      />
+      <rect
+        x={8.88892}
+        y={17.7778}
+        width={2.22222}
+        height={2.22222}
+        fill="#005E72"
+      />
+      <rect
+        x={0.277832}
+        y={11.1111}
+        width={2.22222}
+        height={2.22222}
+        fill="#005E72"
+      />
+      <rect
+        x={17.5}
+        y={11.1111}
+        width={2.22222}
+        height={2.22222}
+        fill="#005E72"
+      />
+      <rect
+        x={6.66675}
+        y={0.833252}
+        width={6.66667}
+        height={2.22222}
+        fill="#005E72"
+      />
+      <rect
+        x={6.66675}
+        y={11.1111}
+        width={2.22222}
+        height={2.22222}
+        fill="#00BFE9"
+      />
+      <rect
+        x={4.44434}
+        y={-0.555664}
+        width={2.22222}
+        height={13.8889}
+        fill="#00BFE9"
+      />
+      <rect
+        x={6.66675}
+        y={6.94434}
+        width={2.22222}
+        height={2.22222}
+        fill="#005E72"
+      />
+      <rect
+        x={6.66675}
+        y={9.16675}
+        width={6.66667}
+        height={2.22222}
+        fill="#BE713F"
+      />
+      <rect
+        x={0.277832}
+        y={13.3333}
+        width={2.22222}
+        height={2.22222}
+        fill="#BE713F"
+      />
+      <rect
+        x={17.5}
+        y={13.3333}
+        width={2.22222}
+        height={2.22222}
+        fill="#BE713F"
+      />
+      <rect
+        x={11.1111}
+        y={11.3889}
+        width={2.22222}
+        height={1.94444}
+        fill="#00BFE9"
+      />
+      <rect
+        x={13.3333}
+        y={11.1111}
+        width={2.22222}
+        height={2.22222}
+        fill="#00BFE9"
+      />
+      <rect
+        x={13.3333}
+        y={-0.555664}
+        width={2.22222}
+        height={11.6667}
+        fill="#00BFE9"
+      />
+      <rect
+        x={11.1111}
+        y={6.94434}
+        width={2.22222}
+        height={2.22222}
+        fill="#005E72"
+      />
+    </g>
+    <defs>
+      <clipPath id="clip0_3170_38710">
+        <rect width={20} height={20} rx={10} fill="white" />
+      </clipPath>
+    </defs>
+  </svg>
+);
+export default Avatar;
