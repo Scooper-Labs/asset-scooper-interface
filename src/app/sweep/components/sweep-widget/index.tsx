@@ -1,3 +1,5 @@
+"use client";
+
 import { TokenSelector } from "@/components/TokenSelector";
 import {
   ChevronDownIcon,
@@ -11,13 +13,13 @@ import { SwapSettings } from "./swap-settings";
 import { COLORS } from "@/constants/theme";
 import { useSelectedTokens } from "@/hooks/useSelectTokens";
 import SweepButton from "./swap-button";
-
+import { useRouter } from "next/navigation";
 
 function SweepWidget() {
   const { isSelected, _selectToken, _unSelectToken, selectedTokens } =
     useSelectedTokens();
 
-
+  const router = useRouter();
 
   return (
     <VStack gap="12px">
@@ -30,6 +32,7 @@ function SweepWidget() {
             color={COLORS.tabTextColor}
             shadow="small"
             border="1px solid #B190EB"
+            onClick={() => router.refresh()}
             _hover={{
               bg: `${COLORS.btnBGGradient}`,
             }}

@@ -23,7 +23,7 @@ export function SwapSettings() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [activeButton, setActiveButton] = useState<string>("auto");
   const { slippageTolerance, setSlippageTolerance } = useSlippageTolerance(
-    SlippageToleranceStorageKey.Sweep,
+    SlippageToleranceStorageKey.Sweep
   );
   const { setSweepThreshold, sweepthreshHold } = useSweepThreshhold();
   const [slippageError, setSlippageError] = useState<boolean>(false);
@@ -41,7 +41,7 @@ export function SwapSettings() {
   };
 
   const handeThreshholdChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const value = event.target.value;
     setSweepThreshold(value);
@@ -70,7 +70,7 @@ export function SwapSettings() {
         onClose={onClose}
         closeOnOverlayClick={false}
         modalContentStyle={{
-          background: "#FDFDFD33",
+          background: "#FDFDFD",
           borderRadius: "16px",
           border: `1px solid ${COLORS.borderColor}`,
           boxShadow: "#E9C7EA4D",
