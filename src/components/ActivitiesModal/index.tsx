@@ -24,6 +24,9 @@ import { IoMdClose } from "react-icons/io";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import Tokens from "./components/Tokens";
 import Transactions from "./components/Transactions";
+import { useAccount, useDisconnect } from "wagmi";
+import { truncate } from "@/utils/address";
+import Avatar from "@/assets/svg";
 
 interface IModals {
   isOpen: boolean;
@@ -33,10 +36,17 @@ interface IModals {
 
 const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
   const [isBalanceVisible, setIsBalanceVisible] = useState<boolean>(true);
+  const { address } = useAccount();
+  const { disconnect } = useDisconnect();
 
   const balanceVisibility = () => {
     setIsBalanceVisible(!isBalanceVisible);
   };
+
+  function disconnectAndCloseModal() {
+    disconnect();
+    onClose();
+  }
 
   return (
     <Drawer
@@ -60,15 +70,9 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
           {/* ----- Heading Account detail ----- */}
           <Flex justify="space-between">
             <HStack>
-              <Circle
-                //@ts-ignore
-                width="32px"
-                border="1px solid black"
-                height="32px"
-              ></Circle>
-
+              <Avatar width={32} height={32} />
               <Text fontSize="16px" lineHeight="19.2px">
-                0x016...28a2
+                {truncate(address || "")}
               </Text>
             </HStack>
 
@@ -164,7 +168,7 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
             fontWeight={400}
             borderRadius="8px"
             h="40px"
-            onClick={onClose}
+            onClick={disconnectAndCloseModal}
             _hover={{
               bgColor: "#FFDFE3",
               color: "#E2001B",
