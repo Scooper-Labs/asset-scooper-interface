@@ -10,9 +10,7 @@ interface MainAppLayoutProps {
 const MainAppLayout: React.FC<MainAppLayoutProps> = ({ children }) => {
   return (
     <>
-      <nav>
-        <AppNavbar />
-      </nav>
+      <AppNavbar />
       {children}
       <footer>
         <AppFooter />
