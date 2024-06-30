@@ -41,7 +41,7 @@ function ConfirmationModal({
 
   const { fetchSwapData, isLoading, swapCallDataArray } = use1inchSwap(
     chainId as ChainId,
-    address,
+    address
   );
 
   const {
@@ -51,10 +51,11 @@ function ConfirmationModal({
     isWriteContractError: isApprovalError,
   } = useAssetScooperContractWrite({
     fn: "swap",
-    args: [parseUnits("0", 18), swapCallDataArray],
+    args: [parseUnits("0", 18), swapCallDataArray], //passing minimum amount and the calldata Array into the smartcontract
     abi: assetscooperAbi,
     contractAddress: assetscooper_contract as Address,
   });
+
   const handlesweep = async () => {
     swap();
   };
