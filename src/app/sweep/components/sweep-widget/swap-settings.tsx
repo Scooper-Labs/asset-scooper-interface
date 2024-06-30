@@ -99,7 +99,7 @@ export function SwapSettings() {
                 border={`1px solid ${COLORS.borderColor}`}
                 borderRadius="12px"
                 _focus={{
-                  border: `1px solid ${COLORS.borderColor}`,
+                  border: `1px solid blue.400`,
                   outline: "none",
                   boxShadow: "none",
                 }}
@@ -173,7 +173,7 @@ export function SwapSettings() {
 
               <Box position="relative">
                 <Input
-                  backgroundColor="#B5B4C6"
+                  backgroundColor="#FBFDFE"
                   border={`1px solid ${COLORS.borderColor}`}
                   borderRadius="12px"
                   _focus={{
@@ -224,7 +224,7 @@ export function SwapSettings() {
               border={`1px solid ${COLORS.borderColor}`}
               borderRadius="12px"
               _focus={{
-                border: `1px solid ${COLORS.borderColor}`,
+                border: `1px solid blue.400`,
                 outline: "none",
                 boxShadow: "none",
               }}
