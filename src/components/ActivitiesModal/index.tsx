@@ -30,6 +30,7 @@ import { useBalances } from "@/hooks/balances/useBalances";
 import { useAppSelector } from "@/hooks/rtkHooks";
 import { RootState } from "@/store/store";
 import Avatar from "@/assets/svg";
+import FormatNumber from "../FormatNumber";
 
 interface IModals {
   isOpen: boolean;
@@ -47,15 +48,13 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
   });
 
   const userWalletTokens = useAppSelector(
-    (state: RootState) => state.SweepTokensSlice.userWalletTokens,
+    (state: RootState) => state.SweepTokensSlice.userWalletTokens
   );
 
-  const totalNetWorth = useMemo(() => {
-    return userWalletTokens.reduce((sum, token) => {
-      const realvalue = token.quoteUSD * token.userBalance;
-      return sum + realvalue;
-    }, 0);
-  }, [userWalletTokens]);
+  const totalNetWorth = userWalletTokens.reduce((sum, token) => {
+    const realvalue = token.quoteUSD * token.userBalance;
+    return sum + realvalue;
+  }, 0);
   const balanceVisibility = () => {
     setIsBalanceVisible(!isBalanceVisible);
   };
@@ -131,21 +130,12 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
               color={COLORS.balTextColor}
               lineHeight="43.2px"
             >
-              ${isBalanceVisible ? totalNetWorth.toFixed(2) : "****"}
-              {/* ${isBalanceVisible ? "305.68" : "****"} */}
+              {isBalanceVisible ? (
+                <FormatNumber pre="$" amount={totalNetWorth} />
+              ) : (
+                "****"
+              )}
             </Text>
-
-            <Box
-              background="#00BA8233"
-              color="#00976A"
-              py="10px"
-              px="10px"
-              borderRadius="28.5px"
-            >
-              <Text fontSize="12px" lineHeight="14.4px">
-                +23.4%
-              </Text>
-            </Box>
           </HStack>
         </Box>
 

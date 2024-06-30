@@ -26,14 +26,6 @@ export const useBalancesQuery = ({ account }: UseBalances) => {
   return useQuery({
     queryKey: [`covalent: ${account}`],
     queryFn: async () => {
-      // return fetch(`/api/balance/${account.toLowerCase()}`).then(
-      //   async (response) => {
-      //     console.log("response raw", response);
-      //     console.log("json response", await response.json());
-      //     await response.json();
-      //   },
-      // );
-
       const resp =
         await covalentClient.BalanceService.getTokenBalancesForWalletAddress(
           "base-mainnet",
@@ -43,9 +35,6 @@ export const useBalancesQuery = ({ account }: UseBalances) => {
       const xxx: BalancesResponse = resp.data;
       return resp;
     },
-    // staleTime: ms("15m"), // 15 mins
-    // gcTime: ms("1h"), // 1hr
-    // enabled: Boolean(account),
   });
 };
 // Define the schema for LogoUrls
@@ -57,7 +46,6 @@ export const useBalances = ({ account }: UseBalances) => {
     (state: RootState) => state.SweepTokensSlice.userWalletTokens
   );
 
-  // const [walletTokenList, setWalletTokenList] = useState<Token[]>([]);
   const { data, isLoading, isError, error, isFetched, isSuccess } =
     useBalancesQuery({ account });
 
