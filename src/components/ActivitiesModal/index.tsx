@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Drawer,
   DrawerBody,
@@ -31,6 +31,8 @@ import { useAppSelector } from "@/hooks/rtkHooks";
 import { RootState } from "@/store/store";
 import Avatar from "@/assets/svg";
 import FormatNumber from "../FormatNumber";
+import { useWalletsPortfolio } from "@/hooks/useMobula";
+import { AssetClass } from "@/utils/classes";
 
 interface IModals {
   isOpen: boolean;
@@ -42,19 +44,31 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
   const [isBalanceVisible, setIsBalanceVisible] = useState<boolean>(true);
   const { address } = useAccount();
   const { disconnect } = useDisconnect();
+  const { data, error, loading } = useWalletsPortfolio();
+  const [userWalletTokens, setUserWalletTokens] = useState<AssetClass[]>([]);
+  const [totalNetWorth, setTotalNetWorth] = useState(0);
 
-  const xxx = useBalances({
-    account: address ?? "",
-  });
+  useEffect(() => {
+    if (data) {
+      console.log("Data: ", data.assets);
+      setUserWalletTokens(data.assets);
+      let _total = data.assets.reduce((sum, token) => {
+        return sum + token.quoteUSD;
+      }, 0);
+      setTotalNetWorth(_total);
+    }
+  }, [data]);
 
-  const userWalletTokens = useAppSelector(
-    (state: RootState) => state.SweepTokensSlice.userWalletTokens
-  );
+  useBalances({ account: address ?? "" });
 
-  const totalNetWorth = userWalletTokens.reduce((sum, token) => {
-    const realvalue = token.quoteUSD * token.userBalance;
-    return sum + realvalue;
-  }, 0);
+  // // const userWalletTokens = useAppSelector(
+  // //   (state: RootState) => state.SweepTokensSlice.userWalletTokens
+  // // );
+
+  // const totalNetWorth = userWalletTokens.reduce((sum, token) => {
+  //   const realvalue = token.quoteUSD * token.userBalance;
+  //   return sum + realvalue;
+  // }, 0);
   const balanceVisibility = () => {
     setIsBalanceVisible(!isBalanceVisible);
   };

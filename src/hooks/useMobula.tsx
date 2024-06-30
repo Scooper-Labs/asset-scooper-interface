@@ -13,7 +13,7 @@ interface HistoryDataInterface {
 
 export const useWalletsPortfolio = () => {
   const { address } = useAccount();
-  const [data, setData] = useState<WalletPortfolioClass[] | null>(null);
+  const [data, setData] = useState<WalletPortfolioClass | null>(null);
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
@@ -51,7 +51,7 @@ export const useWalletsPortfolio = () => {
 
       if (value) {
         console.log("Cache hit");
-        setData(value as WalletPortfolioClass[]);
+        setData(value as WalletPortfolioClass);
       } else {
         console.log("Cache miss");
         fetchWalletsPortfolio();
