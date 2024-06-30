@@ -43,10 +43,7 @@ export function AppFooter() {
               <Text color="#0E111B" fontSize="14px">
                 About Us
               </Text>
-              <LinkComponent
-                href={`#`}
-                // href={`https://github.com/${SOCIAL_GITHUB}`}
-              >
+              <LinkComponent href={`/`}>
                 <RiExternalLinkLine />
               </LinkComponent>
             </HStack>

@@ -49,6 +49,7 @@ function ConfirmationModal({
     abi: assetscooperAbi,
     contractAddress: assetscooper_contract as Address,
   });
+
   const handlesweep = async () => {
     await sweepTokens();
   };
