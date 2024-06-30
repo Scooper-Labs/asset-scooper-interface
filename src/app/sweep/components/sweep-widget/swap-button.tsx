@@ -13,8 +13,7 @@ import ApprovalModal from "../modals/approval";
 import { useReadContracts } from "wagmi";
 import { erc20Abi, Address, parseUnits, formatUnits } from "viem";
 import ConfirmationModal from "../modals/confirmation";
-
-const spenderAddress = "0x111111125421ca6dc452d289314280a0f8842a65";
+import { assetscooper_contract } from "@/constants/contractAddress";
 
 function SweepButton() {
   const { selectedTokens } = useSelectedTokens();
@@ -26,7 +25,7 @@ function SweepButton() {
     abi: erc20Abi,
     address: token.address as Address,
     functionName: "allowance",
-    args: [address, spenderAddress as Address], // You'll need to provide these
+    args: [address, assetscooper_contract as Address], // You'll need to provide these
   }));
 
   const { data, isLoading, refetch, isSuccess, isError } = useReadContracts({

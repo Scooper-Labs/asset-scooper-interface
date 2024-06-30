@@ -14,6 +14,7 @@ import { Address, erc20Abi, parseEther } from "viem";
 import { useAccount, useReadContract } from "wagmi";
 import { ClipLoader } from "react-spinners";
 import { RxReload } from "react-icons/rx";
+import { assetscooper_contract } from "@/constants/contractAddress";
 
 function TokenRow({ token, refetch }: { token: Token; refetch: () => void }) {
   const { name, logoURI, address: tokenAddress, symbol, userBalance } = token;
@@ -27,13 +28,7 @@ function TokenRow({ token, refetch }: { token: Token; refetch: () => void }) {
     abi: erc20Abi,
     address: tokenAddress as Address,
     functionName: "allowance",
-    args:
-      address && chainId
-        ? [
-            address,
-            ONEINCH_ROUTER_ADDRESSES[chainId ? (chainId as ChainId) : 8453],
-          ]
-        : undefined,
+    args: address && chainId ? [address, assetscooper_contract] : undefined,
   });
 
   const {
@@ -43,10 +38,7 @@ function TokenRow({ token, refetch }: { token: Token; refetch: () => void }) {
     isWriteContractError: isApprovalError,
   } = useAssetScooperContractWrite({
     fn: "approve",
-    args: [
-      ONEINCH_ROUTER_ADDRESSES[chainId as ChainId],
-      parseEther(userBalance.toString()),
-    ],
+    args: [assetscooper_contract, parseEther(userBalance.toString())],
     abi: erc20Abi,
     contractAddress: tokenAddress as Address,
   });
