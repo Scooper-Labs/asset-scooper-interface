@@ -14,6 +14,7 @@ import { COLORS } from "@/constants/theme";
 import { useSelectedTokens } from "@/hooks/useSelectTokens";
 import SweepButton from "./swap-button";
 import { useRouter } from "next/navigation";
+import { SweepIcon } from "@/assets/svg";
 
 function SweepWidget() {
   const { isSelected, _selectToken, _unSelectToken, selectedTokens } =
@@ -61,8 +62,13 @@ function SweepWidget() {
 
         <VStack width="100%" gap="2px">
           <Flex width="100%" justify="space-between">
-            <Text>Sweep</Text>
-            <Text fontSize="small">Update in 30 sec 1ETH ≈ 3800 USDC </Text>
+            <Flex gap="6px" alignItems="center">
+              <SweepIcon />
+              <Text>Sweep</Text>
+            </Flex>
+            <Text fontSize="small" color="#9E829F">
+              Update in 30 sec 1ETH ≈ 3800 USDC{" "}
+            </Text>
           </Flex>
           <TokenSelector>
             <Flex
