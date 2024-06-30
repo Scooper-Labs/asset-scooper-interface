@@ -18,9 +18,24 @@ import TokenSelectList from "./token-select-list";
 import ModalComponent from "../ModalComponent";
 import TokenSelectorModalComponent from "./CustomModalComponent";
 import { TokenSelectFooter } from "./TokenSelectorFooter";
+import { useWalletsPortfolio } from "@/hooks/useMobula";
+import { useAppDispatch, useAppSelector } from "@/hooks/rtkHooks";
+import { RootState } from "@/store/store";
+import {
+  selectAllTokens,
+  setUserWalletTokenWithBalance,
+} from "@/store/sweep/sweepSlice";
 
 export function TokenSelector({ children }: { children?: ReactNode }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { data } = useWalletsPortfolio();
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (data) {
+      dispatch(setUserWalletTokenWithBalance(data.assets));
+    }
+  }, [data]);
 
   return (
     <>
@@ -28,11 +43,12 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
         onClick={onOpen}
         fontWeight="500"
         bg="#FAF6FD"
-        borderRadius={10}
+        borderRadius={8}
         color={COLORS.tabTextColor}
-        padding="12px"
+        padding="8px"
         cursor="pointer"
         width="100%"
+        border="1px solid #F6EEFC"
       >
         {children}
       </Box>
@@ -72,7 +88,8 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
             >
               <Text>Convert Low Balance </Text>
               <Text fontSize="small" fontWeight="100" color="#9E829F">
-                48 Tokens with balance below 0.004 ETH
+                {data ? data.assets.length : 0} Tokens with balance below 0.004
+                ETH
               </Text>
               <Box
                 border="none"

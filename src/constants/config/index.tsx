@@ -4,7 +4,8 @@ import { SITE_INFO, SITE_NAME, SITE_URL } from "@/utils/site";
 import { ETH_CHAINS } from "@/utils/network";
 
 export const WALLETCONNECT_PROJECT_ID =
-  process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "";
+  process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ??
+  "944b043d8e14c7103b05771ce54595cb";
 
 if (!WALLETCONNECT_PROJECT_ID) {
   console.warn(

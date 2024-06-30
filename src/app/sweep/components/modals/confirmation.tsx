@@ -35,30 +35,26 @@ function ConfirmationModal({
   refetch: () => void;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { isConnected, chainId, address } = useAccount();
 
   const { selectedTokens } = useSelectedTokens();
 
-  const { fetchSwapData, isLoading, swapCallDataArray } = use1inchSwap(
-    chainId as ChainId,
-    address
-  );
-
   const {
-    write: swap,
-    isPending: isApprovalPending,
+    write: sweepTokens,
+    isPending: isSweeping,
     isConfirmed: isConfirmed,
-    isWriteContractError: isApprovalError,
+    isConfirming,
   } = useAssetScooperContractWrite({
-    fn: "swap",
-    args: [parseUnits("0", 18), swapCallDataArray], //passing minimum amount and the calldata Array into the smartcontract
+    fn: "sweepTokens",
+    args: [selectedTokens.map((token) => token.address), [0n]],
     abi: assetscooperAbi,
     contractAddress: assetscooper_contract as Address,
   });
 
   const handlesweep = async () => {
-    swap();
+    await sweepTokens();
   };
+
+  const isLoading = isSweeping || isConfirming;
 
   return (
     <>
@@ -125,21 +121,14 @@ function ConfirmationModal({
                   tokensAllowanceStatus={tokensAllowanceStatus}
                   refetch={refetch}
                 />
-                <Button
-                  width="100%"
-                  color="#fff"
-                  onClick={fetchSwapData}
-                  bg={tokensAllowanceStatus ? "#0099FB" : "#B5B4C6"}
-                >
-                  fetch calldata
-                </Button>
+
                 <Button
                   width="100%"
                   color="#fff"
                   onClick={handlesweep}
                   bg={tokensAllowanceStatus ? "#0099FB" : "#B5B4C6"}
                 >
-                  Sweep
+                  {isLoading ? "Sweeping" : "Sweep"}
                 </Button>
               </HStack>
             </VStack>

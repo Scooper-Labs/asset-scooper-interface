@@ -4,6 +4,7 @@ import { base } from "viem/chains";
 
 import { Button } from "@chakra-ui/react";
 import { reloadIfNeeded } from "@/utils/reload";
+import { log } from "console";
 
 export function CustomConnectButton({
   className,
@@ -31,6 +32,8 @@ export function CustomConnectButton({
       console.log(">> connecting", connector.type);
       try {
         await connectAsync({ connector });
+      } catch (e) {
+        console.error(">> error connecting", e);
       } finally {
         reloadIfNeeded();
       }

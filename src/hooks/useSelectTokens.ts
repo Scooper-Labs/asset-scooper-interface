@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
-import { type Address } from "viem";
 import { useAppDispatch, useAppSelector } from "./rtkHooks";
 import { Token } from "@/lib/components/types";
 import {
