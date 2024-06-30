@@ -4,9 +4,10 @@ import { stripPrice } from "@/utils/numberUtils";
 interface FNProps {
   pre?: string;
   amount: number;
+  suf?: string;
 }
 
-const FormatNumber: React.FC<FNProps> = ({ pre, amount }) => {
+const FormatNumber: React.FC<FNProps> = ({ pre, amount, suf }) => {
   const { subscript, value } = stripPrice(amount);
 
   const formattedValue = (() => {
@@ -31,6 +32,7 @@ const FormatNumber: React.FC<FNProps> = ({ pre, amount }) => {
     <span>
       {pre ? pre : ""}
       {formattedValue}
+      {suf ? suf : ""}
     </span>
   );
 };

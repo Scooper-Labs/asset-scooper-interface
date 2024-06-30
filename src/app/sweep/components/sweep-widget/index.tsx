@@ -4,11 +4,10 @@ import { TokenSelector } from "@/components/TokenSelector";
 import {
   ChevronDownIcon,
   InfoOutlineIcon,
-  SettingsIcon,
 } from "@chakra-ui/icons";
 import { Box, Button, Flex, HStack, Text, VStack } from "@chakra-ui/react";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { SwapSettings } from "./swap-settings";
 import { COLORS } from "@/constants/theme";
 import { useSelectedTokens } from "@/hooks/useSelectTokens";
@@ -16,9 +15,17 @@ import SweepButton from "./swap-button";
 import { useRouter } from "next/navigation";
 import { SweepIcon } from "@/assets/svg";
 import OverlappingImage, { getImageArray } from "./ImageLap";
+import useGetETHPrice from "@/hooks/useGetETHPrice";
+import FormatNumber from "@/components/FormatNumber";
 
 function SweepWidget() {
   const { selectedTokens } = useSelectedTokens();
+  const { price } = useGetETHPrice();
+
+  const quoteAllTokens = selectedTokens.reduce(
+    (total, selectedToken) => total + selectedToken.quoteUSD,
+    0
+  );
 
   const router = useRouter();
 
@@ -67,7 +74,7 @@ function SweepWidget() {
               <Text>Sweep</Text>
             </Flex>
             <Text fontSize="small" color="#9E829F">
-              Update in 30 sec 1ETH ≈ 3800 USDC{" "}
+              Update in 30 sec 1ETH ≈ {price} USDC{" "}
             </Text>
           </Flex>
           <TokenSelector>
@@ -113,7 +120,13 @@ function SweepWidget() {
               <InfoOutlineIcon />
             </Flex>
 
-            <Text>__</Text>
+            <Text>
+              {price === 0 ? (
+                "__"
+              ) : (
+                <FormatNumber amount={quoteAllTokens / price} suf="ETH" />
+              )}
+            </Text>
           </Flex>
 
           <Flex width="100%" justifyContent="space-between">
@@ -131,7 +144,7 @@ function SweepWidget() {
               <InfoOutlineIcon />
             </Flex>
 
-            <Text>__</Text>
+            <Text>3 seconds</Text>
           </Flex>
 
           <SweepButton />

@@ -2,6 +2,7 @@ import React from "react";
 import { Text, HStack, Avatar, Flex, Heading, Stack } from "@chakra-ui/react";
 import { nanoid } from "@reduxjs/toolkit";
 import { Token } from "@/lib/components/types";
+import FormatNumber from "@/components/FormatNumber";
 
 const Tokens = ({ userWalletTOKENS }: { userWalletTOKENS: Token[] }) => {
   return (
@@ -22,10 +23,10 @@ const Tokens = ({ userWalletTOKENS }: { userWalletTOKENS: Token[] }) => {
 
           <Flex flexDir="column" textAlign="right">
             <Heading fontSize="16px" fontWeight={500}>
-              {token.userBalance}
+              <FormatNumber amount={token.userBalance} />
             </Heading>
             <Text fontSize="14px" color="#9E829F" fontWeight={400}>
-              ~ {token.quoteUSD}
+              ~ <FormatNumber amount={token.quoteUSD} pre="$" />
             </Text>
           </Flex>
         </Flex>
