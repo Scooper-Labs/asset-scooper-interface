@@ -19,3 +19,22 @@ body {
   font-display: swap;
   src: url("/public/fonts/Dellamor.otf") format("opentype");
 }
+
+.customConnectSpan {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: radial-gradient(circle, #0099fb 100%, #006ded 100%);
+  padding: 6px 8px;
+  border-radius: 8px;
+  box-shadow: 0px 3px 5.8px -2.5px #e443ca66;
+  cursor: pointer;
+}
+.customConnectSpan button {
+  all: unset;
+  background: white;
+  font-size: 12px;
+  color: #018fe9;
+  padding: 5px 10px;
+  border-radius: 8px;
+}

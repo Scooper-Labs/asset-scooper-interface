@@ -7,10 +7,10 @@ export const tabs: TabsProps[] = [
   },
   {
     name: "Docs",
-    link: "/docs",
+    link: "#",
   },
   {
     name: "Activity",
-    link: "/activity",
+    link: "#",
   },
 ];
