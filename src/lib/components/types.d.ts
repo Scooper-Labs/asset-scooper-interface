@@ -45,4 +45,6 @@ export interface Token {
   symbol: string;
   quoteUSD: number;
   userBalance: number;
+  price: number;
+  price_change_24h: number;
 }

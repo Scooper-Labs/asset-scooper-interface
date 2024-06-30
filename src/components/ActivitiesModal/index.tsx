@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Drawer,
   DrawerBody,
@@ -30,6 +30,9 @@ import { useBalances } from "@/hooks/balances/useBalances";
 import { useAppSelector } from "@/hooks/rtkHooks";
 import { RootState } from "@/store/store";
 import Avatar from "@/assets/svg";
+import FormatNumber from "../FormatNumber";
+import { useWalletsPortfolio } from "@/hooks/useMobula";
+import { AssetClass } from "@/utils/classes";
 
 interface IModals {
   isOpen: boolean;
@@ -41,21 +44,29 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
   const [isBalanceVisible, setIsBalanceVisible] = useState<boolean>(true);
   const { address } = useAccount();
   const { disconnect } = useDisconnect();
+  const { data, error, loading } = useWalletsPortfolio();
+  const [userWalletTokens, setUserWalletTokens] = useState<AssetClass[]>([]);
 
-  const xxx = useBalances({
-    account: address ?? "",
-  });
+  useEffect(() => {
+    if (data) {
+      console.log("Data: ", data.assets);
+      setUserWalletTokens(data.assets);
+      let _total = data.assets.reduce((sum, token) => {
+        return sum + token.quoteUSD;
+      }, 0);
+    }
+  }, [data]);
 
-  const userWalletTokens = useAppSelector(
-    (state: RootState) => state.SweepTokensSlice.userWalletTokens,
-  );
+  useBalances({ account: address ?? "" });
 
-  const totalNetWorth = useMemo(() => {
-    return userWalletTokens.reduce((sum, token) => {
-      const realvalue = token.quoteUSD * token.userBalance;
-      return sum + realvalue;
-    }, 0);
-  }, [userWalletTokens]);
+  // // const userWalletTokens = useAppSelector(
+  // //   (state: RootState) => state.SweepTokensSlice.userWalletTokens
+  // // );
+
+  // const totalNetWorth = userWalletTokens.reduce((sum, token) => {
+  //   const realvalue = token.quoteUSD * token.userBalance;
+  //   return sum + realvalue;
+  // }, 0);
   const balanceVisibility = () => {
     setIsBalanceVisible(!isBalanceVisible);
   };
@@ -131,10 +142,12 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
               color={COLORS.balTextColor}
               lineHeight="43.2px"
             >
-              ${isBalanceVisible ? totalNetWorth.toFixed(2) : "****"}
-              {/* ${isBalanceVisible ? "305.68" : "****"} */}
+              {isBalanceVisible ? (
+                <FormatNumber pre="$" amount={data ? data.balance : 0} />
+              ) : (
+                "****"
+              )}
             </Text>
-
             <Box
               background="#00BA8233"
               color="#00976A"
@@ -143,7 +156,11 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
               borderRadius="28.5px"
             >
               <Text fontSize="12px" lineHeight="14.4px">
-                +23.4%
+                <FormatNumber
+                  pre={data ? (data.realized_pnl > 0 ? "-" : "+") : ""}
+                  amount={data ? data.realized_pnl : 0}
+                  suf="%"
+                />
               </Text>
             </Box>
           </HStack>

@@ -1,26 +1,20 @@
-import { Address, erc20Abi, parseUnits } from "viem";
-import {
-  useReadContract,
-  useAccount,
-  useWriteContract,
-  useWaitForTransactionReceipt,
-} from "wagmi";
+"use client";
+
+import { Address } from "viem";
+import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { useToast } from "@chakra-ui/react";
-import { useCallback, useEffect } from "react";
-import { ChainId } from "@/constants";
+import { useEffect } from "react";
 
 export const useAssetScooperContractWrite = ({
   fn,
   args,
   abi,
   contractAddress,
-  chainId,
 }: {
   fn: string;
   args: any[];
   abi: any;
   contractAddress: Address;
-  chainId?: ChainId;
 }) => {
   const toast = useToast();
   const {
@@ -29,6 +23,7 @@ export const useAssetScooperContractWrite = ({
     isSuccess: isTrxSubmitted,
     isError: isWriteContractError,
     writeContract,
+    writeContractAsync,
     error: WriteContractError,
     reset,
   } = useWriteContract();
@@ -40,16 +35,17 @@ export const useAssetScooperContractWrite = ({
     error: WaitForTransactionReceiptError,
   } = useWaitForTransactionReceipt({
     hash,
+    confirmations: 2,
   });
 
-  const write = useCallback(() => {
-    writeContract({
+  const write = () =>
+    writeContractAsync({
       address: contractAddress,
       abi,
       functionName: fn,
       args,
     });
-  }, [writeContract, contractAddress, abi, fn, args]);
+
   useEffect(() => {
     if (isPending) {
       toast({
@@ -96,9 +92,6 @@ export const useAssetScooperContractWrite = ({
     isConfirmed,
     isWriteContractError,
     isWaitTrxError,
-    toast,
-    WriteContractError,
-    WaitForTransactionReceiptError,
   ]);
 
   return {
@@ -107,10 +100,6 @@ export const useAssetScooperContractWrite = ({
     isConfirming,
     isTrxSubmitted,
     isConfirmed,
-    isWriteContractError,
-    isWaitTrxError,
-    WriteContractError,
-    WaitForTransactionReceiptError,
     reset,
     hash,
   };
