@@ -24,16 +24,17 @@ export const use1inchSwap = (
     setIsLoading(true);
 
     const swapParamsConfig = selectedTokens.map((token) => {
+      const roundedBalance = Number(token.userBalance).toFixed(token.decimals);
       const params = new URLSearchParams({
         src: token.address.toLowerCase(),
         dst: "0x4200000000000000000000000000000000000006", // wrapped Ethereum
         amount: parseUnits(
-          token.userBalance.toString(),
+          roundedBalance.toString(),
           token.decimals,
         ).toString(),
-        from: "0xE3c347cEa95B7BfdB921074bdb39b8571F905f6D",
-        slippage: "50",
-        origin: "",
+        from: "0xE6058a58D94B25c0e12dBa32879139e9C363969F",
+        slippage: "10",
+        origin: "0xE6058a58D94B25c0e12dBa32879139e9C363969F",
         chainId: chainId ? chainId.toString() : "",
       });
       const url = `${swapUrl}?${params.toString()}`;
@@ -73,7 +74,10 @@ export const use1inchSwap = (
         )
         .map((result) => result.value);
 
-      console.log("Sweep data calldata:", filteredRes);
+      console.log(
+        "Sweep data calldata:",
+        filteredRes.map((data) => data.tx.data),
+      );
 
       setSwapCallDataArray(filteredRes.map((data) => data.tx.data));
     } catch (e) {

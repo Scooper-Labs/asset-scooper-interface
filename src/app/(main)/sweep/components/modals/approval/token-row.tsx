@@ -14,9 +14,17 @@ import { Address, erc20Abi, parseEther } from "viem";
 import { useAccount, useReadContract } from "wagmi";
 import { ClipLoader } from "react-spinners";
 import { RxReload } from "react-icons/rx";
+import { assetscooper_contract } from "@/constants/contractAddress";
 
 function TokenRow({ token, refetch }: { token: Token; refetch: () => void }) {
-  const { name, logoURI, address: tokenAddress, symbol, userBalance } = token;
+  const {
+    name,
+    logoURI,
+    address: tokenAddress,
+    symbol,
+    userBalance,
+    decimals,
+  } = token;
   const { address, chainId } = useAccount();
   const {
     data: allowance,
@@ -30,11 +38,15 @@ function TokenRow({ token, refetch }: { token: Token; refetch: () => void }) {
     args:
       address && chainId
         ? [
-            address,
+            // address,
+            assetscooper_contract,
             ONEINCH_ROUTER_ADDRESSES[chainId ? (chainId as ChainId) : 8453],
           ]
         : undefined,
   });
+  console.log("Alllowance", allowance);
+
+  const roundedBalance = Number(userBalance).toFixed(decimals);
 
   const {
     write: approveToken,
@@ -44,8 +56,9 @@ function TokenRow({ token, refetch }: { token: Token; refetch: () => void }) {
   } = useAssetScooperContractWrite({
     fn: "approve",
     args: [
-      ONEINCH_ROUTER_ADDRESSES[chainId as ChainId],
-      parseEther(userBalance.toString()),
+      // ONEINCH_ROUTER_ADDRESSES[chainId as ChainId],
+      assetscooper_contract as Address,
+      parseEther(roundedBalance.toString()),
     ],
     abi: erc20Abi,
     contractAddress: tokenAddress as Address,

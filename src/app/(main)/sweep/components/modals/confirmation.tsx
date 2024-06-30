@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -36,7 +36,7 @@ function ConfirmationModal({
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isConnected, chainId, address } = useAccount();
-
+  const [calldata, setCalldata] = useState<string[]>([]);
   const { selectedTokens } = useSelectedTokens();
 
   const { fetchSwapData, isLoading, swapCallDataArray } = use1inchSwap(
@@ -55,8 +55,41 @@ function ConfirmationModal({
     abi: assetscooperAbi,
     contractAddress: assetscooper_contract as Address,
   });
-  const handlesweep = async () => {
+  const handlesweep = () => {
+    console.log("calldata before swap", swapCallDataArray);
     swap();
+  };
+
+  const {
+    write: batchTransferAndApprove,
+    isPending: batchtransferPending,
+    isConfirmed: isBatchTransferConfirmed,
+    isWriteContractError: isBatchTransferError,
+  } = useAssetScooperContractWrite({
+    fn: "batchTransferAndApprove",
+    args: [
+      selectedTokens.map((token) => token.address),
+      selectedTokens.map((token) => {
+        const roundedBalance = (Number(token?.userBalance)*0.9).toFixed(
+          token.decimals,
+        );
+        return parseUnits(roundedBalance.toString(), token.decimals);
+      }),
+    ],
+    abi: assetscooperAbi,
+    contractAddress: assetscooper_contract as Address,
+  });
+  const handleBatchTransferAndApprove = () => {
+    console.log(
+      selectedTokens.map((token) => token.address),
+      selectedTokens.map((token) => {
+        const roundedBalance = Number(token?.userBalance).toFixed(
+          token.decimals,
+        );
+        return parseUnits(roundedBalance.toString(), token.decimals);
+      }),
+    );
+    batchTransferAndApprove();
   };
 
   return (
@@ -131,6 +164,14 @@ function ConfirmationModal({
                   bg={tokensAllowanceStatus ? "#0099FB" : "#B5B4C6"}
                 >
                   fetch calldata
+                </Button>
+                <Button
+                  width="100%"
+                  color="#fff"
+                  onClick={handleBatchTransferAndApprove}
+                  bg={tokensAllowanceStatus ? "#0099FB" : "#B5B4C6"}
+                >
+                  BatchTransfer
                 </Button>
                 <Button
                   width="100%"

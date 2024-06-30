@@ -13,6 +13,7 @@ import ApprovalModal from "../modals/approval";
 import { useReadContracts } from "wagmi";
 import { erc20Abi, Address, parseUnits, formatUnits } from "viem";
 import ConfirmationModal from "../modals/confirmation";
+import { assetscooper_contract } from "@/constants/contractAddress";
 
 const spenderAddress = "0x111111125421ca6dc452d289314280a0f8842a65";
 
@@ -26,7 +27,7 @@ function SweepButton() {
     abi: erc20Abi,
     address: token.address as Address,
     functionName: "allowance",
-    args: [address, spenderAddress as Address], // You'll need to provide these
+    args: [address, assetscooper_contract as Address], // You'll need to provide these
   }));
 
   const { data, isLoading, refetch, isSuccess, isError } = useReadContracts({
@@ -42,7 +43,7 @@ function SweepButton() {
           console.log(typeof _allowance);
 
           /* @ts-ignore */
-          return Number(formatUnits(_allowance, decimals)) === userBalance;
+          return Number(formatUnits(_allowance, decimals)) >= userBalance;
         })
       : false;
 
