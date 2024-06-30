@@ -29,7 +29,10 @@ export async function GET(request: NextRequest) {
       const walletsPortfolioData = cleanedResponseFromZero.map(
         (resp) => new WalletPortfolioClass(resp)
       );
-      return NextResponse.json({ data: walletsPortfolioData }, { status: 200 });
+      return NextResponse.json(
+        { data: walletsPortfolioData[0] },
+        { status: 200 }
+      );
     } else {
       const error = await response.text();
       return NextResponse.json({ error }, { status: response.status });
