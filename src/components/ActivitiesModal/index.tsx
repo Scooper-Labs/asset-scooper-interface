@@ -46,7 +46,6 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
   const { disconnect } = useDisconnect();
   const { data, error, loading } = useWalletsPortfolio();
   const [userWalletTokens, setUserWalletTokens] = useState<AssetClass[]>([]);
-  const [totalNetWorth, setTotalNetWorth] = useState(0);
 
   useEffect(() => {
     if (data) {
@@ -55,7 +54,6 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
       let _total = data.assets.reduce((sum, token) => {
         return sum + token.quoteUSD;
       }, 0);
-      setTotalNetWorth(_total);
     }
   }, [data]);
 
@@ -145,7 +143,7 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
               lineHeight="43.2px"
             >
               {isBalanceVisible ? (
-                <FormatNumber pre="$" amount={totalNetWorth} />
+                <FormatNumber pre="$" amount={data ? data.balance : 0} />
               ) : (
                 "****"
               )}
@@ -159,8 +157,9 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
             >
               <Text fontSize="12px" lineHeight="14.4px">
                 <FormatNumber
-                  pre={data ? (data.realized_pnl > 0 ? "-" : "") : ""}
+                  pre={data ? (data.realized_pnl > 0 ? "-" : "+") : ""}
                   amount={data ? data.realized_pnl : 0}
+                  suf="%"
                 />
               </Text>
             </Box>
