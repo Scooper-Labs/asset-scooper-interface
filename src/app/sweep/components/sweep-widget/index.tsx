@@ -16,9 +16,12 @@ import SweepButton from "./swap-button";
 import { useRouter } from "next/navigation";
 import { SweepIcon } from "@/assets/svg";
 import OverlappingImage, { getImageArray } from "./ImageLap";
+import useGetETHPrice from "@/hooks/useGetETHPrice";
 
 function SweepWidget() {
   const { selectedTokens } = useSelectedTokens();
+  const { price } = useGetETHPrice();
+  console.log("price", price);
 
   const router = useRouter();
 
@@ -67,7 +70,7 @@ function SweepWidget() {
               <Text>Sweep</Text>
             </Flex>
             <Text fontSize="small" color="#9E829F">
-              Update in 30 sec 1ETH ≈ 3800 USDC{" "}
+              Update in 30 sec 1ETH ≈ {price} USDC{" "}
             </Text>
           </Flex>
           <TokenSelector>
