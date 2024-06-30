@@ -10,7 +10,7 @@ function TokenSelectList() {
   const { address } = useAccount();
 
   const xxx = useBalances({
-    account: address ?? "0xE3c347cEa95B7BfdB921074bdb39b8571F905f6D",
+    account: address ?? "",
   });
 
   useEffect(() => {}, []);
