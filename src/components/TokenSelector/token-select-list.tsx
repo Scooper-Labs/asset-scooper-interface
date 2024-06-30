@@ -5,20 +5,29 @@ import { useBalances } from "@/hooks/balances/useBalances";
 import { useAccount } from "wagmi";
 import { useAppSelector } from "@/hooks/rtkHooks";
 import { RootState } from "@/store/store";
+import { useWalletsPortfolio } from "@/hooks/useMobula";
+import { AssetClass } from "@/utils/classes";
 
 function TokenSelectList() {
   const { address } = useAccount();
 
+  const { data, error, loading } = useWalletsPortfolio();
+  const [userWalletTokens, setUserWalletTokens] = useState<AssetClass[]>([]);
+
+  useEffect(() => {
+    if (data) {
+      setUserWalletTokens(data.assets);
+    }
+  }, [data]);
+
   const xxx = useBalances({
-    account: address ?? "0xE3c347cEa95B7BfdB921074bdb39b8571F905f6D",
+    account: address ?? "",
   });
 
-  useEffect(() => {}, []);
-  const userWalletTokens = useAppSelector(
-    (state: RootState) => state.SweepTokensSlice.userWalletTokens,
-  );
-
-  console.log("this is balance data", userWalletTokens);
+  // useEffect(() => {}, []);
+  // const userWalletTokens = useAppSelector(
+  //   (state: RootState) => state.SweepTokensSlice.userWalletTokens,
+  // );
 
   return (
     <VStack

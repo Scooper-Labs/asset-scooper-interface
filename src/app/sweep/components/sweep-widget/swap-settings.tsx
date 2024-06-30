@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState } from "react";
 import {
   Box,
@@ -12,29 +10,65 @@ import {
   Stack,
   useDisclosure,
 } from "@chakra-ui/react";
-import ContainerWrapper from "@/components/ContainerWrapper";
 import ModalComponent from "@/components/ModalComponent";
 import { COLORS } from "@/constants/theme";
 import { GrCircleQuestion } from "react-icons/gr";
 import CustomTooltip from "@/components/CustomTooltip";
+import { RiListSettingsLine } from "react-icons/ri";
+import { useSlippageTolerance } from "@/hooks/settings/slippage/useSlippage";
+import { SlippageToleranceStorageKey } from "@/hooks/settings/slippage/utils";
+import { useSweepThreshhold } from "@/hooks/settings/useThreshold";
 
-const Sweep: React.FC = () => {
-  const { isOpen, onClose, onOpen } = useDisclosure();
-
+export function SwapSettings() {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [activeButton, setActiveButton] = useState<string>("auto");
+  const { slippageTolerance, setSlippageTolerance } = useSlippageTolerance(
+    SlippageToleranceStorageKey.Sweep
+  );
+  const { setSweepThreshold, sweepthreshHold } = useSweepThreshhold();
+  const [slippageError, setSlippageError] = useState<boolean>(false);
+
+  const handleSlippageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    if (Number(value) > 50) {
+      setSlippageError(true);
+      return;
+    } else {
+      setSlippageTolerance(value);
+    }
+  };
+
+  const handeThreshholdChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = event.target.value;
+    setSweepThreshold(value);
+  };
 
   return (
-    <ContainerWrapper>
-      <Flex pt={"6rem"}>
-        <Button onClick={onOpen}>open setting page</Button>
-      </Flex>
+    <>
+      <Button
+        onClick={onOpen}
+        fontWeight="500"
+        bg={COLORS.btnBGGradient}
+        borderRadius={10}
+        color={COLORS.tabTextColor}
+        shadow="small"
+        border="1px solid #B190EB"
+        _hover={{
+          bg: `${COLORS.btnBGGradient}`,
+        }}
+      >
+        <RiListSettingsLine color={COLORS.settingIconColor} size="15px" />
+      </Button>
 
+      {/* ----------------------- Sweep Setting UI ------------------------- */}
       <ModalComponent
         isOpen={isOpen}
         onClose={onClose}
         closeOnOverlayClick={false}
         modalContentStyle={{
-          background: "#FDFDFD33",
+          background: "#FDFDFD",
           borderRadius: "16px",
           border: `1px solid ${COLORS.borderColor}`,
           boxShadow: "#E9C7EA4D",
@@ -43,7 +77,7 @@ const Sweep: React.FC = () => {
         <Stack>
           {/* ----------------- Threshold ------------------------ */}
           <Box>
-            <HStack>
+            <HStack marginBottom="7px">
               <Text
                 color="#281629"
                 fontSize="14px"
@@ -53,25 +87,37 @@ const Sweep: React.FC = () => {
                 Threshold
               </Text>
               <Box>
-                <CustomTooltip label="coming soon">
+                <CustomTooltip label="Minimum ETH value of token that can be swept">
                   <GrCircleQuestion color="#C9BCCA" size="13.3px" />
                 </CustomTooltip>
               </Box>
             </HStack>
 
-            <Input
-              backgroundColor="#FBFDFE"
-              mt="8px"
-              border={`1px solid ${COLORS.borderColor}`}
-              borderRadius="12px"
-              _focus={{
-                border: `1px solid ${COLORS.borderColor}`,
-                outline: "none",
-                boxShadow: "none",
-              }}
-              placeholder="$30"
-              textAlign="right"
-            />
+            <Box position="relative">
+              <Input
+                backgroundColor="#FBFDFE"
+                border={`1px solid ${COLORS.borderColor}`}
+                borderRadius="12px"
+                _focus={{
+                  border: `1px solid blue.400`,
+                  outline: "none",
+                  boxShadow: "none",
+                }}
+                placeholder="$30"
+                textAlign="right"
+                onChange={(event) => handeThreshholdChange(event)}
+                value={sweepthreshHold}
+              />
+              <Box
+                position="absolute"
+                top="50%"
+                transform="translateY(-50%)"
+                left="10px"
+                zIndex="100"
+              >
+                ETH
+              </Box>
+            </Box>
           </Box>
 
           {/* ----------------- Maximum Slippage ------------------------ */}
@@ -86,7 +132,7 @@ const Sweep: React.FC = () => {
                 Maximum Slippage
               </Text>
               <Box>
-                <CustomTooltip label="coming soon">
+                <CustomTooltip label="Maximum percentage change agreed for the swap to fluctuate below">
                   <GrCircleQuestion color="#C9BCCA" size="13.3px" />
                 </CustomTooltip>
               </Box>
@@ -106,7 +152,7 @@ const Sweep: React.FC = () => {
                   bg={activeButton === "auto" ? "#E2E8EC" : "transparent"}
                   color={activeButton === "auto" ? "black" : "black"}
                   fontWeight={500}
-                  onClick={() => setActiveButton("auto")}
+                  onClick={() => setSlippageTolerance("1")}
                   _hover={{ bg: "#E2E8EC" }}
                 >
                   Auto
@@ -125,18 +171,32 @@ const Sweep: React.FC = () => {
                 </Button>
               </ButtonGroup>
 
-              <Input
-                backgroundColor="#B5B4C6"
-                border={`1px solid ${COLORS.borderColor}`}
-                borderRadius="12px"
-                _focus={{
-                  border: `1px solid ${COLORS.borderColor}`,
-                  outline: "none",
-                  boxShadow: "none",
-                }}
-                color="#917193"
-                placeholder="0.5%"
-              />
+              <Box position="relative">
+                <Input
+                  backgroundColor="#FBFDFE"
+                  border={`1px solid ${COLORS.borderColor}`}
+                  borderRadius="12px"
+                  _focus={{
+                    border: `1px solid blue.400`,
+                    outline: "none",
+                    boxShadow: "none",
+                  }}
+                  color="#917193"
+                  placeholder="0.5%"
+                  value={slippageTolerance}
+                  onChange={(event) => handleSlippageChange(event)}
+                />
+
+                <Box
+                  position="absolute"
+                  top="50%"
+                  transform="translateY(-50%)"
+                  right="10px"
+                  zIndex="100"
+                >
+                  %
+                </Box>
+              </Box>
             </HStack>
           </Box>
 
@@ -164,7 +224,7 @@ const Sweep: React.FC = () => {
               border={`1px solid ${COLORS.borderColor}`}
               borderRadius="12px"
               _focus={{
-                border: `1px solid ${COLORS.borderColor}`,
+                border: `1px solid blue.400`,
                 outline: "none",
                 boxShadow: "none",
               }}
@@ -180,13 +240,16 @@ const Sweep: React.FC = () => {
             background={COLORS.btnGradient}
             fontWeight={400}
             color="white"
+            _hover={{
+              bg: `${COLORS.btnGradient}`,
+              color: "white",
+            }}
+            onClick={onClose}
           >
             Update
           </Button>
         </Stack>
       </ModalComponent>
-    </ContainerWrapper>
+    </>
   );
-};
-
-export default Sweep;
+}
