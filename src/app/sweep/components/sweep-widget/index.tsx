@@ -15,6 +15,7 @@ import { useSelectedTokens } from "@/hooks/useSelectTokens";
 import SweepButton from "./swap-button";
 import { useRouter } from "next/navigation";
 import { SweepIcon } from "@/assets/svg";
+import OverlappingImage, { getImageArray } from "./ImageLap";
 
 function SweepWidget() {
   const { isSelected, _selectToken, _unSelectToken, selectedTokens } =
@@ -73,19 +74,28 @@ function SweepWidget() {
           <TokenSelector>
             <Flex
               width="100%"
-              border="1px solid #E7BFE7"
+              border={`1px solid ${
+                selectedTokens.length === 0 ? "#E7BFE7" : "#0F04D7"
+              }`}
               backgroundColor="#fff"
               justifyContent="space-between"
-              padding="8px"
+              padding="16px 12px"
               fontSize="small"
               fontWeight="bold"
+              borderRadius="6px"
+              alignItems="center"
             >
               {selectedTokens.length > 0 ? (
-                <Flex>
+                <Flex alignItems="center" gap="6px">
+                  <OverlappingImage
+                    imageArray={getImageArray(selectedTokens)}
+                  />
                   <Text> {selectedTokens.length} tokens selected</Text>
                 </Flex>
               ) : (
-                <Text color="#000">Select Tokens</Text>
+                <Text color="#2C333B" fontWeight={500} fontSize={14}>
+                  Select Tokens
+                </Text>
               )}
               <ChevronDownIcon />
             </Flex>

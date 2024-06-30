@@ -28,11 +28,12 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
         onClick={onOpen}
         fontWeight="500"
         bg="#FAF6FD"
-        borderRadius={10}
+        borderRadius={8}
         color={COLORS.tabTextColor}
-        padding="12px"
+        padding="8px"
         cursor="pointer"
         width="100%"
+        border="1px solid #F6EEFC"
       >
         {children}
       </Box>
