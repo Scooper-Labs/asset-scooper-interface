@@ -10,7 +10,6 @@ export default function useGetETHPrice() {
       try {
         const response = await fetch("/api/eth_price");
         const _price = await response.json();
-        console.log(_price);
         setPrice(parseInt(_price));
       } catch (err) {
         setError("Unknown error occurred: " + err);
@@ -20,7 +19,7 @@ export default function useGetETHPrice() {
       }
     }
     fetchETHPrice();
-    
+
     const intervalId = setInterval(fetchETHPrice, 30000);
 
     return () => clearInterval(intervalId);

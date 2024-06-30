@@ -1,4 +1,4 @@
-import { ChainId, ONEINCH_ROUTER_ADDRESSES } from "@/constants";
+"use client";
 import { useAssetScooperContractWrite } from "@/hooks/useAssetScooperWriteContract";
 import { Token } from "@/lib/components/types";
 import {
@@ -10,15 +10,22 @@ import {
   Button,
 } from "@chakra-ui/react";
 import React, { useEffect } from "react";
-import { Address, erc20Abi, parseEther } from "viem";
+import { Address, erc20Abi, parseEther, parseUnits } from "viem";
 import { useAccount, useReadContract } from "wagmi";
 import { ClipLoader } from "react-spinners";
 import { RxReload } from "react-icons/rx";
 import { assetscooper_contract } from "@/constants/contractAddress";
 
 function TokenRow({ token, refetch }: { token: Token; refetch: () => void }) {
-  const { name, logoURI, address: tokenAddress, symbol, userBalance } = token;
-  const { address, chainId } = useAccount();
+  const {
+    name,
+    logoURI,
+    address: tokenAddress,
+    symbol,
+    userBalance,
+    decimals,
+  } = token;
+  const { address } = useAccount();
   const {
     data: allowance,
     isLoading: isAllowanceLoading,
@@ -28,27 +35,27 @@ function TokenRow({ token, refetch }: { token: Token; refetch: () => void }) {
     abi: erc20Abi,
     address: tokenAddress as Address,
     functionName: "allowance",
-    args: address && chainId ? [address, assetscooper_contract] : undefined,
+    args: address ? [address, assetscooper_contract] : undefined,
   });
 
   const {
     write: approveToken,
     isPending: isApprovalPending,
     isConfirmed: isConfirmed,
-    isWriteContractError: isApprovalError,
+    isConfirming,
   } = useAssetScooperContractWrite({
     fn: "approve",
-    args: [assetscooper_contract, parseEther(userBalance.toString())],
+    args: [assetscooper_contract, parseUnits(userBalance.toString(), decimals)],
     abi: erc20Abi,
     contractAddress: tokenAddress as Address,
   });
-  const handleApprove = () => {
-    approveToken();
+  const handleApprove = async () => {
+    await approveToken();
   };
 
   const isApproved =
-    !!allowance && allowance >= parseEther(userBalance.toString());
-  const isLoading = isAllowanceLoading || isApprovalPending;
+    !!allowance && allowance >= parseUnits(userBalance.toString(), decimals);
+  const isLoading = isAllowanceLoading || isApprovalPending || isConfirming;
 
   useEffect(() => {
     isConfirmed && refetch();
@@ -93,9 +100,6 @@ function TokenRow({ token, refetch }: { token: Token; refetch: () => void }) {
       </HStack>
     </HStack>
   );
-}
-{
-  /* */
 }
 
 export default TokenRow;
