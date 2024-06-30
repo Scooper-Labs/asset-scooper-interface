@@ -17,11 +17,16 @@ import { useRouter } from "next/navigation";
 import { SweepIcon } from "@/assets/svg";
 import OverlappingImage, { getImageArray } from "./ImageLap";
 import useGetETHPrice from "@/hooks/useGetETHPrice";
+import FormatNumber from "@/components/FormatNumber";
 
 function SweepWidget() {
   const { selectedTokens } = useSelectedTokens();
   const { price } = useGetETHPrice();
-  console.log("price", price);
+
+  const quoteAllTokens = selectedTokens.reduce(
+    (total, selectedToken) => total + selectedToken.quoteUSD,
+    0
+  );
 
   const router = useRouter();
 
@@ -116,7 +121,13 @@ function SweepWidget() {
               <InfoOutlineIcon />
             </Flex>
 
-            <Text>__</Text>
+            <Text>
+              {price === 0 ? (
+                "__"
+              ) : (
+                <FormatNumber amount={quoteAllTokens / price} suf="ETH" />
+              )}
+            </Text>
           </Flex>
 
           <Flex width="100%" justifyContent="space-between">
@@ -134,7 +145,7 @@ function SweepWidget() {
               <InfoOutlineIcon />
             </Flex>
 
-            <Text>__</Text>
+            <Text>3 seconds</Text>
           </Flex>
 
           <SweepButton />

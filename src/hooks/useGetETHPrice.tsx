@@ -20,6 +20,10 @@ export default function useGetETHPrice() {
       }
     }
     fetchETHPrice();
+    
+    const intervalId = setInterval(fetchETHPrice, 30000);
+
+    return () => clearInterval(intervalId);
   }, []);
 
   return { price, loading, error };

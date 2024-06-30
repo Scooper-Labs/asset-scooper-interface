@@ -30,13 +30,11 @@ export function SwapSettings() {
 
   const handleSlippageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    console.log(value);
     if (Number(value) > 50) {
       setSlippageError(true);
       return;
     } else {
       setSlippageTolerance(value);
-      setSlippageError(false);
     }
   };
 
@@ -79,7 +77,7 @@ export function SwapSettings() {
         <Stack>
           {/* ----------------- Threshold ------------------------ */}
           <Box>
-            <HStack>
+            <HStack marginBottom="7px">
               <Text
                 color="#281629"
                 fontSize="14px"
@@ -89,26 +87,37 @@ export function SwapSettings() {
                 Threshold
               </Text>
               <Box>
-                <CustomTooltip label="coming soon">
+                <CustomTooltip label="Minimum ETH value of token that can be swept">
                   <GrCircleQuestion color="#C9BCCA" size="13.3px" />
                 </CustomTooltip>
               </Box>
             </HStack>
 
-            <Input
-              backgroundColor="#FBFDFE"
-              mt="8px"
-              border={`1px solid ${COLORS.borderColor}`}
-              borderRadius="12px"
-              _focus={{
-                border: `1px solid ${COLORS.borderColor}`,
-                outline: "none",
-                boxShadow: "none",
-              }}
-              placeholder="$30"
-              textAlign="right"
-              onChange={(event) => handeThreshholdChange(event)}
-            />
+            <Box position="relative">
+              <Input
+                backgroundColor="#FBFDFE"
+                border={`1px solid ${COLORS.borderColor}`}
+                borderRadius="12px"
+                _focus={{
+                  border: `1px solid ${COLORS.borderColor}`,
+                  outline: "none",
+                  boxShadow: "none",
+                }}
+                placeholder="$30"
+                textAlign="right"
+                onChange={(event) => handeThreshholdChange(event)}
+                value={sweepthreshHold}
+              />
+              <Box
+                position="absolute"
+                top="50%"
+                transform="translateY(-50%)"
+                left="10px"
+                zIndex="100"
+              >
+                ETH
+              </Box>
+            </Box>
           </Box>
 
           {/* ----------------- Maximum Slippage ------------------------ */}
@@ -123,7 +132,7 @@ export function SwapSettings() {
                 Maximum Slippage
               </Text>
               <Box>
-                <CustomTooltip label="coming soon">
+                <CustomTooltip label="Maximum percentage change agreed for the swap to fluctuate below">
                   <GrCircleQuestion color="#C9BCCA" size="13.3px" />
                 </CustomTooltip>
               </Box>
@@ -143,7 +152,7 @@ export function SwapSettings() {
                   bg={activeButton === "auto" ? "#E2E8EC" : "transparent"}
                   color={activeButton === "auto" ? "black" : "black"}
                   fontWeight={500}
-                  onClick={() => setSlippageTolerance("0.1")}
+                  onClick={() => setSlippageTolerance("1")}
                   _hover={{ bg: "#E2E8EC" }}
                 >
                   Auto
@@ -162,19 +171,32 @@ export function SwapSettings() {
                 </Button>
               </ButtonGroup>
 
-              <Input
-                backgroundColor="#B5B4C6"
-                border={`1px solid ${COLORS.borderColor}`}
-                borderRadius="12px"
-                _focus={{
-                  border: `1px solid blue.400`,
-                  outline: "none",
-                  boxShadow: "none",
-                }}
-                color="#917193"
-                placeholder="0.5%"
-                onChange={(event) => handleSlippageChange(event)}
-              />
+              <Box position="relative">
+                <Input
+                  backgroundColor="#B5B4C6"
+                  border={`1px solid ${COLORS.borderColor}`}
+                  borderRadius="12px"
+                  _focus={{
+                    border: `1px solid blue.400`,
+                    outline: "none",
+                    boxShadow: "none",
+                  }}
+                  color="#917193"
+                  placeholder="0.5%"
+                  value={slippageTolerance}
+                  onChange={(event) => handleSlippageChange(event)}
+                />
+
+                <Box
+                  position="absolute"
+                  top="50%"
+                  transform="translateY(-50%)"
+                  right="10px"
+                  zIndex="100"
+                >
+                  %
+                </Box>
+              </Box>
             </HStack>
           </Box>
 
