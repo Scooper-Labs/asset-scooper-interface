@@ -35,20 +35,14 @@ function ConfirmationModal({
   refetch: () => void;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { isConnected, chainId, address } = useAccount();
 
   const { selectedTokens } = useSelectedTokens();
 
-  const { fetchSwapData, isLoading, swapCallDataArray } = use1inchSwap(
-    chainId as ChainId,
-    address
-  );
-
   const {
     write: sweepTokens,
-    isPending: isApprovalPending,
+    isPending: isSweeping,
     isConfirmed: isConfirmed,
-    isWriteContractError: isApprovalError,
+    isConfirming,
   } = useAssetScooperContractWrite({
     fn: "sweepTokens",
     args: [selectedTokens.map((token) => token.address), [0n]],
@@ -56,8 +50,10 @@ function ConfirmationModal({
     contractAddress: assetscooper_contract as Address,
   });
   const handlesweep = async () => {
-    sweepTokens();
+    await sweepTokens();
   };
+
+  const isLoading = isSweeping || isConfirming;
 
   return (
     <>
@@ -131,7 +127,7 @@ function ConfirmationModal({
                   onClick={handlesweep}
                   bg={tokensAllowanceStatus ? "#0099FB" : "#B5B4C6"}
                 >
-                  Sweep
+                  {isLoading ? "Sweeping" : "Sweep"}
                 </Button>
               </HStack>
             </VStack>

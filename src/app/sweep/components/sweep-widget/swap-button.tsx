@@ -46,16 +46,10 @@ function SweepButton() {
       : false;
 
   useEffect(() => {
-    // console.log("computeTokenAllowances", data);
-    isSuccess && setTokensAllowance(computeTokenAllowances);
-  }, [isSuccess, isLoading, data]);
+    isSuccess && setTokensAllowance(computeTokenAllowances());
+  }, [selectedTokens, data]);
 
-  // console.log("tokensAllowanceStatus", computeTokenAllowances, data);
-
-  useEffect(() => {
-    refetch();
-    setTokensAllowance(computeTokenAllowances);
-  }, [chainId, isLoading]);
+  console.log("tokensAllowanceStatus", tokensAllowance);
 
   return (
     <>
@@ -69,7 +63,6 @@ function SweepButton() {
                 tokensAllowanceStatus={tokensAllowance}
                 refetch={refetch}
               />
-              {/* <Button onClick={() => refetch()}>Reftch Allowances</Button> */}
             </>
           ) : (
             <>

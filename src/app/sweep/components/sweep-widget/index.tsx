@@ -4,11 +4,10 @@ import { TokenSelector } from "@/components/TokenSelector";
 import {
   ChevronDownIcon,
   InfoOutlineIcon,
-  SettingsIcon,
 } from "@chakra-ui/icons";
 import { Box, Button, Flex, HStack, Text, VStack } from "@chakra-ui/react";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { SwapSettings } from "./swap-settings";
 import { COLORS } from "@/constants/theme";
 import { useSelectedTokens } from "@/hooks/useSelectTokens";
