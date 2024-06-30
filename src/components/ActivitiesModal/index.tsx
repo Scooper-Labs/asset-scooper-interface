@@ -150,6 +150,20 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
                 "****"
               )}
             </Text>
+            <Box
+              background="#00BA8233"
+              color="#00976A"
+              py="10px"
+              px="10px"
+              borderRadius="28.5px"
+            >
+              <Text fontSize="12px" lineHeight="14.4px">
+                <FormatNumber
+                  pre={data ? (data.realized_pnl > 0 ? "-" : "") : ""}
+                  amount={data ? data.realized_pnl : 0}
+                />
+              </Text>
+            </Box>
           </HStack>
         </Box>
 
