@@ -1,58 +1,38 @@
 [
+  { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
+  { "inputs": [], "name": "AssetScooper_PairDoesNotExist", "type": "error" },
+  { "inputs": [], "name": "AssetScooper__AddressZero", "type": "error" },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "aggregationRouterV6",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "message",
-        "type": "string"
-      }
-    ],
-    "name": "EmptyData",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "message",
-        "type": "string"
-      }
-    ],
-    "name": "InsufficientOutputAmount",
+    "inputs": [],
+    "name": "AssetScooper__InsufficientBalance",
     "type": "error"
   },
   {
     "inputs": [],
-    "name": "InvalidSelector",
+    "name": "AssetScooper__InsufficientLiquidity",
     "type": "error"
   },
   {
     "inputs": [],
-    "name": "Reentrancy",
+    "name": "AssetScooper__InsufficientOutputAmount",
+    "type": "error"
+  },
+  { "inputs": [], "name": "AssetScooper__MisMatchLength", "type": "error" },
+  { "inputs": [], "name": "AssetScooper__MisMatchToken", "type": "error" },
+  {
+    "inputs": [],
+    "name": "AssetScooper__UnsuccessfulBalanceCall",
     "type": "error"
   },
   {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "message",
-        "type": "string"
-      }
-    ],
-    "name": "UnsuccessfulSwap",
+    "inputs": [],
+    "name": "AssetScooper__UnsuccessfulDecimalCall",
     "type": "error"
   },
+  { "inputs": [], "name": "AssetScooper__UnsuccessfulSwapTx", "type": "error" },
+  { "inputs": [], "name": "AssetScooper__UnsupportedToken", "type": "error" },
+  { "inputs": [], "name": "AssetScooper__ZeroLengthArray", "type": "error" },
+  { "inputs": [], "name": "Reentrancy", "type": "error" },
   {
     "anonymous": false,
     "inputs": [
@@ -65,66 +45,55 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "dstToken",
+        "name": "tokenIn",
         "type": "address"
       },
       {
-        "indexed": true,
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amountIn",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
         "internalType": "uint256",
         "name": "amountOut",
         "type": "uint256"
       }
     ],
-    "name": "SwapExecuted",
+    "name": "TokenSwapped",
     "type": "event"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address[]",
-        "name": "tokenAddresses",
-        "type": "address[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "amounts",
-        "type": "uint256[]"
-      }
-    ],
-    "name": "approveAll",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [],
-    "name": "i_AggregationRouter_V6",
-    "outputs": [
-      {
-        "internalType": "contract IAggregationRouterV6",
-        "name": "",
-        "type": "address"
-      }
-    ],
+    "name": "owner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "minAmountOut",
-        "type": "uint256"
+        "internalType": "address[]",
+        "name": "tokenAddress",
+        "type": "address[]"
       },
       {
-        "internalType": "bytes[]",
-        "name": "data",
-        "type": "bytes[]"
+        "internalType": "uint256[]",
+        "name": "minAmountOut",
+        "type": "uint256[]"
       }
     ],
-    "name": "swap",
+    "name": "sweepTokens",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "version",
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "stateMutability": "pure",
     "type": "function"
   }
 ]
