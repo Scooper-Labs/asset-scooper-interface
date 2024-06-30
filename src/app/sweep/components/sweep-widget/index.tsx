@@ -8,16 +8,17 @@ import {
 } from "@chakra-ui/icons";
 import { Box, Button, Flex, HStack, Text, VStack } from "@chakra-ui/react";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { SwapSettings } from "./swap-settings";
 import { COLORS } from "@/constants/theme";
 import { useSelectedTokens } from "@/hooks/useSelectTokens";
 import SweepButton from "./swap-button";
 import { useRouter } from "next/navigation";
+import { SweepIcon } from "@/assets/svg";
+import OverlappingImage, { getImageArray } from "./ImageLap";
 
 function SweepWidget() {
-  const { isSelected, _selectToken, _unSelectToken, selectedTokens } =
-    useSelectedTokens();
+  const { selectedTokens } = useSelectedTokens();
 
   const router = useRouter();
 
@@ -61,25 +62,39 @@ function SweepWidget() {
 
         <VStack width="100%" gap="2px">
           <Flex width="100%" justify="space-between">
-            <Text>Sweep</Text>
-            <Text fontSize="small">Update in 30 sec 1ETH ≈ 3800 USDC </Text>
+            <Flex gap="6px" alignItems="center">
+              <SweepIcon />
+              <Text>Sweep</Text>
+            </Flex>
+            <Text fontSize="small" color="#9E829F">
+              Update in 30 sec 1ETH ≈ 3800 USDC{" "}
+            </Text>
           </Flex>
           <TokenSelector>
             <Flex
               width="100%"
-              border="1px solid #E7BFE7"
+              border={`1px solid ${
+                selectedTokens.length === 0 ? "#E7BFE7" : "#0F04D7"
+              }`}
               backgroundColor="#fff"
               justifyContent="space-between"
-              padding="8px"
+              padding="16px 12px"
               fontSize="small"
               fontWeight="bold"
+              borderRadius="6px"
+              alignItems="center"
             >
               {selectedTokens.length > 0 ? (
-                <Flex>
+                <Flex alignItems="center" gap="6px">
+                  <OverlappingImage
+                    imageArray={getImageArray(selectedTokens)}
+                  />
                   <Text> {selectedTokens.length} tokens selected</Text>
                 </Flex>
               ) : (
-                <Text color="#000">Select Tokens</Text>
+                <Text color="#2C333B" fontWeight={500} fontSize={14}>
+                  Select Tokens
+                </Text>
               )}
               <ChevronDownIcon />
             </Flex>
