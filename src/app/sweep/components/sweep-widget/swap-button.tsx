@@ -47,11 +47,11 @@ function SweepButton() {
       : false;
 
   useEffect(() => {
-    console.log("computeTokenAllowances", data);
+    // console.log("computeTokenAllowances", data);
     isSuccess && setTokensAllowance(computeTokenAllowances);
   }, [isSuccess, isLoading, data]);
 
-  console.log("tokensAllowanceStatus", computeTokenAllowances, data);
+  // console.log("tokensAllowanceStatus", computeTokenAllowances, data);
 
   useEffect(() => {
     refetch();
