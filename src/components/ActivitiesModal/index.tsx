@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Drawer,
   DrawerBody,
@@ -26,6 +26,9 @@ import Tokens from "./components/Tokens";
 import Transactions from "./components/Transactions";
 import { useAccount, useDisconnect } from "wagmi";
 import { truncate } from "@/utils/address";
+import { useBalances } from "@/hooks/balances/useBalances";
+import { useAppSelector } from "@/hooks/rtkHooks";
+import { RootState } from "@/store/store";
 import Avatar from "@/assets/svg";
 
 interface IModals {
@@ -39,6 +42,20 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
   const { address } = useAccount();
   const { disconnect } = useDisconnect();
 
+  const xxx = useBalances({
+    account: address ?? "",
+  });
+
+  const userWalletTokens = useAppSelector(
+    (state: RootState) => state.SweepTokensSlice.userWalletTokens,
+  );
+
+  const totalNetWorth = useMemo(() => {
+    return userWalletTokens.reduce((sum, token) => {
+      const realvalue = token.quoteUSD * token.userBalance;
+      return sum + realvalue;
+    }, 0);
+  }, [userWalletTokens]);
   const balanceVisibility = () => {
     setIsBalanceVisible(!isBalanceVisible);
   };
@@ -114,7 +131,8 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
               color={COLORS.balTextColor}
               lineHeight="43.2px"
             >
-              ${isBalanceVisible ? "305.68" : "****"}
+              ${isBalanceVisible ? totalNetWorth.toFixed(2) : "****"}
+              {/* ${isBalanceVisible ? "305.68" : "****"} */}
             </Text>
 
             <Box
@@ -150,7 +168,7 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
 
             <TabPanels>
               <TabPanel>
-                <Tokens />
+                <Tokens userWalletTOKENS={userWalletTokens} />
               </TabPanel>
               <TabPanel>
                 <Transactions />
