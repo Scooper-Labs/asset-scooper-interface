@@ -41,22 +41,22 @@ function ConfirmationModal({
 
   const { fetchSwapData, isLoading, swapCallDataArray } = use1inchSwap(
     chainId as ChainId,
-    address,
+    address
   );
 
   const {
-    write: swap,
+    write: sweepTokens,
     isPending: isApprovalPending,
     isConfirmed: isConfirmed,
     isWriteContractError: isApprovalError,
   } = useAssetScooperContractWrite({
-    fn: "swap",
-    args: [parseUnits("0", 18), swapCallDataArray],
+    fn: "sweepTokens",
+    args: [selectedTokens.map((token) => token.address), [0n]],
     abi: assetscooperAbi,
     contractAddress: assetscooper_contract as Address,
   });
   const handlesweep = async () => {
-    swap();
+    sweepTokens();
   };
 
   return (
@@ -124,14 +124,7 @@ function ConfirmationModal({
                   tokensAllowanceStatus={tokensAllowanceStatus}
                   refetch={refetch}
                 />
-                <Button
-                  width="100%"
-                  color="#fff"
-                  onClick={fetchSwapData}
-                  bg={tokensAllowanceStatus ? "#0099FB" : "#B5B4C6"}
-                >
-                  fetch calldata
-                </Button>
+
                 <Button
                   width="100%"
                   color="#fff"
