@@ -58,16 +58,17 @@ export function GetNetworkColor(
   type: "color" | "bgVariant" = "color"
 ) {
   chain = chain?.toLocaleLowerCase();
-  if (chain === "ethereum" || chain === "mainnet" || chain === "homestead")
+  // if (chain === "ethereum" || chain === "mainnet" || chain === "homestead")
+  if (chain === "base" || chain === "mainnet" || chain === "homestead")
     return NETWORK_COLORS.ethereum[type];
-  if (chain?.includes("arbitrum")) return NETWORK_COLORS.arbitrum[type];
-  if (chain?.includes("base")) return NETWORK_COLORS.base[type];
-  if (chain?.includes("linea")) return NETWORK_COLORS.linea[type];
-  if (chain?.includes("polygon") || chain?.includes("matic"))
-    return NETWORK_COLORS.polygon[type];
-  if (chain?.includes("optimism") || chain?.startsWith("op"))
-    return NETWORK_COLORS.optimism[type];
-  if (chain?.includes("scroll")) return NETWORK_COLORS.scroll[type];
+  // if (chain?.includes("arbitrum")) return NETWORK_COLORS.arbitrum[type];
+  // if (chain?.includes("base")) return NETWORK_COLORS.base[type];
+  // if (chain?.includes("linea")) return NETWORK_COLORS.linea[type];
+  // if (chain?.includes("polygon") || chain?.includes("matic"))
+  //   return NETWORK_COLORS.polygon[type];
+  // if (chain?.includes("optimism") || chain?.startsWith("op"))
+  //   return NETWORK_COLORS.optimism[type];
+  // if (chain?.includes("scroll")) return NETWORK_COLORS.scroll[type];
 
   return NETWORK_COLORS.other[type];
 }
