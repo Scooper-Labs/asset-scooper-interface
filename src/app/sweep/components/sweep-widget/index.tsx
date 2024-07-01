@@ -2,7 +2,15 @@
 
 import { TokenSelector } from "@/components/TokenSelector";
 import { ChevronDownIcon, InfoOutlineIcon } from "@chakra-ui/icons";
-import { Box, Button, Flex, HStack, Text, VStack } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  HStack,
+  Text,
+  VStack,
+  useDisclosure,
+} from "@chakra-ui/react";
 import Image from "next/image";
 import React from "react";
 import { SwapSettings } from "./swap-settings";
@@ -14,6 +22,8 @@ import { SweepIcon } from "@/assets/svg";
 import OverlappingImage, { getImageArray } from "./ImageLap";
 import useGetETHPrice from "@/hooks/useGetETHPrice";
 import FormatNumber from "@/components/FormatNumber";
+import TransactionComplete from "../modals/TransactionCompleted";
+import ErrorOccured from "../modals/ErrorOccured";
 import { Token } from "@/lib/components/types";
 
 export function ETHToReceive({ selectedTokens }: { selectedTokens: Token[] }) {
@@ -35,6 +45,7 @@ export function ETHToReceive({ selectedTokens }: { selectedTokens: Token[] }) {
 }
 
 function SweepWidget() {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const { selectedTokens } = useSelectedTokens();
   const { price } = useGetETHPrice();
 
@@ -107,14 +118,17 @@ function SweepWidget() {
                   <OverlappingImage
                     imageArray={getImageArray(selectedTokens)}
                   />
-                  <Text> {selectedTokens.length} tokens selected</Text>
+                  <Text fontSize="14px" fontWeight="500" color="#2C333B">
+                    {" "}
+                    {selectedTokens.length} tokens selected
+                  </Text>
                 </Flex>
               ) : (
                 <Text color="#2C333B" fontWeight={500} fontSize={14}>
                   Select Tokens
                 </Text>
               )}
-              <ChevronDownIcon />
+              <ChevronDownIcon color="#001423" fontSize="16px" />
             </Flex>
           </TokenSelector>
         </VStack>
@@ -153,6 +167,11 @@ function SweepWidget() {
           </Flex>
 
           <SweepButton />
+
+          <Button onClick={onOpen}>Transaction test</Button>
+          {/* 
+          <TransactionComplete isOpen={isOpen} onClose={onClose} /> */}
+          <ErrorOccured isOpen={isOpen} onClose={onClose} />
         </VStack>
       </VStack>
     </VStack>

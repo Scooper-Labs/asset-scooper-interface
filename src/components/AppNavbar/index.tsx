@@ -20,11 +20,14 @@ import LogoSvg from "@/assets/icons/LogoSVG.svg";
 import { tabs } from "@/assets/site";
 import ConnectButton from "../Buttons/connectButton";
 import { CustomConnectButton } from "../Buttons/SmartWalletButton";
+import { useAccount } from "wagmi";
 
 const NavBar = () => {
   const pathname = usePathname();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = useRef<HTMLButtonElement>(null);
+
+  const { isConnected } = useAccount();
 
   return (
     <Box bg="white" pos={"fixed"} w="100%" py="10px" zIndex={1000} top={0}>
@@ -61,7 +64,7 @@ const NavBar = () => {
           </HStack>
           <HStack>
             <ConnectButton onOpen={onOpen} />
-            <CustomConnectButton />
+            {!isConnected && <CustomConnectButton />}
           </HStack>
         </HStack>
 

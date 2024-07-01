@@ -12,11 +12,12 @@ import TokenSelectList from "./token-select-list";
 import TokenSelectorModalComponent from "./CustomModalComponent";
 import { TokenSelectFooter } from "./TokenSelectorFooter";
 import { useWalletsPortfolio } from "@/hooks/useMobula";
-import { useAppDispatch } from "@/hooks/rtkHooks";
 import { setUserWalletTokenWithBalance } from "@/store/sweep/sweepSlice";
 import { useSweepThreshhold } from "@/hooks/settings/useThreshold";
 import useGetETHPrice from "@/hooks/useGetETHPrice";
 import { WalletPortfolioClass } from "@/utils/classes";
+import { useAppDispatch, useAppSelector } from "@/hooks/rtkHooks";
+import { RootState } from "@/store/store";
 
 export function TokenSelector({ children }: { children?: ReactNode }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -39,6 +40,7 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
       <Box
         onClick={onOpen}
         fontWeight="500"
+        mt="4px"
         bg="#FAF6FD"
         borderRadius={8}
         color={COLORS.tabTextColor}
@@ -62,7 +64,12 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
           boxShadow: "#E9C7EA4D",
         }}
       >
-        <ModalCloseButton />
+        <ModalCloseButton
+          color="#151515"
+          _hover={{
+            bgColor: "none",
+          }}
+        />
         <VStack
           justifyContent="space-between"
           width="100%"
@@ -89,7 +96,7 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
                 balance below {sweepthreshHold}
                 ETH
               </Text>
-              <Box
+              {/* <Box
                 border="none"
                 padding="8px"
                 backgroundColor="#E5F2FA"
@@ -100,7 +107,7 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
                 cursor="pointer"
               >
                 Change ThreshHold
-              </Box>
+              </Box> */}
             </VStack>
 
             <TokenSelectList userWalletTokens={selectedTokens} />
