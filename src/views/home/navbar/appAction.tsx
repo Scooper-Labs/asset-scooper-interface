@@ -9,7 +9,7 @@ const MotionButton = motion(Button);
 
 const Action = () => {
   return (
-    <Link href="#home" passHref>
+    <Link href="/app" passHref>
       <MotionButton
         as="a"
         h="32px"
