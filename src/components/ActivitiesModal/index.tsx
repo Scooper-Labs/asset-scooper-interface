@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Drawer,
   DrawerBody,
@@ -27,12 +27,12 @@ import Transactions from "./components/Transactions";
 import { useAccount, useDisconnect } from "wagmi";
 import { truncate } from "@/utils/address";
 import { useBalances } from "@/hooks/balances/useBalances";
-import { useAppSelector } from "@/hooks/rtkHooks";
-import { RootState } from "@/store/store";
 import Avatar from "@/assets/svg";
 import FormatNumber from "../FormatNumber";
 import { useWalletsPortfolio } from "@/hooks/useMobula";
 import { AssetClass } from "@/utils/classes";
+import { useQuery } from "@apollo/client";
+import { GET_ACCOUNT_TX } from "@/utils/queries";
 
 interface IModals {
   isOpen: boolean;
@@ -44,29 +44,25 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
   const [isBalanceVisible, setIsBalanceVisible] = useState<boolean>(true);
   const { address } = useAccount();
   const { disconnect } = useDisconnect();
-  const { data, error, loading } = useWalletsPortfolio();
+  const { data } = useWalletsPortfolio();
   const [userWalletTokens, setUserWalletTokens] = useState<AssetClass[]>([]);
+
+  const {
+    data: txns,
+    loading,
+    error,
+  } = useQuery(GET_ACCOUNT_TX, {
+    variables: { address },
+  });
 
   useEffect(() => {
     if (data) {
-      console.log("Data: ", data.assets);
       setUserWalletTokens(data.assets);
-      let _total = data.assets.reduce((sum, token) => {
-        return sum + token.quoteUSD;
-      }, 0);
     }
   }, [data]);
 
   useBalances({ account: address ?? "" });
 
-  // // const userWalletTokens = useAppSelector(
-  // //   (state: RootState) => state.SweepTokensSlice.userWalletTokens
-  // // );
-
-  // const totalNetWorth = userWalletTokens.reduce((sum, token) => {
-  //   const realvalue = token.quoteUSD * token.userBalance;
-  //   return sum + realvalue;
-  // }, 0);
   const balanceVisibility = () => {
     setIsBalanceVisible(!isBalanceVisible);
   };
@@ -168,16 +164,18 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
 
         <DrawerBody>
           <Tabs size="lg">
-            <TabList justifyContent="center">
+            <TabList justifyContent="flexStart">
               <Tab
                 color={COLORS.tabTextColor}
-                _selected={{ color: "black", bg: "none", fontWeight: 700 }}
+                _selected={{ color: "#2C333B", bg: "none", fontWeight: 700 }}
+                fontWeight={400}
               >
                 Tokens
               </Tab>
               <Tab
                 color={COLORS.tabTextColor}
-                _selected={{ color: "black", bg: "none", fontWeight: 700 }}
+                _selected={{ color: "#2C333B", bg: "none", fontWeight: 700 }}
+                fontWeight={400}
               >
                 Transactions
               </Tab>
@@ -188,7 +186,11 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
                 <Tokens userWalletTOKENS={userWalletTokens} />
               </TabPanel>
               <TabPanel>
-                <Transactions />
+                <Transactions
+                  txns={txns?.tokenSwappeds}
+                  loading={loading}
+                  error={error}
+                />
               </TabPanel>
             </TabPanels>
           </Tabs>
