@@ -52,6 +52,7 @@ function ConfirmationModal({
   );
 
   const { selectedTokens } = useSelectedTokens();
+  const minAmountOut = selectedTokens.map((t) => 0n);
 
   const {
     write: sweepTokens,
@@ -65,7 +66,7 @@ function ConfirmationModal({
     WaitForTransactionReceiptError,
   } = useAssetScooperContractWrite({
     fn: "sweepTokens",
-    args: [selectedTokens.map((token) => token.address), [0n]],
+    args: [selectedTokens.map((token) => token.address), minAmountOut],
     abi: assetscooperAbi,
     contractAddress: assetscooper_contract as Address,
   });

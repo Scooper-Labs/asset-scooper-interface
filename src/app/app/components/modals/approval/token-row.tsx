@@ -10,7 +10,7 @@ import {
   Button,
 } from "@chakra-ui/react";
 import React, { useEffect } from "react";
-import { Address, erc20Abi, parseEther, parseUnits } from "viem";
+import { Address, erc20Abi, parseUnits } from "viem";
 import { useAccount, useReadContract } from "wagmi";
 import { ClipLoader } from "react-spinners";
 import { RxReload } from "react-icons/rx";
@@ -29,7 +29,6 @@ function TokenRow({ token, refetch }: { token: Token; refetch: () => void }) {
   const {
     data: allowance,
     isLoading: isAllowanceLoading,
-    isSuccess: isAllowanceSuccessLoad,
     refetch: refetchAllowance,
   } = useReadContract({
     abi: erc20Abi,
@@ -57,10 +56,13 @@ function TokenRow({ token, refetch }: { token: Token; refetch: () => void }) {
     !!allowance && allowance >= parseUnits(userBalance.toString(), decimals);
   const isLoading = isAllowanceLoading || isApprovalPending || isConfirming;
 
-  console.log(isLoading, isAllowanceLoading, isApprovalPending, isConfirming);
+  console.log(isApproved, allowance, userBalance);
 
   useEffect(() => {
-    isConfirmed && refetch();
+    if (isConfirmed) {
+      refetchAllowance();
+      refetch();
+    }
   }, [isConfirmed]);
 
   return (
