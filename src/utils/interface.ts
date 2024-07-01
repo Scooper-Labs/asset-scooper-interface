@@ -42,3 +42,11 @@ export interface WalletPortfolioApiResInterface {
   total_unrealized_pnl: number;
   assets: AssetsInterface[];
 }
+export interface TXN_Interface {
+  tokenIn: string;
+  amountIn: string;
+  amountOut: string;
+  transactionHash: string;
+  blockTimestamp: string;
+  blockNumber: string;
+}
