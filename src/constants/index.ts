@@ -20,3 +20,6 @@ export const ONEINCH_ROUTER_ADDRESSES: { [key in ChainId]: Address } = {
   [ChainId.OPTIMISM]: "0x111111125421ca6dc452d289314280a0f8842a65",
   [ChainId.POLYGON]: "0x111111125421ca6dc452d289314280a0f8842a65",
 };
+
+export const SUBGRAPH =
+  "https://api.studio.thegraph.com/query/34803/asset-scooper/0.0.2";

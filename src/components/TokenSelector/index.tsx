@@ -1,3 +1,4 @@
+"use client";
 import {
   ModalCloseButton,
   useDisclosure,
@@ -6,25 +7,17 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { COLORS } from "@/constants/theme";
-import React, {
-  FC,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { ReactNode, useEffect } from "react";
 import TokenSelectList from "./token-select-list";
 import TokenSelectorModalComponent from "./CustomModalComponent";
 import { TokenSelectFooter } from "./TokenSelectorFooter";
 import { useWalletsPortfolio } from "@/hooks/useMobula";
+import { setUserWalletTokenWithBalance } from "@/store/sweep/sweepSlice";
+import { useSweepThreshhold } from "@/hooks/settings/useThreshold";
+import useGetETHPrice from "@/hooks/useGetETHPrice";
+import { WalletPortfolioClass } from "@/utils/classes";
 import { useAppDispatch, useAppSelector } from "@/hooks/rtkHooks";
 import { RootState } from "@/store/store";
-import {
-  selectAllTokens,
-  setUserWalletTokenWithBalance,
-} from "@/store/sweep/sweepSlice";
-import { IoMdClose } from "react-icons/io";
 
 export function TokenSelector({ children }: { children?: ReactNode }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -36,6 +29,11 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
       dispatch(setUserWalletTokenWithBalance(data.assets));
     }
   }, [data]);
+
+  const { sweepthreshHold } = useSweepThreshhold();
+  const { price } = useGetETHPrice();
+
+  const selectedTokens = meetsThreshold(data, price, sweepthreshHold);
 
   return (
     <>
@@ -92,11 +90,10 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
               pt="1rem"
               pb="0.7rem"
             >
-              <Text color="#2C333B" fontWeight={500}>
-                Convert Low Balance{" "}
-              </Text>
-              <Text fontSize="13px" fontWeight="500" color="#9E829F">
-                {data ? data.assets.length : 0} Tokens with balance below 0.004
+              <Text>Convert Low Balance </Text>
+              <Text fontSize="small" fontWeight="100" color="#9E829F">
+                {selectedTokens ? selectedTokens.length : 0} Token(s) with
+                balance below {sweepthreshHold}
                 ETH
               </Text>
               {/* <Box
@@ -113,12 +110,24 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
               </Box> */}
             </VStack>
 
-            <TokenSelectList />
+            <TokenSelectList userWalletTokens={selectedTokens} />
           </VStack>
 
           <TokenSelectFooter onClose={onClose} />
         </VStack>
       </TokenSelectorModalComponent>
     </>
+  );
+}
+function meetsThreshold(
+  data: WalletPortfolioClass | null,
+  price: number,
+  sweepthreshHold: string
+) {
+  const noETH = data?.assets.filter(
+    (token) => token.symbol !== "ETH" && token.symbol !== "WETH"
+  );
+  return noETH?.filter(
+    (token) => token.quoteUSD / price < parseFloat(sweepthreshHold)
   );
 }

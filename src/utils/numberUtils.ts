@@ -42,3 +42,31 @@ export function formatVolume(volume: string) {
     return num.toFixed(2);
   }
 }
+function getOrdinalSuffix(day: number) {
+  if (day > 3 && day < 21) return "th"; // 11th to 20th
+  switch (day % 10) {
+    case 1:
+      return "st";
+    case 2:
+      return "nd";
+    case 3:
+      return "rd";
+    default:
+      return "th";
+  }
+}
+export function getTime(timestamp: number) {
+  const date = new Date(timestamp * 1000);
+
+  const day = date.getUTCDate();
+  const month = date.toLocaleString("default", { month: "long" });
+  const year = date.getUTCFullYear();
+  const hours = String(date.getUTCHours()).padStart(2, "0");
+  const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+
+  const formattedDate = `${day}${getOrdinalSuffix(
+    day
+  )} ${month}, ${year} (${hours}:${minutes})`;
+
+  return formattedDate;
+}
