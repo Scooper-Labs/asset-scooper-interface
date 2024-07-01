@@ -31,12 +31,12 @@ const LandingHeader = () => {
   if (isDesktop && isTop) width = "97vw";
 
   const navLinks: NavLink[] = [
-    { name: "Home", href: "#home" },
+    { name: "Home", href: "#" },
     {
       name: "Features",
-      href: "#features",
+      href: "#",
     },
-    { name: "Docs", href: "#docs" },
+    { name: "Docs", href: "#" },
   ];
 
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
