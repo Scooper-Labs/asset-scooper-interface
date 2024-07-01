@@ -10,15 +10,19 @@ import {
   Button,
   ModalCloseButton,
 } from "@chakra-ui/react";
-import Link from "next/link";
 import ModalComponent from "@/components/ModalComponent";
+import Link from "next/link";
 
 const TransactionComplete = ({
   isOpen,
   onClose,
+  hash,
+  Component,
 }: {
   isOpen: boolean;
   onClose: () => void;
+  hash: string;
+  Component: React.JSX.Element;
 }) => {
   return (
     <ModalComponent
@@ -62,7 +66,7 @@ const TransactionComplete = ({
                 alt="an image"
               />
             </Box>
-            0.04 ETH
+            {Component}
           </Button>
 
           <Box w={"100%"} textAlign="center">
@@ -73,7 +77,7 @@ const TransactionComplete = ({
               Your transaction has been processed and{" "}
               <Text as="span" color="#151515" fontWeight={502}>
                 {" "}
-                0.04 ETH{" "}
+                {Component}{" "}
               </Text>
               has been deposited to your Wallet.
             </Text>
@@ -91,7 +95,9 @@ const TransactionComplete = ({
               h="48px"
               onClick={onClose}
             >
-              See Details
+              <Link href={`https://basescan.org/tx/${hash}`} target="_blank">
+                See Details
+              </Link>
             </Button>
           </Box>
         </Flex>
