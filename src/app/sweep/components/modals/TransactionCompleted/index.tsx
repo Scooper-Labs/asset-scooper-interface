@@ -10,15 +10,16 @@ import {
   Button,
   ModalCloseButton,
 } from "@chakra-ui/react";
-import Link from "next/link";
 import ModalComponent from "@/components/ModalComponent";
 
 const TransactionComplete = ({
   isOpen,
   onClose,
+  hash,
 }: {
   isOpen: boolean;
   onClose: () => void;
+  hash: string;
 }) => {
   return (
     <ModalComponent

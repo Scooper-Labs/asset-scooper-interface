@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useEffect } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -10,20 +12,21 @@ import {
   Button,
   useDisclosure,
   VStack,
-  Box,
   Flex,
   Text,
   HStack,
 } from "@chakra-ui/react";
 import { useSelectedTokens } from "@/hooks/useSelectTokens";
-import { GoInfo } from "react-icons/go";
 import ApprovalModal from "./approval";
-
 import assetscooperAbi from "@/constants/abi/assetscooper.json";
 import { assetscooper_contract } from "@/constants/contractAddress";
 import { useAssetScooperContractWrite } from "@/hooks/useAssetScooperWriteContract";
 import { Address } from "viem";
 import { ETHToReceive } from "../sweep-widget";
+import { useSlippageTolerance } from "@/hooks/settings/slippage/useSlippage";
+import { SlippageToleranceStorageKey } from "@/hooks/settings/slippage/utils";
+import TransactionComplete from "./TransactionCompleted";
+import ErrorOccured from "./ErrorOccured";
 
 function ConfirmationModal({
   tokensAllowanceStatus,
@@ -33,6 +36,20 @@ function ConfirmationModal({
   refetch: () => void;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    onClose: onCloseConfirmed,
+    isOpen: isOpenConfirmed,
+    onOpen: onOpenConfirmed,
+  } = useDisclosure();
+  const {
+    onClose: onCloseError,
+    isOpen: isOpenError,
+    onOpen: onOpenError,
+  } = useDisclosure();
+
+  const { slippageTolerance } = useSlippageTolerance(
+    SlippageToleranceStorageKey.Sweep
+  );
 
   const { selectedTokens } = useSelectedTokens();
 
@@ -40,6 +57,12 @@ function ConfirmationModal({
     write: sweepTokens,
     isPending: isSweeping,
     isConfirming,
+    isConfirmed,
+    hash,
+    isWriteContractError,
+    WriteContractError,
+    isWaitTrxError,
+    WaitForTransactionReceiptError,
   } = useAssetScooperContractWrite({
     fn: "sweepTokens",
     args: [selectedTokens.map((token) => token.address), [0n]],
@@ -50,6 +73,18 @@ function ConfirmationModal({
   const handlesweep = async () => {
     await sweepTokens();
   };
+
+  useEffect(() => {
+    if (isConfirmed || isWriteContractError || isWaitTrxError) {
+      onClose();
+    }
+    if (isConfirmed) {
+      onOpenConfirmed();
+    }
+    if (isWriteContractError || isWaitTrxError) {
+      onOpenError();
+    }
+  }, [isConfirmed, isWriteContractError, isWaitTrxError]);
 
   const isLoading = isSweeping || isConfirming;
 
@@ -83,9 +118,12 @@ function ConfirmationModal({
                 </Text>
               </VStack>
 
-              <VStack alignItems="start" gap="4px" flexDirection="row">
+              <VStack alignItems="start" gap="0">
                 <Text>Get</Text>{" "}
-                <ETHToReceive selectedTokens={selectedTokens} />
+                <Text fontSize="30px">
+                  {" "}
+                  <ETHToReceive selectedTokens={selectedTokens} />
+                </Text>
               </VStack>
 
               <VStack
@@ -100,15 +138,15 @@ function ConfirmationModal({
                 </Text>
 
                 <HStack width="100%" justifyContent="space-between">
-                  <Text>Fee</Text>
-                  <Flex>
-                    0.5% ~ $500 <GoInfo size={15} />
-                  </Flex>
+                  <Text>Slippage</Text>
+                  <Text color="#674669">{slippageTolerance}%</Text>
                 </HStack>
                 <HStack width="100%" justifyContent="space-between">
-                  <Text>Estimated Transaction Time:</Text>
+                  <Text>EEstimated Transaction Time::</Text>
                   <Flex>
-                    <Text>12-15 mins</Text> <GoInfo size={15} />
+                    <Text color="#674669">
+                      {3 * selectedTokens.length} seconds
+                    </Text>
                   </Flex>
                 </HStack>
               </VStack>
@@ -123,6 +161,7 @@ function ConfirmationModal({
                   width="100%"
                   color="#fff"
                   onClick={handlesweep}
+                  disabled={!tokensAllowanceStatus || isLoading}
                   bg={tokensAllowanceStatus ? "#0099FB" : "#B5B4C6"}
                 >
                   {isLoading ? "Sweeping" : "Sweep"}
@@ -133,6 +172,20 @@ function ConfirmationModal({
           <ModalFooter></ModalFooter>
         </ModalContent>
       </Modal>
+      <TransactionComplete
+        isOpen={isConfirmed}
+        onClose={onCloseConfirmed}
+        hash={hash as `0x${string}`}
+      />
+      <ErrorOccured
+        isOpen={isOpenError && (isWriteContractError || isWaitTrxError)}
+        onClose={onCloseError}
+        error={
+          isWriteContractError
+            ? WriteContractError
+            : WaitForTransactionReceiptError
+        }
+      />
     </>
   );
 }
