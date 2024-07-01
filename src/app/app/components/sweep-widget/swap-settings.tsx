@@ -4,20 +4,13 @@ import {
   Text,
   Button,
   ButtonGroup,
-  Flex,
   HStack,
   Input,
   Stack,
-  useDisclosure,
   Popover,
   PopoverTrigger,
   PopoverContent,
-  PopoverHeader,
   PopoverBody,
-  PopoverFooter,
-  PopoverArrow,
-  PopoverCloseButton,
-  PopoverAnchor,
 } from "@chakra-ui/react";
 import { COLORS } from "@/constants/theme";
 import { GrCircleQuestion } from "react-icons/gr";
@@ -28,7 +21,6 @@ import { SlippageToleranceStorageKey } from "@/hooks/settings/slippage/utils";
 import { useSweepThreshhold } from "@/hooks/settings/useThreshold";
 
 export function SwapSettings() {
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const [activeButton, setActiveButton] = useState<string>("auto");
   const { slippageTolerance, setSlippageTolerance } = useSlippageTolerance(
     SlippageToleranceStorageKey.Sweep
@@ -40,7 +32,6 @@ export function SwapSettings() {
     const value = event.target.value;
     if (Number(value) > 50) {
       setSlippageError(true);
-      return;
     } else {
       setSlippageTolerance(value);
     }
