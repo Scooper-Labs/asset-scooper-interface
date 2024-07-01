@@ -1,10 +1,7 @@
 "use client";
 
 import { TokenSelector } from "@/components/TokenSelector";
-import {
-  ChevronDownIcon,
-  InfoOutlineIcon,
-} from "@chakra-ui/icons";
+import { ChevronDownIcon, InfoOutlineIcon } from "@chakra-ui/icons";
 import { Box, Button, Flex, HStack, Text, VStack } from "@chakra-ui/react";
 import Image from "next/image";
 import React from "react";
@@ -17,15 +14,29 @@ import { SweepIcon } from "@/assets/svg";
 import OverlappingImage, { getImageArray } from "./ImageLap";
 import useGetETHPrice from "@/hooks/useGetETHPrice";
 import FormatNumber from "@/components/FormatNumber";
+import { Token } from "@/lib/components/types";
 
-function SweepWidget() {
-  const { selectedTokens } = useSelectedTokens();
+export function ETHToReceive({ selectedTokens }: { selectedTokens: Token[] }) {
   const { price } = useGetETHPrice();
-
   const quoteAllTokens = selectedTokens.reduce(
     (total, selectedToken) => total + selectedToken.quoteUSD,
     0
   );
+
+  return (
+    <Text>
+      {price === 0 ? (
+        "__"
+      ) : (
+        <FormatNumber amount={quoteAllTokens / price} suf="ETH" />
+      )}
+    </Text>
+  );
+}
+
+function SweepWidget() {
+  const { selectedTokens } = useSelectedTokens();
+  const { price } = useGetETHPrice();
 
   const router = useRouter();
 
@@ -120,13 +131,7 @@ function SweepWidget() {
               <InfoOutlineIcon />
             </Flex>
 
-            <Text>
-              {price === 0 ? (
-                "__"
-              ) : (
-                <FormatNumber amount={quoteAllTokens / price} suf="ETH" />
-              )}
-            </Text>
+            <ETHToReceive selectedTokens={selectedTokens} />
           </Flex>
 
           <Flex width="100%" justifyContent="space-between">
