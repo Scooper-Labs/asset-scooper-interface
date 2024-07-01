@@ -1,4 +1,12 @@
-import { Box, Button, Flex, HStack, Text, VStack } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Center,
+  Flex,
+  HStack,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 import { useSelectedTokens } from "@/hooks/useSelectTokens";
 import React, { useEffect, useState, Dispatch, SetStateAction } from "react";
 import { use1inchSwap } from "@/hooks/swap/use1inchSwap";
@@ -11,11 +19,15 @@ import {
 } from "wagmi";
 import ApprovalModal from "../modals/approval";
 import { useReadContracts } from "wagmi";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { erc20Abi, Address, parseUnits, formatUnits } from "viem";
 import ConfirmationModal from "../modals/confirmation";
 import { assetscooper_contract } from "@/constants/contractAddress";
+import { COLORS } from "@/constants/theme";
 
 function SweepButton() {
+  const { open } = useWeb3Modal();
+
   const { selectedTokens } = useSelectedTokens();
 
   const [tokensAllowance, setTokensAllowance] = useState(false);
@@ -54,7 +66,21 @@ function SweepButton() {
   return (
     <>
       {!isConnected ? (
-        <Button>Connect wallet</Button>
+        <Button
+          mt="20px"
+          w="455px"
+          bg={COLORS.sweepBGColor}
+          _hover={{
+            bg: `${COLORS.sweepBGColor}`,
+          }}
+          h="48px"
+          color="white"
+          fontWeight={400}
+          borderRadius="8px"
+          onClick={() => open({ view: "Connect" })}
+        >
+          Connect wallet
+        </Button>
       ) : (
         <>
           {selectedTokens.length > 0 ? (
@@ -66,7 +92,18 @@ function SweepButton() {
             </>
           ) : (
             <>
-              <Button width="100%" bg="#B5B4C6" color="#fff">
+              <Button
+                mt="20px"
+                w="100%"
+                bg={COLORS.sweepBGColor}
+                _hover={{
+                  bg: `${COLORS.sweepBGColor}`,
+                }}
+                h="48px"
+                color="white"
+                fontWeight={400}
+                borderRadius="8px"
+              >
                 Select tokens
               </Button>
             </>
