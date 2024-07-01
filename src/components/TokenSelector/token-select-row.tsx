@@ -57,13 +57,13 @@ function TokenSelectListRow({ token }: { token: Token }) {
             <Image src={logoURI} width={25} height={25} alt={name} />
           </Box> */}
           <WrapItem>
-            <Avatar size="md" name={name} src={logoURI} />
+            <Avatar size="32px" name={name} src={logoURI} />
           </WrapItem>
           <VStack gap="0" alignItems="start">
-            <Text fontWeight="700">
+            <Text fontWeight="500" color="#281629">
               {symbol.length > 6 ? `${symbol.substring(0, 5)}...` : symbol}
             </Text>
-            <Text color="#A8BBD6" fontSize="smaller">
+            <Text color="#A8BBD6" fontSize="13px" fontWeight={500}>
               {name}
             </Text>
           </VStack>
@@ -73,11 +73,11 @@ function TokenSelectListRow({ token }: { token: Token }) {
       {/* bALANCE AND price panels*/}
 
       <VStack alignItems="end" gap="0">
-        <Text fontWeight="700">
+        <Text fontWeight="600" fontSize="14px" color="#2C333B">
           {userBalance.toFixed(3)}{" "}
           {symbol.length > 4 ? `${symbol.substring(0, 3)}...` : symbol}
         </Text>
-        <Text color="#A8BBD6" fontSize="smaller">
+        <Text color="#9E829F" fontWeight={500} fontSize="14px">
           ~$ {quoteUSD.toFixed(4)}
         </Text>
       </VStack>

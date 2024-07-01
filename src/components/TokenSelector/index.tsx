@@ -15,7 +15,6 @@ import React, {
   useState,
 } from "react";
 import TokenSelectList from "./token-select-list";
-import ModalComponent from "../ModalComponent";
 import TokenSelectorModalComponent from "./CustomModalComponent";
 import { TokenSelectFooter } from "./TokenSelectorFooter";
 import { useWalletsPortfolio } from "@/hooks/useMobula";
@@ -25,6 +24,7 @@ import {
   selectAllTokens,
   setUserWalletTokenWithBalance,
 } from "@/store/sweep/sweepSlice";
+import { IoMdClose } from "react-icons/io";
 
 export function TokenSelector({ children }: { children?: ReactNode }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -42,6 +42,7 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
       <Box
         onClick={onOpen}
         fontWeight="500"
+        mt="4px"
         bg="#FAF6FD"
         borderRadius={8}
         color={COLORS.tabTextColor}
@@ -65,7 +66,12 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
           boxShadow: "#E9C7EA4D",
         }}
       >
-        <ModalCloseButton />
+        <ModalCloseButton
+          color="#151515"
+          _hover={{
+            bgColor: "none",
+          }}
+        />
         <VStack
           justifyContent="space-between"
           width="100%"
@@ -86,12 +92,14 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
               pt="1rem"
               pb="0.7rem"
             >
-              <Text>Convert Low Balance </Text>
-              <Text fontSize="small" fontWeight="100" color="#9E829F">
+              <Text color="#2C333B" fontWeight={500}>
+                Convert Low Balance{" "}
+              </Text>
+              <Text fontSize="13px" fontWeight="500" color="#9E829F">
                 {data ? data.assets.length : 0} Tokens with balance below 0.004
                 ETH
               </Text>
-              <Box
+              {/* <Box
                 border="none"
                 padding="8px"
                 backgroundColor="#E5F2FA"
@@ -102,7 +110,7 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
                 cursor="pointer"
               >
                 Change ThreshHold
-              </Box>
+              </Box> */}
             </VStack>
 
             <TokenSelectList />
