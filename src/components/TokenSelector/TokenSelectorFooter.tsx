@@ -13,17 +13,20 @@ import { FaArrowRight } from "react-icons/fa";
 import React, { useMemo } from "react";
 import { useSelectedTokens } from "@/hooks/useSelectTokens";
 import { Token } from "@/lib/components/types";
+import { AssetClass } from "@/utils/classes";
 
-export function TokenSelectFooter({ onClose }: { onClose: () => void }) {
-  const {
-    _selectAllToken,
-    userWalletTokens,
-    selectedTokens,
-    _clearSelectedTokens,
-  } = useSelectedTokens();
+export function TokenSelectFooter({
+  userWalletTokens,
+  onClose,
+}: {
+  userWalletTokens: AssetClass[] | undefined;
+  onClose: () => void;
+}) {
+  const { _selectAllToken, selectedTokens, _clearSelectedTokens } =
+    useSelectedTokens();
 
   const isAllSelected = Boolean(
-    userWalletTokens.length == selectedTokens.length
+    userWalletTokens?.length == selectedTokens.length
   );
 
   const calculateTotalUSDValue = (tokens: Token[]) => {
@@ -73,7 +76,7 @@ export function TokenSelectFooter({ onClose }: { onClose: () => void }) {
                 }
               : (e) => {
                   e.preventDefault();
-                  _selectAllToken(userWalletTokens);
+                  _selectAllToken(userWalletTokens!);
                 }
           }
         >

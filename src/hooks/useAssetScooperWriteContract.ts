@@ -4,6 +4,7 @@ import { Address } from "viem";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { useToast } from "@chakra-ui/react";
 import { useEffect } from "react";
+import { error } from "console";
 
 export const useAssetScooperContractWrite = ({
   fn,
@@ -22,7 +23,6 @@ export const useAssetScooperContractWrite = ({
     isPending,
     isSuccess: isTrxSubmitted,
     isError: isWriteContractError,
-    writeContract,
     writeContractAsync,
     error: WriteContractError,
     reset,
@@ -65,27 +65,18 @@ export const useAssetScooperContractWrite = ({
         isClosable: true,
       });
     }
-    if (isConfirmed) {
-      toast({
-        title: "Transaction Confirmed",
-        description: "Transaction has been confirmed on the network",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
-    }
-    if (isWriteContractError || isWaitTrxError) {
-      toast({
-        title: "Transaction Error",
-        description:
-          WriteContractError?.message ||
-          WaitForTransactionReceiptError?.message ||
-          "An error occurred",
-        status: "error",
-        duration: 2000,
-        isClosable: true,
-      });
-    }
+    // if (isWriteContractError || isWaitTrxError) {
+    //   toast({
+    //     title: "Transaction Error",
+    //     description:
+    //       WriteContractError?.message ||
+    //       ?.message ||
+    //       "An error occurred",
+    //     status: "error",
+    //     duration: 2000,
+    //     isClosable: true,
+    //   });
+    // }
   }, [
     isPending,
     isTrxSubmitted,
@@ -100,7 +91,11 @@ export const useAssetScooperContractWrite = ({
     isConfirming,
     isTrxSubmitted,
     isConfirmed,
+    isWriteContractError,
+    isWaitTrxError,
     reset,
     hash,
+    WriteContractError,
+    WaitForTransactionReceiptError,
   };
 };
