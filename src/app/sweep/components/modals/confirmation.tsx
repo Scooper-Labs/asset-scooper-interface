@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React from "react";
 import {
   Modal,
   ModalOverlay,
@@ -15,9 +15,6 @@ import {
   Text,
   HStack,
 } from "@chakra-ui/react";
-import { useAccount } from "wagmi";
-import { ChainId } from "@/constants";
-import { use1inchSwap } from "@/hooks/swap/use1inchSwap";
 import { useSelectedTokens } from "@/hooks/useSelectTokens";
 import { GoInfo } from "react-icons/go";
 import ApprovalModal from "./approval";
@@ -25,7 +22,8 @@ import ApprovalModal from "./approval";
 import assetscooperAbi from "@/constants/abi/assetscooper.json";
 import { assetscooper_contract } from "@/constants/contractAddress";
 import { useAssetScooperContractWrite } from "@/hooks/useAssetScooperWriteContract";
-import { Address, parseUnits } from "viem";
+import { Address } from "viem";
+import { ETHToReceive } from "../sweep-widget";
 
 function ConfirmationModal({
   tokensAllowanceStatus,
@@ -41,7 +39,6 @@ function ConfirmationModal({
   const {
     write: sweepTokens,
     isPending: isSweeping,
-    isConfirmed: isConfirmed,
     isConfirming,
   } = useAssetScooperContractWrite({
     fn: "sweepTokens",
@@ -49,6 +46,7 @@ function ConfirmationModal({
     abi: assetscooperAbi,
     contractAddress: assetscooper_contract as Address,
   });
+
   const handlesweep = async () => {
     await sweepTokens();
   };
@@ -85,9 +83,9 @@ function ConfirmationModal({
                 </Text>
               </VStack>
 
-              <VStack alignItems="start" gap="0">
-                <Text>Get</Text>
-                <Text fontSize="xx-large">{"xxx"} ETH</Text>
+              <VStack alignItems="start" gap="4px" flexDirection="row">
+                <Text>Get</Text>{" "}
+                <ETHToReceive selectedTokens={selectedTokens} />
               </VStack>
 
               <VStack

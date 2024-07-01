@@ -11,6 +11,7 @@ import {
 } from "@chakra-ui/react";
 import Image from "next/image";
 import React from "react";
+import FormatNumber from "../FormatNumber";
 
 function TokenSelectListRow({ token }: { token: Token }) {
   const { address, logoURI, name, symbol, decimals, quoteUSD, userBalance } =
@@ -45,17 +46,9 @@ function TokenSelectListRow({ token }: { token: Token }) {
       <Checkbox
         isChecked={isSelected(token)}
         colorScheme="#fff"
-        // onChange={
-        //   isSelected(token)
-        //     ? () => _unSelectToken(token)
-        //     : () => _selectToken(token)
-        // }
         iconColor={"#7F56D9"}
       >
         <HStack alignItems="center">
-          {/* <Box overflow="hidden" rounded="100%">
-            <Image src={logoURI} width={25} height={25} alt={name} />
-          </Box> */}
           <WrapItem>
             <Avatar size="md" name={name} src={logoURI} />
           </WrapItem>
@@ -74,11 +67,13 @@ function TokenSelectListRow({ token }: { token: Token }) {
 
       <VStack alignItems="end" gap="0">
         <Text fontWeight="700">
-          {userBalance.toFixed(3)}{" "}
-          {symbol.length > 4 ? `${symbol.substring(0, 3)}...` : symbol}
+          <FormatNumber
+            suf={symbol.length > 4 ? `${symbol.substring(0, 3)}...` : symbol}
+            amount={userBalance}
+          />
         </Text>
         <Text color="#A8BBD6" fontSize="smaller">
-          ~$ {quoteUSD.toFixed(4)}
+          ~ <FormatNumber pre="$" amount={quoteUSD} />
         </Text>
       </VStack>
     </HStack>
