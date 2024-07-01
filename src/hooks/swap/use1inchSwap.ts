@@ -1,7 +1,7 @@
 import { ChainId, ONE_INCH_BASE_URI } from "@/constants";
 import { useSelectedTokens } from "../useSelectTokens";
 import { isPromiseFulfilled } from "../useTokens";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Token } from "@/lib/components/types";
 import { Address, parseUnits } from "viem";
 
@@ -11,7 +11,7 @@ export type SwapResult = SuccessResult | ErrorResult;
 
 export const use1inchSwap = (
   chainId: ChainId | undefined,
-  originAddress: Address | undefined,
+  originAddress: Address | undefined
 ) => {
   const { selectedTokens } = useSelectedTokens();
 
@@ -29,11 +29,11 @@ export const use1inchSwap = (
         dst: "0x4200000000000000000000000000000000000006", // wrapped Ethereum
         amount: parseUnits(
           token.userBalance.toString(),
-          token.decimals,
+          token.decimals
         ).toString(),
         from: "0xE3c347cEa95B7BfdB921074bdb39b8571F905f6D",
-        slippage: "50",
-        origin: "",
+        slippage: "5",
+        origin: "0xE3c347cEa95B7BfdB921074bdb39b8571F905f6D",
         chainId: chainId ? chainId.toString() : "",
       });
       const url = `${swapUrl}?${params.toString()}`;
@@ -69,7 +69,7 @@ export const use1inchSwap = (
       console.log("swap data", results);
       const filteredRes = results
         .filter(
-          (result): result is SuccessResult => result.status === "fulfilled",
+          (result): result is SuccessResult => result.status === "fulfilled"
         )
         .map((result) => result.value);
 
@@ -84,6 +84,11 @@ export const use1inchSwap = (
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchSwapData();
+  }, []);
+
   return {
     fetchSwapData,
     isLoading,

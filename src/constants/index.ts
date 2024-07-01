@@ -1,6 +1,7 @@
 import { Address } from "viem";
 
 export const ONE_INCH_BASE_URI = "https://api.1inch.dev/swap/v6.0/";
+export const ONE_INCH_HISTORY_BASE_URL = "https://api.1inch.dev/history/v2.0/";
 
 export enum ChainId {
   ETHEREUM = 1,

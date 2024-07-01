@@ -50,13 +50,13 @@ function TokenSelectListRow({ token }: { token: Token }) {
       >
         <HStack alignItems="center">
           <WrapItem>
-            <Avatar size="md" name={name} src={logoURI} />
+            <Avatar size="32px" name={name} src={logoURI} />
           </WrapItem>
           <VStack gap="0" alignItems="start">
-            <Text fontWeight="700">
+            <Text fontWeight="500" color="#281629">
               {symbol.length > 6 ? `${symbol.substring(0, 5)}...` : symbol}
             </Text>
-            <Text color="#A8BBD6" fontSize="smaller">
+            <Text color="#A8BBD6" fontSize="13px" fontWeight={500}>
               {name}
             </Text>
           </VStack>

@@ -22,4 +22,7 @@ export const COLORS = {
   launchTextColor: "#007BE0",
   assetHeroTextColor: "#006DED",
   borderColorLanding: "#2F2F3D",
+  sweepBGColor: "#B5B4C6",
+  selectedTokensBGColor:
+    "radial-gradient(50% 50% at 50% 50%, #0099FB 0%, #006DED 100%)",
 };

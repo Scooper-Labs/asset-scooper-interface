@@ -8,21 +8,19 @@ interface CustomTooltipProps {
 
 const CustomTooltip: React.FC<CustomTooltipProps> = ({ label, children }) => {
   return (
-    <Box>
-      <Tooltip
-        label={label}
-        placement="right"
-        border="0.4px solid #8140CE"
-        color="black"
-        fontSize="12px"
-        borderRadius="8px"
-        textAlign="center"
-        p="0.5rem"
-        bgColor="white"
-      >
-        {children}
-      </Tooltip>
-    </Box>
+    <Tooltip
+      label={label}
+      placement="top"
+      border="0.4px solid #8140CE"
+      color="black"
+      fontSize="12px"
+      borderRadius="8px"
+      textAlign="center"
+      p="0.5rem"
+      bgColor="white"
+    >
+      <Box> {children}</Box>
+    </Tooltip>
   );
 };
 
