@@ -48,7 +48,7 @@ const Footer = () => {
                 </Tag>
               </HStack>
 
-              <LinkComponent href="#home">
+              <LinkComponent href="#">
                 <Text color={COLORS.tabTextColor}>Documentation</Text>
               </LinkComponent>
             </Flex>
@@ -60,7 +60,7 @@ const Footer = () => {
 
               <LinkComponent
                 // href="https://mirror.xyz/0x41aDd734d7f63e01FCc336a4030817fdF643D754"
-                href="#home"
+                href="#"
               >
                 <Text color={COLORS.tabTextColor}>Blog</Text>
               </LinkComponent>
@@ -71,7 +71,7 @@ const Footer = () => {
                 Link
               </Text>
               <Link
-                href="#home"
+                href="/app"
                 color={COLORS.launchTextColor}
                 fontSize="14px"
                 fontWeight={500}
