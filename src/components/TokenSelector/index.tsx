@@ -113,7 +113,10 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
             <TokenSelectList userWalletTokens={selectedTokens} />
           </VStack>
 
-          <TokenSelectFooter onClose={onClose} />
+          <TokenSelectFooter
+            onClose={onClose}
+            userWalletTokens={selectedTokens}
+          />
         </VStack>
       </TokenSelectorModalComponent>
     </>

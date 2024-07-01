@@ -15,7 +15,7 @@ export default function OverlappingImage({
   count = 5,
 }: OverlapProps) {
   return (
-    <AvatarGroup size="24px" max={count}>
+    <AvatarGroup size="sm" max={count}>
       {imageArray.map((image) => (
         <Avatar name={image.symbol} src={image.src} key={image.address} />
       ))}

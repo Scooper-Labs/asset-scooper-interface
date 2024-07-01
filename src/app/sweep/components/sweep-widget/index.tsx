@@ -22,8 +22,6 @@ import { SweepIcon } from "@/assets/svg";
 import OverlappingImage, { getImageArray } from "./ImageLap";
 import useGetETHPrice from "@/hooks/useGetETHPrice";
 import FormatNumber from "@/components/FormatNumber";
-import TransactionComplete from "../modals/TransactionCompleted";
-import ErrorOccured from "../modals/ErrorOccured";
 import { Token } from "@/lib/components/types";
 
 export function ETHToReceive({ selectedTokens }: { selectedTokens: Token[] }) {
@@ -34,13 +32,13 @@ export function ETHToReceive({ selectedTokens }: { selectedTokens: Token[] }) {
   );
 
   return (
-    <Text>
+    <>
       {price === 0 ? (
         "__"
       ) : (
         <FormatNumber amount={quoteAllTokens / price} suf="ETH" />
       )}
-    </Text>
+    </>
   );
 }
 
@@ -167,11 +165,6 @@ function SweepWidget() {
           </Flex>
 
           <SweepButton />
-
-          <Button onClick={onOpen}>Transaction test</Button>
-          {/* 
-          <TransactionComplete isOpen={isOpen} onClose={onClose} /> */}
-          <ErrorOccured isOpen={isOpen} onClose={onClose} />
         </VStack>
       </VStack>
     </VStack>

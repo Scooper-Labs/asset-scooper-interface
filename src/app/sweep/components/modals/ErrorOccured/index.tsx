@@ -10,15 +10,18 @@ import {
   Button,
   ModalCloseButton,
 } from "@chakra-ui/react";
-import Link from "next/link";
 import ModalComponent from "@/components/ModalComponent";
-
+type ErrMsg = {
+  message: string;
+};
 const ErrorOccured = ({
   isOpen,
   onClose,
+  error,
 }: {
   isOpen: boolean;
   onClose: () => void;
+  error: ErrMsg | null;
 }) => {
   return (
     <ModalComponent
@@ -40,7 +43,7 @@ const ErrorOccured = ({
               An Error has occured
             </Text>
             <Text as="span" color="#E2001B" fontSize="14px">
-              “Unknown Error” Error: Chain ID unsupported{" "}
+              {error ? error.message.split(".")[0] + "." : "“Unknown Error”"}
             </Text>
 
             <Button
