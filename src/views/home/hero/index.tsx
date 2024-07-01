@@ -98,7 +98,7 @@ const HeroSection = () => {
           <Button
             bg={COLORS.launchTextColor}
             as={Link}
-            href="#home"
+            href="/app"
             color="white"
             height="32px"
             fontSize="14px"

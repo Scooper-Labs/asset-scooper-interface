@@ -11,70 +11,52 @@ import {
 } from "@chakra-ui/react";
 import Link from "next/link";
 import Image from "next/image";
-import { nanoid } from "@reduxjs/toolkit";
 import { HiExternalLink } from "react-icons/hi";
 import SweepTransactionIcon from "@/assets/icons/sweeptransactionIcon.png";
-import SwapTransactionIcon from "@/assets/icons/swaptransactionIcon.png";
-import TransferTransactionIcon from "@/assets/icons/transfertransactionIcon.png";
-import ReceivedTransactionIcon from "@/assets/icons/receivedtransactionIcon.png";
+import { TXN_Interface } from "@/utils/interface";
+import { ApolloError } from "@apollo/client";
+import { groupTransactionsByBlock } from "@/utils/classes";
 
-const transactions = [
-  {
-    icon: SweepTransactionIcon,
-    transactiontitle: "Sweep contract executed",
-    transactiondate: "1 June, 2024",
-    externallink: "#",
-  },
-  {
-    icon: SwapTransactionIcon,
-    transactiontitle: "134 DEGEN swapped for 4502 WEGEN",
-    transactiondate: "1 June, 2024",
-    externallink: "#",
-  },
+interface ITransactions {
+  txns: TXN_Interface[] | undefined;
+  loading: boolean;
+  error: ApolloError | undefined;
+}
 
-  {
-    icon: TransferTransactionIcon,
-    transactiontitle: "0.16 ETH transfered to 0x016...28a2",
-    transactiondate: "1 June, 2024",
-    externallink: "#",
-  },
+function Transactions({ txns, loading, error }: ITransactions) {
+  if (loading) return <Text>Loading...</Text>;
+  if (error) return <Text>Error: {error.message}</Text>;
+  if (txns === undefined || txns.length === 0)
+    return <Text>No transactions found</Text>;
 
-  {
-    icon: ReceivedTransactionIcon,
-    transactiontitle: "0.16 ETH received from 0x016...28a2",
-    transactiondate: "1 June, 2024",
-    externallink: "#",
-  },
-];
-
-const Transactions: React.FC = () => {
+  const transactions = groupTransactionsByBlock(txns);
   return (
     <Stack>
-      {transactions.map((transaction) => (
+      {transactions.map((txn) => (
         <Flex
           justify="space-between"
           py="15px"
-          key={nanoid()}
+          key={txn.transactionHash}
           borderBottom="1px"
           borderColor="#E7F4F7"
         >
           <HStack>
             <Circle>
-              <Image alt="" src={transaction.icon} width={35} height={35} />
+              <Image alt="" src={SweepTransactionIcon} width={35} height={35} />
             </Circle>
             <Flex flexDir="column">
               <Heading fontSize="15px" fontWeight={500}>
-                {transaction.transactiontitle}
+                Swept {txn.tokensIn.length} token(s) into {txn.wethIn} WETH
               </Heading>
               <Text fontSize="13px" color="#9E829F">
-                {transaction.transactiondate}
+                {txn.time}
               </Text>
             </Flex>
           </HStack>
 
           <Button
             as={Link}
-            href={transaction.externallink}
+            href={`https://basescan.org/tx/${txn.transactionHash}`}
             bg="none"
             _hover={{
               bg: "none",
@@ -86,6 +68,6 @@ const Transactions: React.FC = () => {
       ))}
     </Stack>
   );
-};
+}
 
 export default Transactions;

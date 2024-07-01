@@ -11,11 +11,9 @@ export default function HomeView() {
   return (
     <Box bg={COLORS.darkBG} h="full" w="full">
       <LandingHeader />
-
       <HeroSection />
       <SectionOne />
       <SectionTwo />
-
       <Footer />
     </Box>
   );

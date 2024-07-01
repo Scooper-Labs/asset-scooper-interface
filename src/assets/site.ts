@@ -6,11 +6,15 @@ export const tabs: TabsProps[] = [
     link: "/sweep",
   },
   {
+    name: "Wrap",
+    link: "#",
+  },
+  {
     name: "Docs",
-    link: "/docs",
+    link: "#",
   },
   {
     name: "Activity",
-    link: "/activity",
+    link: "#",
   },
 ];

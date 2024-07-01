@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Drawer,
   DrawerBody,
@@ -24,6 +24,15 @@ import { IoMdClose } from "react-icons/io";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import Tokens from "./components/Tokens";
 import Transactions from "./components/Transactions";
+import { useAccount, useDisconnect } from "wagmi";
+import { truncate } from "@/utils/address";
+import { useBalances } from "@/hooks/balances/useBalances";
+import Avatar from "@/assets/svg";
+import FormatNumber from "../FormatNumber";
+import { useWalletsPortfolio } from "@/hooks/useMobula";
+import { AssetClass } from "@/utils/classes";
+import { useQuery } from "@apollo/client";
+import { GET_ACCOUNT_TX } from "@/utils/queries";
 
 interface IModals {
   isOpen: boolean;
@@ -33,10 +42,35 @@ interface IModals {
 
 const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
   const [isBalanceVisible, setIsBalanceVisible] = useState<boolean>(true);
+  const { address } = useAccount();
+  const { disconnect } = useDisconnect();
+  const { data } = useWalletsPortfolio();
+  const [userWalletTokens, setUserWalletTokens] = useState<AssetClass[]>([]);
+
+  const {
+    data: txns,
+    loading,
+    error,
+  } = useQuery(GET_ACCOUNT_TX, {
+    variables: { address },
+  });
+
+  useEffect(() => {
+    if (data) {
+      setUserWalletTokens(data.assets);
+    }
+  }, [data]);
+
+  useBalances({ account: address ?? "" });
 
   const balanceVisibility = () => {
     setIsBalanceVisible(!isBalanceVisible);
   };
+
+  function disconnectAndCloseModal() {
+    disconnect();
+    onClose();
+  }
 
   return (
     <Drawer
@@ -60,15 +94,9 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
           {/* ----- Heading Account detail ----- */}
           <Flex justify="space-between">
             <HStack>
-              <Circle
-                //@ts-ignore
-                width="32px"
-                border="1px solid black"
-                height="32px"
-              ></Circle>
-
+              <Avatar width={32} height={32} />
               <Text fontSize="16px" lineHeight="19.2px">
-                0x016...28a2
+                {truncate(address || "")}
               </Text>
             </HStack>
 
@@ -110,9 +138,12 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
               color={COLORS.balTextColor}
               lineHeight="43.2px"
             >
-              ${isBalanceVisible ? "305.68" : "****"}
+              {isBalanceVisible ? (
+                <FormatNumber pre="$" amount={data ? data.balance : 0} />
+              ) : (
+                "****"
+              )}
             </Text>
-
             <Box
               background="#00BA8233"
               color="#00976A"
@@ -121,7 +152,11 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
               borderRadius="28.5px"
             >
               <Text fontSize="12px" lineHeight="14.4px">
-                +23.4%
+                <FormatNumber
+                  pre={data ? (data.realized_pnl > 0 ? "-" : "+") : ""}
+                  amount={data ? data.realized_pnl : 0}
+                  suf="%"
+                />
               </Text>
             </Box>
           </HStack>
@@ -129,16 +164,18 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
 
         <DrawerBody>
           <Tabs size="lg">
-            <TabList justifyContent="center">
+            <TabList justifyContent="flexStart">
               <Tab
                 color={COLORS.tabTextColor}
-                _selected={{ color: "black", bg: "none", fontWeight: 700 }}
+                _selected={{ color: "#2C333B", bg: "none", fontWeight: 700 }}
+                fontWeight={400}
               >
                 Tokens
               </Tab>
               <Tab
                 color={COLORS.tabTextColor}
-                _selected={{ color: "black", bg: "none", fontWeight: 700 }}
+                _selected={{ color: "#2C333B", bg: "none", fontWeight: 700 }}
+                fontWeight={400}
               >
                 Transactions
               </Tab>
@@ -146,10 +183,14 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
 
             <TabPanels>
               <TabPanel>
-                <Tokens />
+                <Tokens userWalletTOKENS={userWalletTokens} />
               </TabPanel>
               <TabPanel>
-                <Transactions />
+                <Transactions
+                  txns={txns?.tokenSwappeds}
+                  loading={loading}
+                  error={error}
+                />
               </TabPanel>
             </TabPanels>
           </Tabs>
@@ -164,7 +205,7 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
             fontWeight={400}
             borderRadius="8px"
             h="40px"
-            onClick={onClose}
+            onClick={disconnectAndCloseModal}
             _hover={{
               bgColor: "#FFDFE3",
               color: "#E2001B",

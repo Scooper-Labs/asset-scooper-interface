@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
-import { type Address } from "viem";
 import { useAppDispatch, useAppSelector } from "./rtkHooks";
 import { Token } from "@/lib/components/types";
 import {
@@ -15,10 +14,10 @@ import { RootState } from "@/store/store";
 export const useSelectedTokens = () => {
   const dispatch = useAppDispatch();
   const selectedTokenLists = useAppSelector(
-    (state: RootState) => state.SweepTokensSlice.SelectedLowBalanceTokens,
+    (state: RootState) => state.SweepTokensSlice.SelectedLowBalanceTokens
   );
   const userWalletTokens = useAppSelector(
-    (state: RootState) => state.SweepTokensSlice.userWalletTokens,
+    (state: RootState) => state.SweepTokensSlice.userWalletTokens
   );
   const _selectToken = useCallback((token: Token) => {
     dispatch(selectToken(token));
@@ -34,9 +33,9 @@ export const useSelectedTokens = () => {
   const isSelected = useCallback(
     (token: Token) =>
       selectedTokenLists.some(
-        (selectedToken) => selectedToken.address === token.address,
+        (selectedToken) => selectedToken.address === token.address
       ),
-    [selectedTokenLists],
+    [selectedTokenLists]
   );
   //   const isSelected = useCallback(
   //     (token: Token) => selectedTokenLists.map((selectedToken) => selectedToken.address).includes(token.address),

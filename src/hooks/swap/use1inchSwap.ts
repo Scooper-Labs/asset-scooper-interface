@@ -1,24 +1,20 @@
 import { ChainId, ONE_INCH_BASE_URI } from "@/constants";
 import { useSelectedTokens } from "../useSelectTokens";
 import { isPromiseFulfilled } from "../useTokens";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Token } from "@/lib/components/types";
 import { Address, parseUnits } from "viem";
 
-type SuccessResult = { status: "fulfilled"; value: any; token: Token };
-type ErrorResult = { status: "rejected"; reason: unknown; value: Token };
-type SwapResult = SuccessResult | ErrorResult;
+export type SuccessResult = { status: "fulfilled"; value: any; token: Token };
+export type ErrorResult = { status: "rejected"; reason: unknown; value: Token };
+export type SwapResult = SuccessResult | ErrorResult;
 
 export const use1inchSwap = (
   chainId: ChainId | undefined,
-  originAddress: Address | undefined,
+  originAddress: Address | undefined
 ) => {
   const { selectedTokens } = useSelectedTokens();
-  const [tokensWithLiquidity, setTokensWithLiquidity] = useState<Token[]>([]);
-  const [tokensWithNoLiquidity, setTokensWithNoLiquidity] = useState<Token[]>(
-    [],
-  );
-  const [shouldFetch, setShouldFetch] = useState<boolean>(false);
+
   const [swapCallDataArray, setSwapCallDataArray] = useState<string[]>([]);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -30,16 +26,15 @@ export const use1inchSwap = (
     const swapParamsConfig = selectedTokens.map((token) => {
       const params = new URLSearchParams({
         src: token.address.toLowerCase(),
-        dst: "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2", // wrapped Ethereum
+        dst: "0x4200000000000000000000000000000000000006", // wrapped Ethereum
         amount: parseUnits(
           token.userBalance.toString(),
-          token.decimals,
+          token.decimals
         ).toString(),
-        from: originAddress
-          ? originAddress?.toString()
-          : "0xE3c347cEa95B7BfdB921074bdb39b8571F905f6D",
-        slippage: "50",
-        chainId: chainId ? chainId.toString() : "", // Assuming chainId is a number, convert to string
+        from: "0xE3c347cEa95B7BfdB921074bdb39b8571F905f6D",
+        slippage: "5",
+        origin: "0xE3c347cEa95B7BfdB921074bdb39b8571F905f6D",
+        chainId: chainId ? chainId.toString() : "",
       });
       const url = `${swapUrl}?${params.toString()}`;
       return { url, token };
@@ -50,6 +45,7 @@ export const use1inchSwap = (
 
     try {
       const results = [];
+      const callDataArray = [];
       for (const config of swapParamsConfig) {
         try {
           const response = await fetch(config.url);
@@ -59,6 +55,7 @@ export const use1inchSwap = (
             value: data,
             token: config.token,
           });
+          callDataArray.push(data.tx.data);
         } catch (error) {
           results.push({
             status: "rejected",
@@ -69,32 +66,16 @@ export const use1inchSwap = (
         await delay(1100);
       }
 
+      console.log("swap data", results);
       const filteredRes = results
         .filter(
-          (result): result is SuccessResult => result.status === "fulfilled",
+          (result): result is SuccessResult => result.status === "fulfilled"
         )
-        .map((result) => result);
+        .map((result) => result.value);
 
-      console.log("Sweep data:", filteredRes);
+      console.log("Sweep data calldata:", filteredRes);
 
-      filteredRes.map(async (result) => {
-        console.log(result.status);
-
-        if (result.value.error || result.value.statusCode == 400) {
-          console.log("token address BADDD REQUEST", result.token.address);
-          //push result.token to setTokensWithNoLiquidity
-
-          setTokensWithNoLiquidity((prev) => [...prev, result.token]);
-        } else if (result.value.tx) {
-          console.log("token address", result.token.address);
-          //push result.token to setTokensWithLiquidity
-          setTokensWithLiquidity((prev) => [...prev, result.token]);
-          setSwapCallDataArray((prev) => [...prev, result.value.tx.data]);
-        }
-
-        console.log(tokensWithNoLiquidity, tokensWithLiquidity);
-      });
-      return filteredRes;
+      setSwapCallDataArray(filteredRes.map((data) => data.tx.data));
     } catch (e) {
       console.error("Error fetching swap data:", e);
       // setError("Failed to fetch swap data. Please try again.");
@@ -103,11 +84,14 @@ export const use1inchSwap = (
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchSwapData();
+  }, []);
+
   return {
     fetchSwapData,
     isLoading,
-    tokensWithLiquidity,
-    tokensWithNoLiquidity,
     swapCallDataArray,
   };
 };

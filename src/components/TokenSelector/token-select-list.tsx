@@ -1,36 +1,40 @@
-import { Box, Button, VStack } from "@chakra-ui/react";
-import React, { useEffect, useRef, useState } from "react";
+import { Box, VStack, Text, HStack } from "@chakra-ui/react";
 import TokenSelectListRow from "./token-select-row";
 import { useBalances } from "@/hooks/balances/useBalances";
 import { useAccount } from "wagmi";
-import { useAppSelector } from "@/hooks/rtkHooks";
-import { RootState } from "@/store/store";
+import { AssetClass } from "@/utils/classes";
 
-function TokenSelectList() {
+function TokenSelectList({
+  userWalletTokens,
+}: {
+  userWalletTokens: AssetClass[] | undefined;
+}) {
   const { address } = useAccount();
 
   const xxx = useBalances({
-    account: address ?? "0xE3c347cEa95B7BfdB921074bdb39b8571F905f6D",
+    account: address ?? "",
   });
-
-  useEffect(() => {}, []);
-  const userWalletTokens = useAppSelector(
-    (state: RootState) => state.SweepTokensSlice.userWalletTokens,
-  );
-
-  console.log("this is balance data", userWalletTokens);
 
   return (
     <VStack
       borderTop="1px solid #F7E5F7"
       width="100%"
       height="341px"
-      padding="1rem"
+      px="1rem"
+      pb="1.4rem"
       overflowY="scroll"
       // ref={vStackRef}
       gap="12px"
     >
-      {/* <Button onClick={handleHeightCheck}>{_height ? _height : "e"}</Button> */}
+      <HStack
+        fontSize="smaller"
+        padding="0.5rem"
+        color="#9E829F"
+        justifyContent="space-between"
+        width="100%"
+      >
+        <Text>Tokens</Text> <Text>Value</Text>
+      </HStack>
       {userWalletTokens?.map((token, i) => {
         return (
           <Box key={i} width="100%">

@@ -1,8 +1,17 @@
 import { useSelectedTokens } from "@/hooks/useSelectTokens";
 import { Token } from "@/lib/components/types";
-import { Box, Checkbox, HStack, Text, VStack } from "@chakra-ui/react";
+import {
+  Box,
+  Checkbox,
+  HStack,
+  Text,
+  VStack,
+  WrapItem,
+  Avatar,
+} from "@chakra-ui/react";
 import Image from "next/image";
 import React from "react";
+import FormatNumber from "../FormatNumber";
 
 function TokenSelectListRow({ token }: { token: Token }) {
   const { address, logoURI, name, symbol, decimals, quoteUSD, userBalance } =
@@ -19,9 +28,7 @@ function TokenSelectListRow({ token }: { token: Token }) {
       borderRadius="12px"
       padding="8px"
       cursor="pointer"
-      _hover={
-        {bg: "gray.50"}
-      }
+      _hover={{ bg: "gray.50" }}
       transition="color"
       transitionDuration="500ms"
       onClick={
@@ -39,22 +46,17 @@ function TokenSelectListRow({ token }: { token: Token }) {
       <Checkbox
         isChecked={isSelected(token)}
         colorScheme="#fff"
-        // onChange={
-        //   isSelected(token)
-        //     ? () => _unSelectToken(token)
-        //     : () => _selectToken(token)
-        // }
         iconColor={"#7F56D9"}
       >
         <HStack alignItems="center">
-          <Box overflow="hidden" rounded="100%">
-            <Image src={logoURI} width={25} height={25} alt={name} />
-          </Box>
+          <WrapItem>
+            <Avatar size="sm" name={name} src={logoURI} />
+          </WrapItem>
           <VStack gap="0" alignItems="start">
-            <Text fontWeight="700">
+            <Text fontWeight="500" color="#281629">
               {symbol.length > 6 ? `${symbol.substring(0, 5)}...` : symbol}
             </Text>
-            <Text color="#A8BBD6" fontSize="smaller">
+            <Text color="#A8BBD6" fontSize="13px" fontWeight={500}>
               {name}
             </Text>
           </VStack>
@@ -65,11 +67,13 @@ function TokenSelectListRow({ token }: { token: Token }) {
 
       <VStack alignItems="end" gap="0">
         <Text fontWeight="700">
-          {userBalance.toFixed(3)}{" "}
-          {symbol.length > 4 ? `${symbol.substring(0, 3)}...` : symbol}
+          <FormatNumber
+            suf={symbol.length > 4 ? `${symbol.substring(0, 3)}...` : symbol}
+            amount={userBalance}
+          />
         </Text>
         <Text color="#A8BBD6" fontSize="smaller">
-          ~$ {quoteUSD.toFixed(4)}
+          ~ <FormatNumber pre="$" amount={quoteUSD} />
         </Text>
       </VStack>
     </HStack>
