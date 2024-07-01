@@ -42,7 +42,7 @@ const SectionTwo = () => {
             <Button
               bg={COLORS.launchTextColor}
               as={Link}
-              href="#home"
+              href="/app"
               color="white"
               width="102px"
               height="32px"

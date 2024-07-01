@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Box, Text, Tooltip, Button } from "@chakra-ui/react";
+import { Text, Button } from "@chakra-ui/react";
 import { COLORS } from "@/constants/theme";
 
 const MotionButton = motion(Button);
@@ -24,11 +24,9 @@ const Action = () => {
           bg: `${COLORS.btnGradient}`,
         }}
       >
-        <Tooltip hasArrow label="coming soon" bg="red.600">
-          <Text fontSize={{ base: "13px", md: "14px" }} fontWeight="500">
-            Launch App
-          </Text>
-        </Tooltip>
+        <Text fontSize={{ base: "13px", md: "14px" }} fontWeight="500">
+          Launch App
+        </Text>
       </MotionButton>
     </Link>
   );
