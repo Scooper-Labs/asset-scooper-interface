@@ -1,4 +1,10 @@
-import { AssetsInterface, WalletPortfolioApiResInterface } from "./interface";
+import { formatEther } from "viem";
+import {
+  AssetsInterface,
+  TXN_Interface,
+  WalletPortfolioApiResInterface,
+} from "./interface";
+import { getTime } from "./numberUtils";
 
 export class WalletPortfolioClass {
   wallet: string;
@@ -54,4 +60,44 @@ export class AssetClass {
     this.decimals = contracts_balances[0].decimals;
     this.address = contracts_balances[0].address;
   }
+}
+
+export class BlockTransactions {
+  blockNumber: number;
+  wethIn: number;
+  time: string;
+  transactionHash: string;
+  tokensIn: string[];
+  amountsIn: string[];
+
+  constructor(txns: TXN_Interface[]) {
+    const { blockNumber, blockTimestamp, transactionHash } = txns[0];
+    this.blockNumber = parseInt(blockNumber);
+    this.time = getTime(parseInt(blockTimestamp));
+    this.transactionHash = transactionHash;
+    this.tokensIn = txns.map((txn) => txn.tokenIn);
+    this.amountsIn = txns.map((txn) => txn.amountIn);
+    this.wethIn = txns.reduce(
+      (acc, txn) => acc + parseInt(formatEther(BigInt(txn.amountOut))),
+      0
+    );
+  }
+}
+export function groupTransactionsByBlock(
+  txns: TXN_Interface[]
+): BlockTransactions[] {
+  const blockMap: { [blockNumber: string]: TXN_Interface[] } = {};
+
+  // Group transactions by block number
+  txns.forEach((txn) => {
+    if (!blockMap[txn.blockNumber]) {
+      blockMap[txn.blockNumber] = [];
+    }
+    blockMap[txn.blockNumber].push(txn);
+  });
+
+  // Create BlockTransactions for each group
+  return Object.values(blockMap).map(
+    (txnsInBlock) => new BlockTransactions(txnsInBlock)
+  );
 }

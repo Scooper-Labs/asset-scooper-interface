@@ -24,16 +24,30 @@ import useGetETHPrice from "@/hooks/useGetETHPrice";
 import FormatNumber from "@/components/FormatNumber";
 import TransactionComplete from "../modals/TransactionCompleted";
 import ErrorOccured from "../modals/ErrorOccured";
+import { Token } from "@/lib/components/types";
+
+export function ETHToReceive({ selectedTokens }: { selectedTokens: Token[] }) {
+  const { price } = useGetETHPrice();
+  const quoteAllTokens = selectedTokens.reduce(
+    (total, selectedToken) => total + selectedToken.quoteUSD,
+    0
+  );
+
+  return (
+    <Text>
+      {price === 0 ? (
+        "__"
+      ) : (
+        <FormatNumber amount={quoteAllTokens / price} suf="ETH" />
+      )}
+    </Text>
+  );
+}
 
 function SweepWidget() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { selectedTokens } = useSelectedTokens();
   const { price } = useGetETHPrice();
-
-  const quoteAllTokens = selectedTokens.reduce(
-    (total, selectedToken) => total + selectedToken.quoteUSD,
-    0
-  );
 
   const router = useRouter();
 
@@ -131,13 +145,7 @@ function SweepWidget() {
               <InfoOutlineIcon />
             </Flex>
 
-            <Text>
-              {price === 0 ? (
-                "__"
-              ) : (
-                <FormatNumber amount={quoteAllTokens / price} suf="ETH" />
-              )}
-            </Text>
+            <ETHToReceive selectedTokens={selectedTokens} />
           </Flex>
 
           <Flex width="100%" justifyContent="space-between">

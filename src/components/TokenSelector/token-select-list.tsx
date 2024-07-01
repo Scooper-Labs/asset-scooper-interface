@@ -1,33 +1,19 @@
-import { Box, Button, VStack, Text, HStack } from "@chakra-ui/react";
-import React, { useEffect, useRef, useState } from "react";
+import { Box, VStack, Text, HStack } from "@chakra-ui/react";
 import TokenSelectListRow from "./token-select-row";
 import { useBalances } from "@/hooks/balances/useBalances";
 import { useAccount } from "wagmi";
-import { useAppSelector } from "@/hooks/rtkHooks";
-import { RootState } from "@/store/store";
-import { useWalletsPortfolio } from "@/hooks/useMobula";
 import { AssetClass } from "@/utils/classes";
 
-function TokenSelectList() {
+function TokenSelectList({
+  userWalletTokens,
+}: {
+  userWalletTokens: AssetClass[] | undefined;
+}) {
   const { address } = useAccount();
-
-  const { data, error, loading } = useWalletsPortfolio();
-  const [userWalletTokens, setUserWalletTokens] = useState<AssetClass[]>([]);
-
-  useEffect(() => {
-    if (data) {
-      setUserWalletTokens(data.assets);
-    }
-  }, [data]);
 
   const xxx = useBalances({
     account: address ?? "",
   });
-
-  // useEffect(() => {}, []);
-  // const userWalletTokens = useAppSelector(
-  //   (state: RootState) => state.SweepTokensSlice.userWalletTokens,
-  // );
 
   return (
     <VStack
@@ -49,7 +35,6 @@ function TokenSelectList() {
       >
         <Text>Tokens</Text> <Text>Value</Text>
       </HStack>
-      {/* <Button onClick={handleHeightCheck}>{_height ? _height : "e"}</Button> */}
       {userWalletTokens?.map((token, i) => {
         return (
           <Box key={i} width="100%">
