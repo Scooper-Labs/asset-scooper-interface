@@ -87,6 +87,14 @@ function ConfirmationModal({
   }, [isConfirmed, isWriteContractError, isWaitTrxError]);
 
   const isLoading = isSweeping || isConfirming;
+  const isDisabled = !tokensAllowanceStatus || isLoading;
+
+  console.log(
+    isDisabled,
+    !tokensAllowanceStatus || isLoading,
+    tokensAllowanceStatus,
+    isLoading
+  );
 
   return (
     <>
@@ -142,7 +150,7 @@ function ConfirmationModal({
                   <Text color="#674669">{slippageTolerance}%</Text>
                 </HStack>
                 <HStack width="100%" justifyContent="space-between">
-                  <Text>EEstimated Transaction Time::</Text>
+                  <Text>Estimated Transaction Time::</Text>
                   <Flex>
                     <Text color="#674669">
                       {3 * selectedTokens.length} seconds
@@ -156,16 +164,29 @@ function ConfirmationModal({
                   tokensAllowanceStatus={tokensAllowanceStatus}
                   refetch={refetch}
                 />
-
+                <button
+                  onClick={handlesweep}
+                  disabled={isDisabled}
+                  style={{
+                    width: "100%",
+                    color: "#fff",
+                    background: tokensAllowanceStatus ? "#0099FB" : "#B5B4C6",
+                    height: "2.5rem",
+                    borderRadius: "0.375rem",
+                  }}
+                >
+                  {isLoading ? "Sweeping" : "Sweep"}
+                </button>
+                {/* 
                 <Button
                   width="100%"
                   color="#fff"
                   onClick={handlesweep}
-                  disabled={!tokensAllowanceStatus || isLoading}
+                  disabled={isDisabled}
                   bg={tokensAllowanceStatus ? "#0099FB" : "#B5B4C6"}
                 >
                   {isLoading ? "Sweeping" : "Sweep"}
-                </Button>
+                </Button> */}
               </HStack>
             </VStack>
           </ModalBody>
@@ -176,6 +197,7 @@ function ConfirmationModal({
         isOpen={isConfirmed}
         onClose={onCloseConfirmed}
         hash={hash as `0x${string}`}
+        Component={<ETHToReceive selectedTokens={selectedTokens} />}
       />
       <ErrorOccured
         isOpen={isOpenError && (isWriteContractError || isWaitTrxError)}
