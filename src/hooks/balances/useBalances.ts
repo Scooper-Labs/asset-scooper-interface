@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../rtkHooks";
 import { RootState } from "@/store/store";
 import {
@@ -31,12 +31,21 @@ export const useBalances = ({ account }: UseBalances) => {
     enabled: true,
   });
 
+  const filteredAssets = useMemo(() => {
+    if (data?.data?.assets) {
+      return data.data.assets.filter(
+        (asset: AssetClass) =>
+          asset.address !== "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      );
+    }
+    return [];
+  }, [data]);
   useEffect(() => {
     if (data) {
       try {
         dispatch(setUserWalletTokenWithBalance([]));
         dispatch(clearAllSelectedTokens());
-        dispatch(setUserWalletTokenWithBalance(data.assets));
+        dispatch(setUserWalletTokenWithBalance(filteredAssets));
       } catch (error) {
         console.error("Error validating data:", error);
       }
@@ -44,7 +53,7 @@ export const useBalances = ({ account }: UseBalances) => {
   }, [data, isLoading]);
 
   return {
-    walletBalance: data?.data?.assets as AssetClass[],
+    walletBalance: filteredAssets as AssetClass[],
     isError,
     isLoading,
   };
