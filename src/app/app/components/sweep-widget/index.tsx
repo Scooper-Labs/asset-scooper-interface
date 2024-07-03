@@ -2,6 +2,7 @@
 
 import { TokenSelector } from "@/components/TokenSelector";
 import { ChevronDownIcon, InfoOutlineIcon } from "@chakra-ui/icons";
+import { AiOutlineQuestionCircle } from "react-icons/ai";
 import {
   Box,
   Button,
@@ -57,6 +58,7 @@ function SweepWidget() {
             fontWeight="500"
             bg={COLORS.btnBGGradient}
             borderRadius={10}
+            fontSize="14px"
             color={COLORS.tabTextColor}
             shadow="small"
             border="1px solid #B190EB"
@@ -91,9 +93,15 @@ function SweepWidget() {
           <Flex width="100%" justify="space-between">
             <Flex gap="6px" alignItems="center">
               <SweepIcon />
-              <Text>Sweep</Text>
+              <Text
+                fontWeight={500}
+                fontSize={{ base: "13px", md: "14px" }}
+                color="#281629"
+              >
+                Sweep
+              </Text>
             </Flex>
-            <Text fontSize="small" color="#9E829F">
+            <Text fontSize="12px" color={COLORS.tabTextColor}>
               Update in 30 sec 1ETH ≈ {price} USDC{" "}
             </Text>
           </Flex>
@@ -139,8 +147,14 @@ function SweepWidget() {
         >
           <Flex width="100%" justifyContent="space-between">
             <Flex alignItems="center" gap="4px">
-              <Text>You will receive..</Text>
-              <InfoOutlineIcon />
+              <Text
+                fontSize="14px"
+                fontWeight={500}
+                color={COLORS.tabTextColor}
+              >
+                You will receive..
+              </Text>
+              <AiOutlineQuestionCircle color="#C9BCCA" />
             </Flex>
 
             <ETHToReceive selectedTokens={selectedTokens} />
@@ -148,8 +162,14 @@ function SweepWidget() {
 
           <Flex width="100%" justifyContent="space-between">
             <Flex alignItems="center" gap="4px">
-              <Text>Transaction fee..</Text>
-              <InfoOutlineIcon />
+              <Text
+                fontSize="14px"
+                fontWeight={500}
+                color={COLORS.tabTextColor}
+              >
+                Transaction fee
+              </Text>
+              <AiOutlineQuestionCircle color="#C9BCCA" />
             </Flex>
 
             <Text>__</Text>
@@ -157,8 +177,14 @@ function SweepWidget() {
 
           <Flex width="100%" justifyContent="space-between">
             <Flex alignItems="center" gap="4px">
-              <Text>Estimated transaction time...</Text>
-              <InfoOutlineIcon />
+              <Text
+                fontSize="14px"
+                fontWeight={500}
+                color={COLORS.tabTextColor}
+              >
+                Estimated transaction time
+              </Text>
+              <AiOutlineQuestionCircle color="#C9BCCA" />
             </Flex>
 
             <Text>3 seconds</Text>
