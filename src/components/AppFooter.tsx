@@ -6,14 +6,58 @@ import { LinkComponent } from "./LinkComponent";
 import ContainerWrapper from "./ContainerWrapper";
 import { COLORS } from "@/constants/theme";
 import { RiExternalLinkLine } from "react-icons/ri";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { tabs } from "@/assets/site";
 
 export function AppFooter() {
+  const pathname = usePathname();
   return (
-    <Box bg={COLORS.footerBGColor} w="100%" h="72px" py="10px" mt="50px">
+    <Box
+      bg={{ base: "#FCFCFD", md: `${COLORS.footerBGColor}` }}
+      w="100%"
+      h="72px"
+      py="10px"
+      mt="40px"
+      borderTop={{ base: "1px solid #EDEEF2", md: "none" }}
+    >
       <ContainerWrapper>
+        {/* --------------------------- Mobile Screen -------------------- */}
         <Flex
+          display={{ base: "flex", md: "none" }}
           as="footer"
-          position="sticky"
+          position="static"
+          justify="space-between"
+          align="center"
+          color="neutral-content"
+          p="4"
+        >
+          {tabs.map((e, i) => (
+            <Link href={e.link} key={i} prefetch={false}>
+              <HStack
+                opacity={pathname === e.link ? 1 : 0.5}
+                px="10px"
+                py="5px"
+                borderRadius={"50px"}
+                color={pathname === e.link ? "#006DED" : "#9E829F"}
+                _hover={{ opacity: 1 }}
+              >
+                <Text
+                  fontWeight={pathname === e.link ? 600 : 400}
+                  fontSize={["12px", "12px", "12px", "14px", "16px"]}
+                >
+                  {e.name}
+                </Text>
+              </HStack>
+            </Link>
+          ))}
+        </Flex>
+
+        {/* --------------------------- Desktop Screen ------------------- */}
+        <Flex
+          display={{ base: "none", md: "flex" }}
+          as="footer"
+          position="static"
           justify="space-between"
           align="center"
           bg="neutral"

@@ -18,6 +18,8 @@ import {
   TabPanels,
   Tab,
   TabPanel,
+  useBreakpointValue,
+  DrawerOverlay,
 } from "@chakra-ui/react";
 import { COLORS } from "@/constants/theme";
 import { IoMdClose } from "react-icons/io";
@@ -72,16 +74,31 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
     onClose();
   }
 
+  const drawerPlacement = useBreakpointValue<"bottom" | "right">({
+    base: "bottom",
+    md: "right",
+  });
+
   return (
     <Drawer
       isOpen={isOpen}
-      placement="right"
+      placement={drawerPlacement}
       onClose={onClose}
       finalFocusRef={btnRef}
       size={"sm"}
       blockScrollOnMount={true}
     >
-      <DrawerContent border="1px solid #E7BFE7" background="#FDFDFD">
+      <DrawerOverlay
+        display={{ base: "flex", md: "none" }}
+        bg="#06081A80"
+        backdropFilter="auto"
+        backdropBlur="2px"
+      />
+      <DrawerContent
+        border="1px solid #E7BFE7"
+        background="#FDFDFD"
+        borderRadius={{ base: "20px 20px 0px 0px", md: "0px" }}
+      >
         {/* ----- Heading ----- */}
         <Box
           py="20px"
@@ -95,22 +112,49 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
           <Flex justify="space-between">
             <HStack>
               <Avatar width={32} height={32} />
-              <Text fontSize="16px" lineHeight="19.2px">
+              <Text
+                fontSize="16px"
+                lineHeight="19.2px"
+                fontWeight={502}
+                color="#151829"
+              >
                 {truncate(address || "")}
               </Text>
             </HStack>
 
-            <Circle
-              onClick={onClose}
-              background="#018FE91A"
-              borderRadius="50px"
-              //@ts-ignore
-              width="32px"
-              height="32px"
-              cursor="pointer"
-            >
-              <IoMdClose color="black" />
-            </Circle>
+            <HStack>
+              <Center
+                display={{ base: "flex", md: "none" }}
+                as={Button}
+                width="95px"
+                bgColor="#FFDFE3"
+                py="10px"
+                px="10px"
+                color="#E2001B"
+                fontWeight={400}
+                borderRadius="104px"
+                h="29px"
+                onClick={disconnectAndCloseModal}
+                _hover={{
+                  bgColor: "#FFDFE3",
+                  color: "#E2001B",
+                }}
+              >
+                Disconnect
+              </Center>
+
+              <Circle
+                onClick={onClose}
+                background="#018FE91A"
+                borderRadius="50px"
+                //@ts-ignore
+                width="32px"
+                height="32px"
+                cursor="pointer"
+              >
+                <IoMdClose color="black" />
+              </Circle>
+            </HStack>
           </Flex>
 
           <HStack mt="40px">
@@ -196,7 +240,7 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
           </Tabs>
         </DrawerBody>
 
-        <DrawerFooter>
+        <DrawerFooter display={{ base: "none", md: "flex" }}>
           <Center
             as={Button}
             width="100%"

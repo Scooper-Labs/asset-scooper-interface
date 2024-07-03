@@ -2,7 +2,7 @@ import { TabsProps } from "@/lib/components/types";
 
 export const tabs: TabsProps[] = [
   {
-    name: "App",
+    name: "Sweep",
     link: "/app",
   },
   {
@@ -14,7 +14,7 @@ export const tabs: TabsProps[] = [
     link: "#",
   },
   {
-    name: "Activity",
+    name: "Transaction activity",
     link: "#",
   },
 ];
