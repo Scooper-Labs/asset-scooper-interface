@@ -52,7 +52,7 @@ function SweepButton() {
       {!isConnected ? (
         <Button
           mt="20px"
-          w="455px"
+          w={{ base: "100%", md: "455px" }}
           bg={COLORS.sweepBGColor}
           _hover={{
             bg: `${COLORS.sweepBGColor}`,

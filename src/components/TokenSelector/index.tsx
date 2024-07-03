@@ -65,9 +65,10 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
         }}
       >
         <ModalCloseButton
+          mt="10px"
           color="#151515"
           _hover={{
-            bgColor: "none",
+            bg: "none",
           }}
         />
         <VStack
