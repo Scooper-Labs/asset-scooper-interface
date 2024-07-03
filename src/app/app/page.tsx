@@ -12,9 +12,8 @@ const Sweep: React.FC = () => {
         pt={"6rem"}
         width="100%"
         height="100%"
+        justifyContent="center"
         alignItems="center"
-        justify="center"
-        minHeight="100vh"
       >
         <SweepWidget />
       </Flex>
