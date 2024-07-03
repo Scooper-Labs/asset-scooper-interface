@@ -17,7 +17,7 @@ interface ModalComponentProps extends PropsWithChildren<ModalProps> {
   modalBodyStyle?: ModalBodyProps;
 }
 
-const TokenSelectorModalComponent: FC<ModalComponentProps> = ({
+const ModalMobileComponent: FC<ModalComponentProps> = ({
   children,
   isOpen,
   confetti,
@@ -31,23 +31,25 @@ const TokenSelectorModalComponent: FC<ModalComponentProps> = ({
       <Modal
         isCentered
         blockScrollOnMount={true}
+        scrollBehavior={"inside"}
         isOpen={isOpen}
         size={"sm"}
         onClose={onClose}
         motionPreset="scale"
         {...props}
       >
-        <ModalOverlay bg="#00000020" backdropFilter="auto" backdropBlur="2px" />
+        <ModalOverlay bg="#06081A80" backdropFilter="auto" backdropBlur="2px" />
         <ModalContent
-          w={{ base: "90vw", md: "70vw" }}
-          borderRadius={10}
+          w={{ base: "90vw", md: "60vw" }}
+          borderRadius="16px"
           py="1%"
-          position={{ base: "fixed" }}
-          bottom={{ base: "0" }}
-          mb={{ base: "40px" }}
+          position="fixed"
+          bottom="0"
+          mb="40px"
+          bg="#FDFDFDCF"
           {...modalContentStyle}
         >
-          <ModalBody padding="0" py="0" px="0" {...modalBodyStyle}>
+          <ModalBody {...modalBodyStyle}>
             <>{children}</>
           </ModalBody>
         </ModalContent>
@@ -56,4 +58,4 @@ const TokenSelectorModalComponent: FC<ModalComponentProps> = ({
   );
 };
 
-export default TokenSelectorModalComponent;
+export default ModalMobileComponent;
