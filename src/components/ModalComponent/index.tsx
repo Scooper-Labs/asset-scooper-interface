@@ -38,11 +38,14 @@ const ModalComponent: FC<ModalComponentProps> = ({
         motionPreset="scale"
         {...props}
       >
-        <ModalOverlay bg="#00000020" backdropFilter="auto" backdropBlur="2px" />
+        <ModalOverlay bg="#06081A80" backdropFilter="auto" backdropBlur="2px" />
         <ModalContent
           w={{ base: "90vw", md: "60vw" }}
-          borderRadius={10}
+          borderRadius="24px"
           py="1%"
+          position={{ base: "fixed" }}
+          bottom={{ base: "0" }}
+          mb={{ base: "40px" }}
           {...modalContentStyle}
         >
           <ModalBody {...modalBodyStyle}>
