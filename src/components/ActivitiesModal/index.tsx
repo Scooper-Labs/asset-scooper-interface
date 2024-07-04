@@ -63,7 +63,10 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
     }
   }, [data]);
 
-  useBalances({ account: address ?? "" });
+  useBalances({
+    //@ts-ignore
+    account: address ?? "",
+  });
 
   const balanceVisibility = () => {
     setIsBalanceVisible(!isBalanceVisible);

@@ -9,6 +9,7 @@ const client = new ApolloClient({
   uri: SUBGRAPH,
   cache: new InMemoryCache(),
 });
+
 const ApolloClientProvider: FC<ProvidersProps> = ({ children }) => {
   return <ApolloProvider client={client}>{children}</ApolloProvider>;
 };
