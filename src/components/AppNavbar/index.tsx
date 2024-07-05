@@ -8,6 +8,8 @@ import {
   useDisclosure,
   Center,
   Divider,
+  Tag,
+  TagLabel,
 } from "@chakra-ui/react";
 import { useRef } from "react";
 import { usePathname } from "next/navigation";
@@ -51,9 +53,16 @@ const NavBar = () => {
           // height={{ base: "56px", md: "52px" }}
         >
           <HStack>
-            <Link href={"/"} role="logo_link" prefetch={false}>
-              <Image alt="Logo" src={LogoSvg} />
-            </Link>
+            <HStack>
+              <Link href={"/"} role="logo_link" prefetch={false}>
+                <Image alt="Logo" src={LogoSvg} />
+              </Link>
+
+              <Tag size="md" colorScheme="red" borderRadius="full">
+                <TagLabel>beta</TagLabel>
+              </Tag>
+            </HStack>
+
             <Center height="20px" display={{ base: "none", md: "flex" }}>
               <Divider orientation="vertical" border="1px solid #EB65D566" />
             </Center>
