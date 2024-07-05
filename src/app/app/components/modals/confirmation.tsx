@@ -27,6 +27,7 @@ import { useSlippageTolerance } from "@/hooks/settings/slippage/useSlippage";
 import { SlippageToleranceStorageKey } from "@/hooks/settings/slippage/utils";
 import TransactionComplete from "./TransactionCompleted";
 import ErrorOccured from "./ErrorOccured";
+import { useBatchApprovals } from "@/hooks/approvals/useBatchApprovals";
 
 function ConfirmationModal({
   tokensAllowanceStatus,
@@ -48,10 +49,15 @@ function ConfirmationModal({
   } = useDisclosure();
 
   const { slippageTolerance } = useSlippageTolerance(
-    SlippageToleranceStorageKey.Sweep
+    SlippageToleranceStorageKey.Sweep,
   );
 
   const { selectedTokens } = useSelectedTokens();
+
+  const { approveTTokens } = useBatchApprovals({
+    tokens: selectedTokens,
+    amount: selectedTokens.map((item) => item.userBalance),
+  });
   const minAmountOut = selectedTokens.map((t) => 0n);
 
   const {
@@ -94,7 +100,7 @@ function ConfirmationModal({
     isDisabled,
     !tokensAllowanceStatus || isLoading,
     tokensAllowanceStatus,
-    isLoading
+    isLoading,
   );
 
   return (
@@ -161,33 +167,23 @@ function ConfirmationModal({
               </VStack>
 
               <HStack width="100%">
-                <ApprovalModal
-                  tokensAllowanceStatus={tokensAllowanceStatus}
-                  refetch={refetch}
-                />
-                <button
+                {
+                  <ApprovalModal
+                    tokensAllowanceStatus={tokensAllowanceStatus}
+                    refetch={refetch}
+                  />
+                }
+                <Button
                   onClick={handlesweep}
                   disabled={isDisabled}
-                  style={{
-                    width: "100%",
-                    color: "#fff",
-                    background: tokensAllowanceStatus ? "#0099FB" : "#B5B4C6",
-                    height: "2.5rem",
-                    borderRadius: "0.375rem",
-                  }}
-                >
-                  {isLoading ? "Sweeping" : "Sweep"}
-                </button>
-                {/* 
-                <Button
                   width="100%"
                   color="#fff"
-                  onClick={handlesweep}
-                  disabled={isDisabled}
                   bg={tokensAllowanceStatus ? "#0099FB" : "#B5B4C6"}
+                  height="2.5rem"
+                  borderRadius="0.375rem"
                 >
                   {isLoading ? "Sweeping" : "Sweep"}
-                </Button> */}
+                </Button>
               </HStack>
             </VStack>
           </ModalBody>

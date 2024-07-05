@@ -16,6 +16,7 @@
     "@covalenthq/client-sdk": "^1.0.2",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
+    "@paraswap/core": "^2.4.0",
     "@reduxjs/toolkit": "^2.2.5",
     "@tanstack/react-query": "^5.45.0",
     "@web3modal/wagmi": "^5.0.1",
