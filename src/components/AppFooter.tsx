@@ -1,6 +1,15 @@
 import React from "react";
 import { SITE_EMOJI, SITE_INFO } from "@/utils/site";
-import { Flex, Box, HStack, Text, Center, Divider } from "@chakra-ui/react";
+import {
+  Flex,
+  Box,
+  HStack,
+  Text,
+  Center,
+  Divider,
+  Tag,
+  TagLabel,
+} from "@chakra-ui/react";
 import { NetworkStatus } from "./NetworkStatus";
 import { LinkComponent } from "./LinkComponent";
 import ContainerWrapper from "./ContainerWrapper";
@@ -64,9 +73,15 @@ export function AppFooter() {
           color="neutral-content"
           p="4"
         >
-          <Text fontWeight={500} fontSize="14px" color="#1D282A">
-            {SITE_EMOJI} {SITE_INFO}
-          </Text>
+          <HStack>
+            <Text fontWeight={500} fontSize="14px" color="#1D282A">
+              {SITE_EMOJI} {SITE_INFO}
+            </Text>
+
+            <Tag size="md" colorScheme="red" borderRadius="full">
+              <TagLabel>beta</TagLabel>
+            </Tag>
+          </HStack>
 
           <HStack>
             {/* --------------- Blog Link ----------------- */}
