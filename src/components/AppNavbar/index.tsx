@@ -8,6 +8,8 @@ import {
   useDisclosure,
   Center,
   Divider,
+  Tag,
+  TagLabel,
 } from "@chakra-ui/react";
 import { useRef } from "react";
 import { usePathname } from "next/navigation";
@@ -21,6 +23,7 @@ import { tabs } from "@/assets/site";
 import ConnectButton from "../Buttons/connectButton";
 import { CustomConnectButton } from "../Buttons/SmartWalletButton";
 import { useAccount } from "wagmi";
+import { COLORS } from "@/constants/theme";
 
 const NavBar = () => {
   const pathname = usePathname();
@@ -30,17 +33,45 @@ const NavBar = () => {
   const { isConnected } = useAccount();
 
   return (
-    <Box bg="white" pos={"fixed"} w="100%" py="10px" zIndex={1000} top={0}>
+    <Box
+      bg="white"
+      pos={"fixed"}
+      w="100%"
+      py="10px"
+      zIndex={1000}
+      top={0}
+      borderBottom={{
+        base: `1px solid ${COLORS.appNavBarBorderColorM}`,
+        md: `1px solid ${COLORS.appNavBarBorderColor}`,
+      }}
+    >
       <ContainerWrapper>
-        <HStack h={"55px"} justify={"space-between"}>
+        <HStack
+          h={"55px"}
+          justify={"space-between"}
+          //         width={{ base: "100%", md: "100%", lg: "430px" }}
+          // height={{ base: "56px", md: "52px" }}
+        >
           <HStack>
-            <Link href={"/"} role="logo_link" prefetch={false}>
-              <Image alt="Logo" src={LogoSvg} />
-            </Link>
-            <Center height="20px">
+            <HStack>
+              <Link href={"/"} role="logo_link" prefetch={false}>
+                <Image alt="Logo" src={LogoSvg} />
+              </Link>
+
+              <Tag
+                display={{ base: "none", md: "flex" }}
+                size="md"
+                colorScheme="red"
+                borderRadius="full"
+              >
+                <TagLabel>beta</TagLabel>
+              </Tag>
+            </HStack>
+
+            <Center height="20px" display={{ base: "none", md: "flex" }}>
               <Divider orientation="vertical" border="1px solid #EB65D566" />
             </Center>
-            <HStack>
+            <HStack display={{ base: "none", md: "flex" }}>
               {tabs.map((e, i) => (
                 <Link href={e.link} key={i} prefetch={false}>
                   <HStack

@@ -25,4 +25,6 @@ export const COLORS = {
   sweepBGColor: "#B5B4C6",
   selectedTokensBGColor:
     "radial-gradient(50% 50% at 50% 50%, #0099FB 0%, #006DED 100%)",
+  appNavBarBorderColor: "#F7E5F7",
+  appNavBarBorderColorM: "#01E3D433",
 };
