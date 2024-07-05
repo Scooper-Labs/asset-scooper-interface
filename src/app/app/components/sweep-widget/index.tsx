@@ -11,6 +11,8 @@ import {
   Text,
   VStack,
   useDisclosure,
+  Tag,
+  TagLabel,
 } from "@chakra-ui/react";
 import Image from "next/image";
 import React from "react";
@@ -54,6 +56,15 @@ function SweepWidget() {
     <VStack gap="12px">
       <Flex justify="end" fontSize="small" width="100%">
         <HStack>
+          <Tag
+            display={{ base: "flex", md: "none" }}
+            size="lg"
+            colorScheme="red"
+            borderRadius="full"
+          >
+            <TagLabel>beta</TagLabel>
+          </Tag>
+
           <Button
             fontWeight="500"
             bg={COLORS.btnBGGradient}

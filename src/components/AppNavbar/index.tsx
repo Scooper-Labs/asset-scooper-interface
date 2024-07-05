@@ -58,7 +58,12 @@ const NavBar = () => {
                 <Image alt="Logo" src={LogoSvg} />
               </Link>
 
-              <Tag size="md" colorScheme="red" borderRadius="full">
+              <Tag
+                display={{ base: "none", md: "flex" }}
+                size="md"
+                colorScheme="red"
+                borderRadius="full"
+              >
                 <TagLabel>beta</TagLabel>
               </Tag>
             </HStack>
