@@ -21,7 +21,7 @@ import { RootState } from "@/store/store";
 
 export function TokenSelector({ children }: { children?: ReactNode }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { data } = useWalletsPortfolio();
+  const { data, error, loading } = useWalletsPortfolio();
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
   const { price } = useGetETHPrice();
 
   const selectedTokens = meetsThreshold(data, price, sweepthreshHold);
-
+  
   return (
     <>
       <Box
@@ -97,21 +97,13 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
                 balance below {sweepthreshHold}
                 ETH
               </Text>
-              {/* <Box
-                border="none"
-                padding="8px"
-                backgroundColor="#E5F2FA"
-                fontSize="small"
-                color="#018FE9"
-                width="fit-content"
-                borderRadius="8px"
-                cursor="pointer"
-              >
-                Change ThreshHold
-              </Box> */}
             </VStack>
 
-            <TokenSelectList userWalletTokens={selectedTokens} />
+            <TokenSelectList
+              userWalletTokens={selectedTokens}
+              error={error}
+              loading={loading}
+            />
           </VStack>
 
           <TokenSelectFooter
@@ -126,12 +118,12 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
 function meetsThreshold(
   data: WalletPortfolioClass | null,
   price: number,
-  sweepthreshHold: string
+  sweepthreshHold: string,
 ) {
   const noETH = data?.assets.filter(
-    (token) => token.symbol !== "ETH" && token.symbol !== "WETH"
+    (token) => token.symbol !== "ETH" && token.symbol !== "WETH",
   );
   return noETH?.filter(
-    (token) => token.quoteUSD / price < parseFloat(sweepthreshHold)
+    (token) => token.quoteUSD / price < parseFloat(sweepthreshHold),
   );
 }
