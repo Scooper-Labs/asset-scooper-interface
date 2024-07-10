@@ -35,6 +35,9 @@ import { useWalletsPortfolio } from "@/hooks/useMobula";
 import { AssetClass } from "@/utils/classes";
 import { useQuery } from "@apollo/client";
 import { GET_ACCOUNT_TX } from "@/utils/queries";
+import { MdCheckCircleOutline } from "react-icons/md";
+import { HiOutlineDocumentDuplicate } from "react-icons/hi";
+import CopyToClipboard from "react-copy-to-clipboard";
 
 interface IModals {
   isOpen: boolean;
@@ -48,7 +51,7 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
   const { disconnect } = useDisconnect();
   const { data } = useWalletsPortfolio();
   const [userWalletTokens, setUserWalletTokens] = useState<AssetClass[]>([]);
-
+  const [addressCopied, setAddressCopied] = useState(false);
   const {
     data: txns,
     loading,
@@ -123,6 +126,22 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
               >
                 {truncate(address || "")}
               </Text>
+
+              {addressCopied ? (
+                <MdCheckCircleOutline size={16} aria-hidden="true" />
+              ) : (
+                <CopyToClipboard
+                  text={address ?? ""}
+                  onCopy={() => {
+                    setAddressCopied(true);
+                    setTimeout(() => {
+                      setAddressCopied(false);
+                    }, 800);
+                  }}
+                >
+                  <HiOutlineDocumentDuplicate size={16} />
+                </CopyToClipboard>
+              )}
             </HStack>
 
             <HStack>
