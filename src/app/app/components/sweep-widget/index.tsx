@@ -26,12 +26,19 @@ import OverlappingImage, { getImageArray } from "./ImageLap";
 import useGetETHPrice from "@/hooks/useGetETHPrice";
 import FormatNumber from "@/components/FormatNumber";
 import { Token } from "@/lib/components/types";
+import { useParaSwap } from "@/hooks/swap/useParaswapSwap";
+import { base } from "viem/chains";
+import { useAccount } from "wagmi";
+import { useAssetScooperContractWrite } from "@/hooks/useAssetScooperWriteContract";
+import { PARASWAP_TRANSFER_PROXY } from "@/constants/contractAddress";
+import { Address, erc20Abi, parseUnits } from "viem";
+import { useSmartWallet } from "@/hooks/useSmartWallet";
 
 export function ETHToReceive({ selectedTokens }: { selectedTokens: Token[] }) {
   const { price } = useGetETHPrice();
   const quoteAllTokens = selectedTokens.reduce(
     (total, selectedToken) => total + selectedToken.quoteUSD,
-    0
+    0,
   );
 
   return (
@@ -46,12 +53,59 @@ export function ETHToReceive({ selectedTokens }: { selectedTokens: Token[] }) {
 }
 
 function SweepWidget() {
+  const { address } = useAccount();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { selectedTokens } = useSelectedTokens();
   const { price } = useGetETHPrice();
 
+  console.log("address", address)
   const router = useRouter();
 
+  const { getRate, buildSwap, swapsTrxData } = useParaSwap();
+
+  const handleSwap = async () => {
+    const trade = await getRate({
+      srcToken: selectedTokens[0],
+      destToken: selectedTokens[1],
+      srcAmount: "10000",
+      networkID: base.id,
+    });
+    console.log("trade test", trade);
+    console.log("trade price route", trade);
+    const swapBuild = await buildSwap({
+      srcToken: selectedTokens[0],
+      destToken: selectedTokens[1],
+      srcAmount: "10000",
+      minAmount: "10000",
+      priceRoute: trade,
+      userAddress: address ?? "",
+      receiver: address ?? "",
+      networkID: base.id,
+    });
+
+    console.log("swapBuild swapBuild", swapBuild);
+  };
+  const handleBatchSwap = async () => {
+    const swapTransactions = await swapsTrxData();
+    if (swapTransactions) {
+      console.log("this is batch swap data", swapTransactions);
+    }
+  };
+  const {
+    write: approveToken,
+    isPending: isApprovalPending,
+    isConfirmed: isConfirmed,
+    isConfirming,
+  } = useAssetScooperContractWrite({
+    fn: "approve",
+    args: [PARASWAP_TRANSFER_PROXY as Address, parseUnits("100000000000", 18)],
+    abi: erc20Abi,
+    contractAddress:
+      selectedTokens.length > 0
+        ? (selectedTokens[0].address as Address)
+        : "0xE3c347cEa95B7BfdB921074bdb39b8571F905f6D",
+  });
+  const { isSmartWallet } = useSmartWallet();
   return (
     <VStack gap="12px">
       <Flex justify="end" fontSize="small" width="100%">
@@ -200,7 +254,14 @@ function SweepWidget() {
 
             <Text>3 seconds</Text>
           </Flex>
-
+          {/* {isSmartWallet && <Text>USING SMART WALLET</Text>}
+          <Button  onClick={() => approveToken()} width="100%">
+            ApproveUSDC
+          </Button>
+          <Button width="100%" onClick={handleBatchSwap}>Handle Batch Swap</Button>
+          <Button onClick={handleSwap} width="100%">
+            ParaswapTest
+          </Button> */}
           <SweepButton />
         </VStack>
       </VStack>
