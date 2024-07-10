@@ -1,2 +1,5 @@
 export const assetscooper_contract =
   "0x699Dc58648371EDB907b1FCfbf69EDadC335F353";
+
+export const PARASWAP_TRANSFER_PROXY =
+  "0x6a000f20005980200259b80c5102003040001068";

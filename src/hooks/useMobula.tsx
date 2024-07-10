@@ -59,7 +59,7 @@ export const useWalletsPortfolio = () => {
     };
 
     handleEffect();
-  }, [address]);
+  }, []);
 
   return { data, error, loading };
 };

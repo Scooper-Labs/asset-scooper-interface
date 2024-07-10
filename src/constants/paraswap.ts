@@ -1,0 +1,1 @@
+export const PARASWAP_API_URL = "https://api.paraswap.io";
