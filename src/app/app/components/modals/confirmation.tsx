@@ -54,7 +54,7 @@ function ConfirmationModal({
   } = useDisclosure();
 
   const { slippageTolerance } = useSlippageTolerance(
-    SlippageToleranceStorageKey.Sweep,
+    SlippageToleranceStorageKey.Sweep
   );
 
   const { selectedTokens } = useSelectedTokens();
@@ -106,7 +106,7 @@ function ConfirmationModal({
     isDisabled,
     !tokensAllowanceStatus || isLoading,
     tokensAllowanceStatus,
-    isLoading,
+    isLoading
   );
 
   return (
@@ -177,7 +177,7 @@ function ConfirmationModal({
                   <Button
                     width="100%"
                     color="#fff"
-                    bg={tokensAllowanceStatus ? "#0099FB" : "#B5B4C6"}
+                    bg={tokensAllowanceStatus ? "#B5B4C6" : "#0099FB"}
                     onClick={() => approveTTokens()}
                   >
                     Approve All
