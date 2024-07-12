@@ -3,11 +3,12 @@
 import { FC, ReactNode } from "react";
 import ChakraProvider from "./chakra";
 import ReduxProviders from "./redux";
+import ApolloClientProvider from "./apolloProder";
 
 export const RootProvider = ({ children }: { children: ReactNode }) => {
   return (
     <ReduxProviders>
-      <ChakraProvider>{children}</ChakraProvider>
+      <ChakraProvider><ApolloClientProvider>{children}</ApolloClientProvider></ChakraProvider>
     </ReduxProviders>
   );
 };

@@ -8,12 +8,16 @@ import { useReadContracts } from "wagmi";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { erc20Abi, Address, formatUnits } from "viem";
 import ConfirmationModal from "../modals/confirmation";
-import { assetscooper_contract } from "@/constants/contractAddress";
+import {
+  assetscooper_contract,
+  PARASWAP_TRANSFER_PROXY,
+} from "@/constants/contractAddress";
 import { COLORS } from "@/constants/theme";
+import { useSmartWallet } from "@/hooks/useSmartWallet";
 
 function SweepButton() {
   const { open } = useWeb3Modal();
-
+  const { isSmartWallet } = useSmartWallet();
   const { selectedTokens } = useSelectedTokens();
 
   const [tokensAllowance, setTokensAllowance] = useState(false);
@@ -23,7 +27,12 @@ function SweepButton() {
     abi: erc20Abi,
     address: token.address as Address,
     functionName: "allowance",
-    args: [address, assetscooper_contract as Address], // You'll need to provide these
+    args: [
+      address,
+      isSmartWallet
+        ? (PARASWAP_TRANSFER_PROXY as Address)
+        : (assetscooper_contract as Address),
+    ],
   }));
 
   const { data, refetch, isSuccess } = useReadContracts({
@@ -52,7 +61,7 @@ function SweepButton() {
       {!isConnected ? (
         <Button
           mt="20px"
-          w="455px"
+          w={{ base: "100%", md: "455px" }}
           bg={COLORS.sweepBGColor}
           _hover={{
             bg: `${COLORS.sweepBGColor}`,

@@ -2,6 +2,7 @@
 
 import { TokenSelector } from "@/components/TokenSelector";
 import { ChevronDownIcon, InfoOutlineIcon } from "@chakra-ui/icons";
+import { AiOutlineQuestionCircle } from "react-icons/ai";
 import {
   Box,
   Button,
@@ -10,6 +11,8 @@ import {
   Text,
   VStack,
   useDisclosure,
+  Tag,
+  TagLabel,
 } from "@chakra-ui/react";
 import Image from "next/image";
 import React from "react";
@@ -23,12 +26,19 @@ import OverlappingImage, { getImageArray } from "./ImageLap";
 import useGetETHPrice from "@/hooks/useGetETHPrice";
 import FormatNumber from "@/components/FormatNumber";
 import { Token } from "@/lib/components/types";
+import { useParaSwap } from "@/hooks/swap/useParaswapSwap";
+import { base } from "viem/chains";
+import { useAccount } from "wagmi";
+import { useAssetScooperContractWrite } from "@/hooks/useAssetScooperWriteContract";
+import { PARASWAP_TRANSFER_PROXY } from "@/constants/contractAddress";
+import { Address, erc20Abi, parseUnits } from "viem";
+import { useSmartWallet } from "@/hooks/useSmartWallet";
 
 export function ETHToReceive({ selectedTokens }: { selectedTokens: Token[] }) {
   const { price } = useGetETHPrice();
   const quoteAllTokens = selectedTokens.reduce(
     (total, selectedToken) => total + selectedToken.quoteUSD,
-    0
+    0,
   );
 
   return (
@@ -43,20 +53,77 @@ export function ETHToReceive({ selectedTokens }: { selectedTokens: Token[] }) {
 }
 
 function SweepWidget() {
+  const { address } = useAccount();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { selectedTokens } = useSelectedTokens();
   const { price } = useGetETHPrice();
 
+  console.log("address", address)
   const router = useRouter();
 
+  const { getRate, buildSwap, swapsTrxData } = useParaSwap();
+
+  const handleSwap = async () => {
+    const trade = await getRate({
+      srcToken: selectedTokens[0],
+      destToken: selectedTokens[1],
+      srcAmount: "10000",
+      networkID: base.id,
+    });
+    console.log("trade test", trade);
+    console.log("trade price route", trade);
+    const swapBuild = await buildSwap({
+      srcToken: selectedTokens[0],
+      destToken: selectedTokens[1],
+      srcAmount: "10000",
+      minAmount: "10000",
+      priceRoute: trade,
+      userAddress: address ?? "",
+      receiver: address ?? "",
+      networkID: base.id,
+    });
+
+    console.log("swapBuild swapBuild", swapBuild);
+  };
+  const handleBatchSwap = async () => {
+    const swapTransactions = await swapsTrxData();
+    if (swapTransactions) {
+      console.log("this is batch swap data", swapTransactions);
+    }
+  };
+  const {
+    write: approveToken,
+    isPending: isApprovalPending,
+    isConfirmed: isConfirmed,
+    isConfirming,
+  } = useAssetScooperContractWrite({
+    fn: "approve",
+    args: [PARASWAP_TRANSFER_PROXY as Address, parseUnits("100000000000", 18)],
+    abi: erc20Abi,
+    contractAddress:
+      selectedTokens.length > 0
+        ? (selectedTokens[0].address as Address)
+        : "0xE3c347cEa95B7BfdB921074bdb39b8571F905f6D",
+  });
+  const { isSmartWallet } = useSmartWallet();
   return (
     <VStack gap="12px">
       <Flex justify="end" fontSize="small" width="100%">
         <HStack>
+          <Tag
+            display={{ base: "flex", md: "none" }}
+            size="lg"
+            colorScheme="red"
+            borderRadius="full"
+          >
+            <TagLabel>beta</TagLabel>
+          </Tag>
+
           <Button
             fontWeight="500"
             bg={COLORS.btnBGGradient}
             borderRadius={10}
+            fontSize="14px"
             color={COLORS.tabTextColor}
             shadow="small"
             border="1px solid #B190EB"
@@ -91,9 +158,15 @@ function SweepWidget() {
           <Flex width="100%" justify="space-between">
             <Flex gap="6px" alignItems="center">
               <SweepIcon />
-              <Text>Sweep</Text>
+              <Text
+                fontWeight={500}
+                fontSize={{ base: "13px", md: "14px" }}
+                color="#281629"
+              >
+                Sweep
+              </Text>
             </Flex>
-            <Text fontSize="small" color="#9E829F">
+            <Text fontSize="12px" color={COLORS.tabTextColor}>
               Update in 30 sec 1ETH ≈ {price} USDC{" "}
             </Text>
           </Flex>
@@ -139,8 +212,14 @@ function SweepWidget() {
         >
           <Flex width="100%" justifyContent="space-between">
             <Flex alignItems="center" gap="4px">
-              <Text>You will receive..</Text>
-              <InfoOutlineIcon />
+              <Text
+                fontSize="14px"
+                fontWeight={500}
+                color={COLORS.tabTextColor}
+              >
+                You will receive..
+              </Text>
+              <AiOutlineQuestionCircle color="#C9BCCA" />
             </Flex>
 
             <ETHToReceive selectedTokens={selectedTokens} />
@@ -148,8 +227,14 @@ function SweepWidget() {
 
           <Flex width="100%" justifyContent="space-between">
             <Flex alignItems="center" gap="4px">
-              <Text>Transaction fee..</Text>
-              <InfoOutlineIcon />
+              <Text
+                fontSize="14px"
+                fontWeight={500}
+                color={COLORS.tabTextColor}
+              >
+                Transaction fee
+              </Text>
+              <AiOutlineQuestionCircle color="#C9BCCA" />
             </Flex>
 
             <Text>__</Text>
@@ -157,13 +242,26 @@ function SweepWidget() {
 
           <Flex width="100%" justifyContent="space-between">
             <Flex alignItems="center" gap="4px">
-              <Text>Estimated transaction time...</Text>
-              <InfoOutlineIcon />
+              <Text
+                fontSize="14px"
+                fontWeight={500}
+                color={COLORS.tabTextColor}
+              >
+                Estimated transaction time
+              </Text>
+              <AiOutlineQuestionCircle color="#C9BCCA" />
             </Flex>
 
             <Text>3 seconds</Text>
           </Flex>
-
+          {/* {isSmartWallet && <Text>USING SMART WALLET</Text>}
+          <Button  onClick={() => approveToken()} width="100%">
+            ApproveUSDC
+          </Button>
+          <Button width="100%" onClick={handleBatchSwap}>Handle Batch Swap</Button>
+          <Button onClick={handleSwap} width="100%">
+            ParaswapTest
+          </Button> */}
           <SweepButton />
         </VStack>
       </VStack>

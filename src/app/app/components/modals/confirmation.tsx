@@ -19,7 +19,10 @@ import {
 import { useSelectedTokens } from "@/hooks/useSelectTokens";
 import ApprovalModal from "./approval";
 import assetscooperAbi from "@/constants/abi/assetscooper.json";
-import { assetscooper_contract } from "@/constants/contractAddress";
+import {
+  assetscooper_contract,
+  PARASWAP_TRANSFER_PROXY,
+} from "@/constants/contractAddress";
 import { useAssetScooperContractWrite } from "@/hooks/useAssetScooperWriteContract";
 import { Address } from "viem";
 import { ETHToReceive } from "../sweep-widget";
@@ -27,6 +30,8 @@ import { useSlippageTolerance } from "@/hooks/settings/slippage/useSlippage";
 import { SlippageToleranceStorageKey } from "@/hooks/settings/slippage/utils";
 import TransactionComplete from "./TransactionCompleted";
 import ErrorOccured from "./ErrorOccured";
+import { useBatchApprovals } from "@/hooks/approvals/useBatchApprovals";
+import { useSmartWallet } from "@/hooks/useSmartWallet";
 
 function ConfirmationModal({
   tokensAllowanceStatus,
@@ -41,6 +46,7 @@ function ConfirmationModal({
     isOpen: isOpenConfirmed,
     onOpen: onOpenConfirmed,
   } = useDisclosure();
+
   const {
     onClose: onCloseError,
     isOpen: isOpenError,
@@ -48,10 +54,16 @@ function ConfirmationModal({
   } = useDisclosure();
 
   const { slippageTolerance } = useSlippageTolerance(
-    SlippageToleranceStorageKey.Sweep
+    SlippageToleranceStorageKey.Sweep,
   );
 
   const { selectedTokens } = useSelectedTokens();
+  const { isSmartWallet } = useSmartWallet();
+  const { approveTTokens } = useBatchApprovals({
+    tokens: selectedTokens,
+    amounts: selectedTokens.map((item) => item.userBalance.toString()),
+    spender: PARASWAP_TRANSFER_PROXY as Address,
+  });
   const minAmountOut = selectedTokens.map((t) => 0n);
 
   const {
@@ -94,7 +106,7 @@ function ConfirmationModal({
     isDisabled,
     !tokensAllowanceStatus || isLoading,
     tokensAllowanceStatus,
-    isLoading
+    isLoading,
   );
 
   return (
@@ -161,33 +173,32 @@ function ConfirmationModal({
               </VStack>
 
               <HStack width="100%">
-                <ApprovalModal
-                  tokensAllowanceStatus={tokensAllowanceStatus}
-                  refetch={refetch}
-                />
-                <button
+                {isSmartWallet ? (
+                  <Button
+                    width="100%"
+                    color="#fff"
+                    bg={tokensAllowanceStatus ? "#0099FB" : "#B5B4C6"}
+                    onClick={() => approveTTokens()}
+                  >
+                    Approve All
+                  </Button>
+                ) : (
+                  <ApprovalModal
+                    tokensAllowanceStatus={tokensAllowanceStatus}
+                    refetch={refetch}
+                  />
+                )}
+                <Button
                   onClick={handlesweep}
                   disabled={isDisabled}
-                  style={{
-                    width: "100%",
-                    color: "#fff",
-                    background: tokensAllowanceStatus ? "#0099FB" : "#B5B4C6",
-                    height: "2.5rem",
-                    borderRadius: "0.375rem",
-                  }}
-                >
-                  {isLoading ? "Sweeping" : "Sweep"}
-                </button>
-                {/* 
-                <Button
                   width="100%"
                   color="#fff"
-                  onClick={handlesweep}
-                  disabled={isDisabled}
                   bg={tokensAllowanceStatus ? "#0099FB" : "#B5B4C6"}
+                  height="2.5rem"
+                  borderRadius="0.375rem"
                 >
                   {isLoading ? "Sweeping" : "Sweep"}
-                </Button> */}
+                </Button>
               </HStack>
             </VStack>
           </ModalBody>
