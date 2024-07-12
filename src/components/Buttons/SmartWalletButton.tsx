@@ -53,7 +53,7 @@ export function CustomConnectButton({
         borderRadius: "8px",
       }}
     >
-      {buttonContent ?? "Create a wallet"}
+      {buttonContent ?? "Create wallet"}
     </Button>
   );
 }

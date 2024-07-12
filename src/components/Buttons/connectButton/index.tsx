@@ -24,7 +24,7 @@ export default function ConnectButton({ onOpen }: { onOpen: () => void }) {
       borderRadius="8px"
       onClick={() => open({ view: "Connect" })}
     >
-      Connect Wallet
+      Connect
     </Button>
   );
 }
