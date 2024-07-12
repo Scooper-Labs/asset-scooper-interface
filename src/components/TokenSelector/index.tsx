@@ -34,7 +34,7 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
   const { price } = useGetETHPrice();
 
   const selectedTokens = meetsThreshold(data, price, sweepthreshHold);
-  
+
   return (
     <>
       <Box
@@ -118,12 +118,12 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
 function meetsThreshold(
   data: WalletPortfolioClass | null,
   price: number,
-  sweepthreshHold: string,
+  sweepthreshHold: string
 ) {
   const noETH = data?.assets.filter(
-    (token) => token.symbol !== "ETH" && token.symbol !== "WETH",
+    (token) => token.symbol !== "ETH" && token.symbol !== "WETH"
   );
   return noETH?.filter(
-    (token) => token.quoteUSD / price < parseFloat(sweepthreshHold),
+    (token) => token.quoteUSD / price < parseFloat(sweepthreshHold)
   );
 }
