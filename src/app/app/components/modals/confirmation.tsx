@@ -32,6 +32,7 @@ import TransactionComplete from "./TransactionCompleted";
 import ErrorOccured from "./ErrorOccured";
 import { useBatchApprovals } from "@/hooks/approvals/useBatchApprovals";
 import { useSmartWallet } from "@/hooks/useSmartWallet";
+import { useParaSwap } from "@/hooks/swap/useParaswapSwap";
 
 function ConfirmationModal({
   tokensAllowanceStatus,
@@ -54,18 +55,23 @@ function ConfirmationModal({
   } = useDisclosure();
 
   const { slippageTolerance } = useSlippageTolerance(
-    SlippageToleranceStorageKey.Sweep
+    SlippageToleranceStorageKey.Sweep,
   );
 
   const { selectedTokens } = useSelectedTokens();
   const { isSmartWallet } = useSmartWallet();
+
+  //Batch approvals
   const { approveTTokens } = useBatchApprovals({
     tokens: selectedTokens,
     amounts: selectedTokens.map((item) => item.userBalance.toString()),
     spender: PARASWAP_TRANSFER_PROXY as Address,
   });
+
+  //min-out put for eoa swap, array of bigint 0s
   const minAmountOut = selectedTokens.map((t) => 0n);
 
+  //eoa swap
   const {
     write: sweepTokens,
     isPending: isSweeping,
@@ -87,6 +93,10 @@ function ConfirmationModal({
     await sweepTokens();
   };
 
+  //Batch swap with paraswap
+
+  const { executeBatchSwap } = useParaSwap();
+
   useEffect(() => {
     if (isConfirmed || isWriteContractError || isWaitTrxError) {
       onClose();
@@ -106,7 +116,7 @@ function ConfirmationModal({
     isDisabled,
     !tokensAllowanceStatus || isLoading,
     tokensAllowanceStatus,
-    isLoading
+    isLoading,
   );
 
   return (
@@ -188,17 +198,29 @@ function ConfirmationModal({
                     refetch={refetch}
                   />
                 )}
-                <Button
-                  onClick={handlesweep}
-                  disabled={isDisabled}
-                  width="100%"
-                  color="#fff"
-                  bg={tokensAllowanceStatus ? "#0099FB" : "#B5B4C6"}
-                  height="2.5rem"
-                  borderRadius="0.375rem"
-                >
-                  {isLoading ? "Sweeping" : "Sweep"}
-                </Button>
+                {isSmartWallet ? (
+                  <Button
+                    onClick={()=>executeBatchSwap()}
+                    disabled={isDisabled}
+                    width="100%"
+                    color="#fff"
+                    bg={tokensAllowanceStatus ? "#0099FB" : "#B5B4C6"}
+                    height="2.5rem"
+                    borderRadius="0.375rem"
+                  >Execute Batch Swap</Button>
+                ) : (
+                  <Button
+                    onClick={handlesweep}
+                    disabled={isDisabled}
+                    width="100%"
+                    color="#fff"
+                    bg={tokensAllowanceStatus ? "#0099FB" : "#B5B4C6"}
+                    height="2.5rem"
+                    borderRadius="0.375rem"
+                  >
+                    {isLoading ? "Sweeping" : "Sweep"}
+                  </Button>
+                )}
               </HStack>
             </VStack>
           </ModalBody>

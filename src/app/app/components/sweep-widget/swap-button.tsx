@@ -23,6 +23,8 @@ function SweepButton() {
   const [tokensAllowance, setTokensAllowance] = useState(false);
 
   const { isConnected, address } = useAccount();
+
+  //constructing approval call data for both smart wallet and eoa
   const contracts = selectedTokens.map((token) => ({
     abi: erc20Abi,
     address: token.address as Address,
@@ -54,8 +56,12 @@ function SweepButton() {
 
   useEffect(() => {
     isSuccess && setTokensAllowance(computeTokenAllowances());
-  }, [selectedTokens, data]);
+  }, [selectedTokens, data, address]);
 
+  //ensuring it runs at first load
+  useEffect(() => {
+    isSuccess && setTokensAllowance(computeTokenAllowances());
+  }, []);
   return (
     <>
       {!isConnected ? (
