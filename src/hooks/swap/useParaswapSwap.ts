@@ -8,15 +8,16 @@ import { useAccount } from "wagmi";
 import { useSelectedTokens } from "../useSelectTokens";
 import { useSendCalls } from "wagmi/experimental";
 import { useToast } from "@chakra-ui/react";
+import { Address } from "viem";
 
 const PARTNER = "chucknorrisv6";
 const SLIPPAGE = 1;
 
 interface TransactionParams {
-  to: string;
+  to: Address;
   from: string;
-  value: string;
-  data: string;
+  value: bigint;
+  data: Address;
   gasPrice: string;
   gas?: string;
   chainId: number;
@@ -171,7 +172,7 @@ export const useParaSwap = () => {
         setLoading(false);
       }
     },
-    [chainId, address]
+    [chainId, address],
   );
 
   const swapsTrxData = async () => {
@@ -184,7 +185,7 @@ export const useParaSwap = () => {
     setError(null);
 
     const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
-    const swapData = [];
+    const swapData: TransactionParams[] = [];
 
     try {
       for (const token of selectedTokens) {
@@ -227,32 +228,33 @@ export const useParaSwap = () => {
     }
   };
 
-  // const executeSwap = async () => {
-  //   const swapTxnData = await swapsTrxData();
-  //   if (swapTxnData) {
-  //     sendCalls(
-  //       {
-  //         calls: swapTxnData,
-  //       },
-  //       {
-  //         onSuccess(data, variables, context) {
-  //           () =>
-  //             toast({
-  //               title: "Tokens swap succesful.",
-  //               description:
-  //                 "Your tokens have been successfully approved proceed to swap.",
-  //               status: "success",
-  //               duration: 9000,
-  //               isClosable: true,
-  //             });
-  //         },
-  //       }
-  //     );
-  //   }
-  // };
+  const executeBatchSwap = async () => {
+    const swapTxnData = await swapsTrxData();
+    if (swapTxnData) {
+      sendCalls(
+        {
+          calls: swapTxnData,
+        },
+        {
+          onSuccess(data, variables, context) {
+            () =>
+              toast({
+                title: "Tokens swap succesful.",
+                description:
+                  "Your tokens have been successfully approved proceed to swap.",
+                status: "success",
+                duration: 9000,
+                isClosable: true,
+              });
+          },
+        },
+      );
+    }
+  };
   return {
     getRate,
     buildSwap,
     swapsTrxData,
+    executeBatchSwap
   };
 };
