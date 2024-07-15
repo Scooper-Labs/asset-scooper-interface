@@ -49,7 +49,7 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
   const [isBalanceVisible, setIsBalanceVisible] = useState<boolean>(true);
   const { address } = useAccount();
   const { disconnect } = useDisconnect();
-  const { data } = useWalletsPortfolio();
+  const { data, loading: loadPortfolio } = useWalletsPortfolio();
   const [userWalletTokens, setUserWalletTokens] = useState<AssetClass[]>([]);
   const [addressCopied, setAddressCopied] = useState(false);
   const {
@@ -139,7 +139,10 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
                     }, 800);
                   }}
                 >
-                  <HiOutlineDocumentDuplicate size={16} />
+                  <HiOutlineDocumentDuplicate
+                    size={16}
+                    style={{ cursor: "pointer" }}
+                  />
                 </CopyToClipboard>
               )}
             </HStack>
@@ -197,35 +200,39 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
             </Box>
           </HStack>
 
-          <HStack>
-            <Text
-              fontWeight={400}
-              fontSize="36px"
-              color={COLORS.balTextColor}
-              lineHeight="43.2px"
-            >
-              {isBalanceVisible ? (
-                <FormatNumber pre="$" amount={data ? data.balance : 0} />
-              ) : (
-                "****"
-              )}
-            </Text>
-            <Box
-              background="#00BA8233"
-              color="#00976A"
-              py="10px"
-              px="10px"
-              borderRadius="28.5px"
-            >
-              <Text fontSize="12px" lineHeight="14.4px">
-                <FormatNumber
-                  pre={data ? (data.realized_pnl > 0 ? "-" : "+") : ""}
-                  amount={data ? data.realized_pnl : 0}
-                  suf="%"
-                />
+          {loadPortfolio ? (
+            <div>Loading Balances</div>
+          ) : (
+            <HStack>
+              <Text
+                fontWeight={400}
+                fontSize="36px"
+                color={COLORS.balTextColor}
+                lineHeight="43.2px"
+              >
+                {isBalanceVisible ? (
+                  <FormatNumber pre="$" amount={data ? data.balance : 0} />
+                ) : (
+                  "****"
+                )}
               </Text>
-            </Box>
-          </HStack>
+              <Box
+                background="#00BA8233"
+                color="#00976A"
+                py="10px"
+                px="10px"
+                borderRadius="28.5px"
+              >
+                <Text fontSize="12px" lineHeight="14.4px">
+                  <FormatNumber
+                    pre={data ? (data.realized_pnl > 0 ? "-" : "+") : ""}
+                    amount={data ? data.realized_pnl : 0}
+                    suf="%"
+                  />
+                </Text>
+              </Box>
+            </HStack>
+          )}
         </Box>
 
         <DrawerBody>
@@ -249,7 +256,11 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
 
             <TabPanels>
               <TabPanel>
-                <Tokens userWalletTOKENS={userWalletTokens} />
+                {loadPortfolio ? (
+                  <div>Loading tokens</div>
+                ) : (
+                  <Tokens userWalletTOKENS={userWalletTokens} />
+                )}
               </TabPanel>
               <TabPanel>
                 <Transactions

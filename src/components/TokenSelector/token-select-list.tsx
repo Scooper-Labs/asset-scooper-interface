@@ -82,7 +82,7 @@ const ListContent: React.FC<ListContentProps> = ({
     );
   }
 
-  if (error) {
+  if (!walletBalance && error) {
     return (
       <Box>
         <Text>An error occurred while fetching balance</Text>

@@ -6,15 +6,18 @@ import { PARASWAP_API_URL } from "@/constants/paraswap";
 import { Token } from "@/lib/components/types";
 import { useAccount } from "wagmi";
 import { useSelectedTokens } from "../useSelectTokens";
+import { useSendCalls } from "wagmi/experimental";
+import { useToast } from "@chakra-ui/react";
+import { Address } from "viem";
 
 const PARTNER = "chucknorrisv6";
 const SLIPPAGE = 1;
 
 interface TransactionParams {
-  to: string;
+  to: Address;
   from: string;
-  value: string;
-  data: string;
+  value: bigint;
+  data: Address;
   gasPrice: string;
   gas?: string;
   chainId: number;
@@ -27,6 +30,9 @@ export const useParaSwap = () => {
     useState<TransactionParams | null>(null);
   const { address, chainId } = useAccount();
   const { selectedTokens } = useSelectedTokens();
+
+  const toast = useToast();
+  const { sendCalls } = useSendCalls();
 
   const getRate = async ({
     srcToken,
@@ -174,38 +180,31 @@ export const useParaSwap = () => {
       setError("Please connect wallet");
       return null;
     }
-  
+
     setLoading(true);
     setError(null);
-  
-    const ETH_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
-    const swapData = [];
-  
+
+    const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+    const swapData: TransactionParams[] = [];
+
     try {
       for (const token of selectedTokens) {
-        if (token.address.toLowerCase() === ETH_ADDRESS.toLowerCase()) {
-          continue; 
-        }
-  
         const srcAmount = token.userBalance;
         const srcAmountBN = new BigNumber(srcAmount)
           .times(10 ** token.decimals)
           .toFixed(0);
-  
-       
+
         const priceRoute = await getRate({
           srcToken: token,
-          destToken: { address: ETH_ADDRESS, decimals: 18 } as Token, 
+          destToken: { address: ETH_ADDRESS, decimals: 18 } as Token,
           srcAmount: srcAmountBN,
           networkID: chainId,
         });
-  
-   
+
         const minAmount = new BigNumber(priceRoute.destAmount)
           .times(1 - SLIPPAGE / 100)
           .toFixed(0);
-  
-    
+
         const txParams = await buildSwap({
           srcToken: token,
           destToken: { address: ETH_ADDRESS, decimals: 18 } as Token,
@@ -215,10 +214,10 @@ export const useParaSwap = () => {
           userAddress: address,
           networkID: chainId,
         });
-  
+
         swapData.push(txParams);
       }
-  
+
       return swapData;
     } catch (e) {
       console.error(e);
@@ -228,9 +227,34 @@ export const useParaSwap = () => {
       setLoading(false);
     }
   };
+
+  const executeBatchSwap = async () => {
+    const swapTxnData = await swapsTrxData();
+    if (swapTxnData) {
+      sendCalls(
+        {
+          calls: swapTxnData,
+        },
+        {
+          onSuccess(data, variables, context) {
+            () =>
+              toast({
+                title: "Tokens swap succesful.",
+                description:
+                  "Your tokens have been successfully approved proceed to swap.",
+                status: "success",
+                duration: 9000,
+                isClosable: true,
+              });
+          },
+        },
+      );
+    }
+  };
   return {
     getRate,
     buildSwap,
-    swapsTrxData
+    swapsTrxData,
+    executeBatchSwap
   };
 };
