@@ -11,10 +11,10 @@ export async function GET(request: NextRequest) {
   if (!walletsParam) {
     return NextResponse.json(
       { error: "Wallets parameter is required" },
-      { status: 400 }
+      { status: 400 },
     );
   }
-  const url = `${Mobula_Api}/multi-portfolio?wallets=${walletsParam}&blockchains=${blockchainsParam}`;
+  const url = `${Mobula_Api}/multi-portfolio?wallets=${walletsParam}&blockchains=${blockchainsParam}&cache=false&stale=60`;
 
   try {
     const response = await fetch(url, options);
@@ -27,11 +27,11 @@ export async function GET(request: NextRequest) {
         return obj;
       });
       const walletsPortfolioData = cleanedResponseFromZero.map(
-        (resp) => new WalletPortfolioClass(resp)
+        (resp) => new WalletPortfolioClass(resp),
       );
       return NextResponse.json(
         { data: walletsPortfolioData[0] },
-        { status: 200 }
+        { status: 200 },
       );
     } else {
       const error = await response.text();

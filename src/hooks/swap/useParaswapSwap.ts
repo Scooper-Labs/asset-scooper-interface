@@ -9,6 +9,7 @@ import { useSelectedTokens } from "../useSelectTokens";
 import { useSendCalls } from "wagmi/experimental";
 import { useToast } from "@chakra-ui/react";
 import { Address } from "viem";
+import { useWalletsPortfolio } from "../useMobula";
 
 const PARTNER = "chucknorrisv6";
 const SLIPPAGE = 1;
@@ -30,7 +31,7 @@ export const useParaSwap = () => {
     useState<TransactionParams | null>(null);
   const { address, chainId } = useAccount();
   const { selectedTokens } = useSelectedTokens();
-
+  const { refetch: refetchTokenBalance } = useWalletsPortfolio();
   const toast = useToast();
   const { sendCalls } = useSendCalls();
 
@@ -111,69 +112,69 @@ export const useParaSwap = () => {
     return data;
   };
 
-  const getSwapTransaction = useCallback(
-    async ({
-      srcToken,
-      destToken,
-      srcAmount,
-      slippage = SLIPPAGE,
-      receiver,
-    }: {
-      srcToken: Token;
-      destToken: Token;
-      srcAmount: string;
-      slippage?: number;
-      receiver?: string;
-    }) => {
-      if (!chainId || !address) {
-        setError("Please connect wallet");
-        return;
-      }
+  // const getSwapTransaction = useCallback(
+  //   async ({
+  //     srcToken,
+  //     destToken,
+  //     srcAmount,
+  //     slippage = SLIPPAGE,
+  //     receiver,
+  //   }: {
+  //     srcToken: Token;
+  //     destToken: Token;
+  //     srcAmount: string;
+  //     slippage?: number;
+  //     receiver?: string;
+  //   }) => {
+  //     if (!chainId || !address) {
+  //       setError("Please connect wallet");
+  //       return;
+  //     }
 
-      setLoading(true);
-      setError(null);
+  //     setLoading(true);
+  //     setError(null);
 
-      try {
-        const networkID = chainId;
-        const srcAmountBN = new BigNumber(srcAmount)
-          .times(10 ** srcToken.decimals)
-          .toFixed(0);
+  //     try {
+  //       const networkID = chainId;
+  //       const srcAmountBN = new BigNumber(srcAmount)
+  //         .times(10 ** srcToken.decimals)
+  //         .toFixed(0);
 
-        // Get rate
-        const priceRoute = await getRate({
-          srcToken,
-          destToken,
-          srcAmount: srcAmountBN,
-          networkID,
-        });
+  //       // Get rate
+  //       const priceRoute = await getRate({
+  //         srcToken,
+  //         destToken,
+  //         srcAmount: srcAmountBN,
+  //         networkID,
+  //       });
 
-        // Calculate minimum amount
-        const minAmount = new BigNumber(priceRoute.destAmount)
-          .times(1 - slippage / 100)
-          .toFixed(0);
+  //       // Calculate minimum amount
+  //       const minAmount = new BigNumber(priceRoute.destAmount)
+  //         .times(1 - slippage / 100)
+  //         .toFixed(0);
 
-        // Build swap transaction
-        const txParams = await buildSwap({
-          srcToken,
-          destToken,
-          srcAmount: srcAmountBN,
-          minAmount,
-          priceRoute,
-          userAddress: address,
-          receiver,
-          networkID,
-        });
+  //       // Build swap transaction
+  //       const txParams = await buildSwap({
+  //         srcToken,
+  //         destToken,
+  //         srcAmount: srcAmountBN,
+  //         minAmount,
+  //         priceRoute,
+  //         userAddress: address,
+  //         receiver,
+  //         networkID,
+  //       });
 
-        setTransactionRequest(txParams);
-      } catch (e) {
-        console.error(e);
-        setError("An error occurred while getting swap transaction");
-      } finally {
-        setLoading(false);
-      }
-    },
-    [chainId, address],
-  );
+  //       setTransactionRequest(txParams);
+  //     } catch (e) {
+  //       console.error(e);
+  //       setError("An error occurred while getting swap transaction");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   },
+  //   [chainId, address],
+  // );
 
   const swapsTrxData = async () => {
     if (!chainId || !address) {
@@ -237,6 +238,7 @@ export const useParaSwap = () => {
         },
         {
           onSuccess(data, variables, context) {
+            refetchTokenBalance();
             () =>
               toast({
                 title: "Tokens swap succesful.",
@@ -255,6 +257,6 @@ export const useParaSwap = () => {
     getRate,
     buildSwap,
     swapsTrxData,
-    executeBatchSwap
+    executeBatchSwap,
   };
 };
