@@ -49,6 +49,11 @@ export const useWalletsPortfolio = () => {
     }
   }
 
+  async function refetch() {
+    setData(null);
+    setError(null);
+    await fetchWalletsPortfolio();
+  }
   useEffect(() => {
     const handleEffect = async () => {
       if (address === undefined) {
@@ -69,7 +74,7 @@ export const useWalletsPortfolio = () => {
     handleEffect();
   }, [address]);
 
-  return { data, error, loading };
+  return { data, error, loading, refetch };
 };
 
 export const useWalletsHistory = () => {

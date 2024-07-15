@@ -33,6 +33,7 @@ import ErrorOccured from "./ErrorOccured";
 import { useBatchApprovals } from "@/hooks/approvals/useBatchApprovals";
 import { useSmartWallet } from "@/hooks/useSmartWallet";
 import { useParaSwap } from "@/hooks/swap/useParaswapSwap";
+import { useWalletsPortfolio } from "@/hooks/useMobula";
 
 function ConfirmationModal({
   tokensAllowanceStatus,
@@ -42,6 +43,7 @@ function ConfirmationModal({
   refetch: () => void;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
+
   const {
     onClose: onCloseConfirmed,
     isOpen: isOpenConfirmed,
@@ -200,14 +202,16 @@ function ConfirmationModal({
                 )}
                 {isSmartWallet ? (
                   <Button
-                    onClick={()=>executeBatchSwap()}
+                    onClick={() => executeBatchSwap()}
                     disabled={isDisabled}
                     width="100%"
                     color="#fff"
                     bg={tokensAllowanceStatus ? "#0099FB" : "#B5B4C6"}
                     height="2.5rem"
                     borderRadius="0.375rem"
-                  >Execute Batch Swap</Button>
+                  >
+                    Execute Batch Swap
+                  </Button>
                 ) : (
                   <Button
                     onClick={handlesweep}

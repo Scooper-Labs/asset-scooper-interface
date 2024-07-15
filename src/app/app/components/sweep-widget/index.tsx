@@ -33,6 +33,7 @@ import { useAssetScooperContractWrite } from "@/hooks/useAssetScooperWriteContra
 import { PARASWAP_TRANSFER_PROXY } from "@/constants/contractAddress";
 import { Address, erc20Abi, parseUnits } from "viem";
 import { useSmartWallet } from "@/hooks/useSmartWallet";
+import { useWalletsPortfolio } from "@/hooks/useMobula";
 
 export function ETHToReceive({ selectedTokens }: { selectedTokens: Token[] }) {
   const { price } = useGetETHPrice();
@@ -58,11 +59,11 @@ function SweepWidget() {
   const { selectedTokens } = useSelectedTokens();
   const { price } = useGetETHPrice();
 
-  console.log("address", address)
+  console.log("address", address);
   const router = useRouter();
 
   const { getRate, buildSwap, swapsTrxData } = useParaSwap();
-
+  const { refetch: refetchTokenBalance } = useWalletsPortfolio();
   const handleSwap = async () => {
     const trade = await getRate({
       srcToken: selectedTokens[0],
@@ -105,6 +106,7 @@ function SweepWidget() {
         ? (selectedTokens[0].address as Address)
         : "0xE3c347cEa95B7BfdB921074bdb39b8571F905f6D",
   });
+
   const { isSmartWallet } = useSmartWallet();
   return (
     <VStack gap="12px">
@@ -127,7 +129,10 @@ function SweepWidget() {
             color={COLORS.tabTextColor}
             shadow="small"
             border="1px solid #B190EB"
-            onClick={() => router.refresh()}
+            onClick={() => {
+              refetchTokenBalance();
+              router.refresh();
+            }}
             _hover={{
               bg: `${COLORS.btnBGGradient}`,
             }}
@@ -254,14 +259,6 @@ function SweepWidget() {
 
             <Text>3 seconds</Text>
           </Flex>
-          {/* {isSmartWallet && <Text>USING SMART WALLET</Text>}
-          <Button  onClick={() => approveToken()} width="100%">
-            ApproveUSDC
-          </Button>
-          <Button width="100%" onClick={handleBatchSwap}>Handle Batch Swap</Button>
-          <Button onClick={handleSwap} width="100%">
-            ParaswapTest
-          </Button> */}
           <SweepButton />
         </VStack>
       </VStack>
