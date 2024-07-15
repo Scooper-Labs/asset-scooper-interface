@@ -133,12 +133,7 @@ function ConfirmationModal({
       >
         Sweep
       </Button>
-      <Modal
-        isOpen={true}
-        onClose={() => {
-          false;
-        }}
-      >
+      <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>
