@@ -3,6 +3,8 @@ import { Token } from "@/lib/components/types";
 import { Address, encodeFunctionData, erc20Abi, parseUnits } from "viem";
 import { useSendCalls } from "wagmi/experimental";
 import { useToast } from "@chakra-ui/react";
+import CustomToast from "@/components/CustomToast";
+
 export const useBatchApprovals = ({
   tokens,
   amounts,
@@ -45,16 +47,14 @@ export const useBatchApprovals = ({
       {
         onSuccess(data, variables, context) {
           () =>
-            toast({
-              title: "Tokens approval succesful.",
-              description:
-                "Your tokens have been successfully approved proceed to swap.",
-              status: "success",
-              duration: 9000,
-              isClosable: true,
-            });
+            CustomToast(
+              toast,
+              "Your tokens have been successfully approved proceed to swap.",
+              4000,
+              "top-right"
+            );
         },
-      },
+      }
     );
 
   return {
