@@ -39,7 +39,7 @@ export function ETHToReceive({ selectedTokens }: { selectedTokens: Token[] }) {
   const { price } = useGetETHPrice();
   const quoteAllTokens = selectedTokens.reduce(
     (total, selectedToken) => total + selectedToken.quoteUSD,
-    0,
+    0
   );
 
   return (
@@ -59,11 +59,12 @@ function SweepWidget() {
   const { selectedTokens } = useSelectedTokens();
   const { price } = useGetETHPrice();
 
-  console.log("address", address);
+  // console.log("address", address);
   const router = useRouter();
 
   const { getRate, buildSwap, swapsTrxData } = useParaSwap();
   const { refetch: refetchTokenBalance } = useWalletsPortfolio();
+
   const handleSwap = async () => {
     const trade = await getRate({
       srcToken: selectedTokens[0],
@@ -71,8 +72,8 @@ function SweepWidget() {
       srcAmount: "10000",
       networkID: base.id,
     });
-    console.log("trade test", trade);
-    console.log("trade price route", trade);
+    // console.log("trade test", trade);
+    // console.log("trade price route", trade);
     const swapBuild = await buildSwap({
       srcToken: selectedTokens[0],
       destToken: selectedTokens[1],
@@ -84,14 +85,16 @@ function SweepWidget() {
       networkID: base.id,
     });
 
-    console.log("swapBuild swapBuild", swapBuild);
+    // console.log("swapBuild swapBuild", swapBuild);
   };
+
   const handleBatchSwap = async () => {
     const swapTransactions = await swapsTrxData();
     if (swapTransactions) {
       console.log("this is batch swap data", swapTransactions);
     }
   };
+
   const {
     write: approveToken,
     isPending: isApprovalPending,
@@ -108,6 +111,7 @@ function SweepWidget() {
   });
 
   const { isSmartWallet } = useSmartWallet();
+
   return (
     <VStack gap="12px">
       <Flex justify="end" fontSize="small" width="100%">
