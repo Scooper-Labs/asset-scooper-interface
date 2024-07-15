@@ -10,6 +10,7 @@ import { useSendCalls } from "wagmi/experimental";
 import { useToast } from "@chakra-ui/react";
 import { Address } from "viem";
 import { useWalletsPortfolio } from "../useMobula";
+import CustomToast from "@/components/CustomToast";
 
 const PARTNER = "chucknorrisv6";
 const SLIPPAGE = 1;
@@ -240,16 +241,14 @@ export const useParaSwap = () => {
           onSuccess(data, variables, context) {
             refetchTokenBalance();
             () =>
-              toast({
-                title: "Tokens swap succesful.",
-                description:
-                  "Your tokens have been successfully approved proceed to swap.",
-                status: "success",
-                duration: 9000,
-                isClosable: true,
-              });
+              CustomToast(
+                toast,
+                "Your tokens have been successfully approved proceed to swap.",
+                4000,
+                "top-right"
+              );
           },
-        },
+        }
       );
     }
   };

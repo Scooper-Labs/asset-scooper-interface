@@ -118,33 +118,44 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
           <Flex justify="space-between">
             <HStack>
               <Avatar width={32} height={32} />
-              <Text
-                fontSize="16px"
-                lineHeight="19.2px"
-                fontWeight={502}
-                color="#151829"
+              <CopyToClipboard
+                text={address ?? ""}
+                onCopy={() => {
+                  setAddressCopied(true);
+                  setTimeout(() => {
+                    setAddressCopied(false);
+                  }, 800);
+                }}
               >
-                {truncate(address || "")}
-              </Text>
+                <HStack>
+                  <Text
+                    fontSize="16px"
+                    lineHeight="19.2px"
+                    fontWeight={502}
+                    color="#151829"
+                    cursor="pointer"
+                    _hover={{
+                      cursor: "pointer",
+                      color: "#9E829F",
+                    }}
+                  >
+                    {truncate(address || "")}
+                  </Text>
 
-              {addressCopied ? (
-                <MdCheckCircleOutline size={16} aria-hidden="true" />
-              ) : (
-                <CopyToClipboard
-                  text={address ?? ""}
-                  onCopy={() => {
-                    setAddressCopied(true);
-                    setTimeout(() => {
-                      setAddressCopied(false);
-                    }, 800);
-                  }}
-                >
-                  <HiOutlineDocumentDuplicate
-                    size={16}
-                    style={{ cursor: "pointer" }}
-                  />
-                </CopyToClipboard>
-              )}
+                  {addressCopied ? (
+                    <MdCheckCircleOutline
+                      size={16}
+                      aria-hidden="true"
+                      color={COLORS.balTextColor}
+                    />
+                  ) : (
+                    <HiOutlineDocumentDuplicate
+                      size={16}
+                      style={{ cursor: "pointer" }}
+                    />
+                  )}
+                </HStack>
+              </CopyToClipboard>
             </HStack>
 
             <HStack>

@@ -33,7 +33,7 @@ import ErrorOccured from "./ErrorOccured";
 import { useBatchApprovals } from "@/hooks/approvals/useBatchApprovals";
 import { useSmartWallet } from "@/hooks/useSmartWallet";
 import { useParaSwap } from "@/hooks/swap/useParaswapSwap";
-import { useWalletsPortfolio } from "@/hooks/useMobula";
+import ModalComponent from "@/components/ModalComponent";
 
 function ConfirmationModal({
   tokensAllowanceStatus,
@@ -57,7 +57,7 @@ function ConfirmationModal({
   } = useDisclosure();
 
   const { slippageTolerance } = useSlippageTolerance(
-    SlippageToleranceStorageKey.Sweep,
+    SlippageToleranceStorageKey.Sweep
   );
 
   const { selectedTokens } = useSelectedTokens();
@@ -118,7 +118,7 @@ function ConfirmationModal({
     isDisabled,
     !tokensAllowanceStatus || isLoading,
     tokensAllowanceStatus,
-    isLoading,
+    isLoading
   );
 
   return (
@@ -133,7 +133,12 @@ function ConfirmationModal({
       >
         Sweep
       </Button>
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal
+        isOpen={true}
+        onClose={() => {
+          false;
+        }}
+      >
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>
