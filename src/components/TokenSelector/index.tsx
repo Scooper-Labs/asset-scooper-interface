@@ -18,22 +18,38 @@ import useGetETHPrice from "@/hooks/useGetETHPrice";
 import { WalletPortfolioClass } from "@/utils/classes";
 import { useAppDispatch, useAppSelector } from "@/hooks/rtkHooks";
 import { RootState } from "@/store/store";
+import { useBalances } from "@/hooks/balances/useBalances";
+import { useAccount } from "wagmi";
 
 export function TokenSelector({ children }: { children?: ReactNode }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { data, error, loading } = useWalletsPortfolio();
-  const dispatch = useAppDispatch();
+  // const { data, error, loading } = useWalletsPortfolio();
+  const { address, isConnected } = useAccount();
 
+  // const dispatch = useAppDispatch();
+
+  const { serializedBalance, data, isError, isLoading, error, refetch } =
+    useBalances({
+      address,
+    });
+  // useEffect(() => {
+  //   if (serializedBalance) {
+  //     dispatch(setUserWalletTokenWithBalance(data.assets));
+  //   }
+  // }, [serializedBalance]);
+  
   useEffect(() => {
-    if (data) {
-      dispatch(setUserWalletTokenWithBalance(data.assets));
-    }
-  }, [data]);
+    refetch();
+  }, [address, isConnected]);
 
   const { sweepthreshHold } = useSweepThreshhold();
   const { price } = useGetETHPrice();
 
-  const selectedTokens = meetsThreshold(data, price, sweepthreshHold);
+  const selectedTokens = meetsThreshold(
+    serializedBalance,
+    price,
+    sweepthreshHold,
+  );
 
   return (
     <>
@@ -101,8 +117,8 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
 
             <TokenSelectList
               userWalletTokens={selectedTokens}
-              error={error}
-              loading={loading}
+              error={isError}
+              loading={isLoading}
             />
           </VStack>
 
@@ -118,12 +134,12 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
 function meetsThreshold(
   data: WalletPortfolioClass | null,
   price: number,
-  sweepthreshHold: string
+  sweepthreshHold: string,
 ) {
   const noETH = data?.assets.filter(
-    (token) => token.symbol !== "ETH" && token.symbol !== "WETH"
+    (token) => token.symbol !== "ETH" && token.symbol !== "WETH",
   );
   return noETH?.filter(
-    (token) => token.quoteUSD / price < parseFloat(sweepthreshHold)
+    (token) => token.quoteUSD / price < parseFloat(sweepthreshHold),
   );
 }
