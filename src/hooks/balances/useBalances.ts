@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../rtkHooks";
 import { RootState } from "@/store/store";
 import {
@@ -10,51 +10,41 @@ import { useQuery } from "@tanstack/react-query";
 import { Address } from "viem";
 import { WalletPortfolioClass } from "@/utils/classes";
 import { AssetClass } from "@/utils/classes";
+import Moralis from "moralis";
 
 interface UseBalances {
-  account: Address | undefined;
+  address: Address | undefined;
 }
-export const useBalances = ({ account }: UseBalances) => {
+export const useBalances = ({ address }: UseBalances) => {
   const dispatch = useAppDispatch();
+  const [serializedBalance, setSerializedBalance] =
+    useState<WalletPortfolioClass | null>(null);
 
-  // const { data, error, loading } = useWalletsPortfolio();
-
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["/walletBalance"],
-    queryFn: async () =>
-      fetch(`/api/portfolio?wallets=${account}`).then((response) =>
-        response.json(),
-      ),
+    queryFn: () => {
+      const queryParams = new URLSearchParams({
+        chain: "base",
+      });
+
+      return fetch(
+        `https://deep-index.moralis.io/api/v2.2/wallets/${address}/tokens?${queryParams.toString()}`,
+        {
+          headers: {
+            "X-API-Key": process.env.NEXT_PUBLIC_MORALIS_API_KEY ?? "",
+          },
+        },
+      ).then((response) => response.json());
+    },
     // staleTime: ms("60s"),
     // gcTime: ms("1h"),
     refetchOnWindowFocus: true,
     enabled: true,
   });
 
-  const filteredAssets = useMemo(() => {
-    if (data?.data?.assets) {
-      return data.data.assets.filter(
-        (asset: AssetClass) =>
-          asset.address !== "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-      );
-    }
-    return [];
-  }, [data]);
   useEffect(() => {
-    if (data) {
-      try {
-        dispatch(setUserWalletTokenWithBalance([]));
-        dispatch(clearAllSelectedTokens());
-        dispatch(setUserWalletTokenWithBalance(filteredAssets));
-      } catch (error) {
-        console.error("Error validating data:", error);
-      }
-    }
-  }, [data, isLoading]);
-
-  return {
-    walletBalance: filteredAssets as AssetClass[],
-    isError,
-    isLoading,
-  };
+    setSerializedBalance(data?.result);
+  }, [data, isLoading, isError, error]);
+  console.log("usebalance testings", data?.result, isLoading, isError, error);
+  return { serializedBalance, data, isLoading, isError, error, refetch };
 };
