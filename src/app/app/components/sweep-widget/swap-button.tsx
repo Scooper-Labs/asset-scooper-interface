@@ -46,11 +46,11 @@ function SweepButton() {
       ? data.every((allowance, index) => {
           const userBalance = selectedTokens[index].userBalance;
           const decimals = selectedTokens[index].decimals;
-          const _allowance = allowance.result ?? 0n;
-          console.log(typeof _allowance);
+          const _allowance = (allowance.result as bigint) ?? 0n;
 
-          /* @ts-ignore */
-          return Number(formatUnits(_allowance, decimals)) === userBalance;
+          const allow =
+            Number(formatUnits(_allowance, decimals)) >= userBalance;
+          return allow;
         })
       : false;
 
@@ -115,3 +115,17 @@ function SweepButton() {
 }
 // InfoOutlineIcon
 export default SweepButton;
+
+interface AllowanceResultTrue {
+  error?: undefined;
+  result: string | number | bigint;
+  status: "success";
+}
+
+interface AllowanceResultFalse {
+  error: Error;
+  result?: undefined;
+  status: "failure";
+}
+
+type AllowanceRes = AllowanceResultTrue | AllowanceResultFalse;
