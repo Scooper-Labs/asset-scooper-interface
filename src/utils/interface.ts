@@ -50,3 +50,26 @@ export interface TXN_Interface {
   blockTimestamp: string;
   blockNumber: string;
 }
+
+export interface MoralisAssetInterface {
+  balance: string;
+  balance_formatted: string;
+  decimals: number;
+  logo: string;
+  name: string;
+  native_token: boolean;
+  percentage_relative_to_total_supply: number | null;
+  portfolio_percentage: number;
+  possible_spam: boolean;
+  symbol: string;
+  thumbnail: string;
+  token_address: string;
+  total_supply: number | null;
+  total_supply_formatted: number | null;
+  usd_price: number;
+  usd_price_24hr_percent_change: number;
+  usd_price_24hr_usd_change: number;
+  usd_value: number;
+  usd_value_24hr_usd_change: number;
+  verified_contract: boolean;
+}

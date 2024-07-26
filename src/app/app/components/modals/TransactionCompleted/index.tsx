@@ -34,6 +34,7 @@ const TransactionComplete = ({
         _hover={{
           bg: "none",
         }}
+        onClick={onClose}
       />
       <Stack w="100%">
         <Flex justify="center" alignItems="center" flexDir="column">
