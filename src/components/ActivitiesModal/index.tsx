@@ -32,7 +32,7 @@ import { useBalances } from "@/hooks/balances/useBalances";
 import Avatar from "@/assets/svg";
 import FormatNumber from "../FormatNumber";
 import { useWalletsPortfolio } from "@/hooks/useMobula";
-import { AssetClass } from "@/utils/classes";
+import { AssetClass, MoralisAssetClass } from "@/utils/classes";
 import { useQuery } from "@apollo/client";
 import { GET_ACCOUNT_TX } from "@/utils/queries";
 import { MdCheckCircleOutline } from "react-icons/md";
@@ -50,7 +50,8 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
   const { address } = useAccount();
   const { disconnect } = useDisconnect();
   const { data, loading: loadPortfolio } = useWalletsPortfolio();
-  const [userWalletTokens, setUserWalletTokens] = useState<AssetClass[]>([]);
+  const { moralisAssets, isLoading } = useBalances({ address });
+  const [userWalletTokens, setWT] = useState<MoralisAssetClass[]>([]);
   const [addressCopied, setAddressCopied] = useState(false);
   const {
     data: txns,
@@ -61,15 +62,10 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
   });
 
   useEffect(() => {
-    if (data) {
-      setUserWalletTokens(data.assets);
+    if (moralisAssets) {
+      setWT(moralisAssets);
     }
-  }, [data]);
-
-  useBalances({
-    //@ts-ignore
-    account: address ?? "",
-  });
+  }, [moralisAssets]);
 
   const balanceVisibility = () => {
     setIsBalanceVisible(!isBalanceVisible);
@@ -267,7 +263,7 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
 
             <TabPanels>
               <TabPanel>
-                {loadPortfolio ? (
+                {isLoading ? (
                   <div>Loading tokens</div>
                 ) : (
                   <Tokens userWalletTOKENS={userWalletTokens} />

@@ -11,33 +11,19 @@ import { ReactNode, useEffect } from "react";
 import TokenSelectList from "./token-select-list";
 import TokenSelectorModalComponent from "./CustomModalComponent";
 import { TokenSelectFooter } from "./TokenSelectorFooter";
-import { useWalletsPortfolio } from "@/hooks/useMobula";
-import { setUserWalletTokenWithBalance } from "@/store/sweep/sweepSlice";
 import { useSweepThreshhold } from "@/hooks/settings/useThreshold";
 import useGetETHPrice from "@/hooks/useGetETHPrice";
-import { WalletPortfolioClass } from "@/utils/classes";
-import { useAppDispatch, useAppSelector } from "@/hooks/rtkHooks";
-import { RootState } from "@/store/store";
+import { MoralisAssetClass } from "@/utils/classes";
 import { useBalances } from "@/hooks/balances/useBalances";
 import { useAccount } from "wagmi";
 
 export function TokenSelector({ children }: { children?: ReactNode }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  // const { data, error, loading } = useWalletsPortfolio();
   const { address, isConnected } = useAccount();
+  const { isError, isLoading, moralisAssets, refetch } = useBalances({
+    address,
+  });
 
-  // const dispatch = useAppDispatch();
-
-  const { serializedBalance, data, isError, isLoading, error, refetch } =
-    useBalances({
-      address,
-    });
-  // useEffect(() => {
-  //   if (serializedBalance) {
-  //     dispatch(setUserWalletTokenWithBalance(data.assets));
-  //   }
-  // }, [serializedBalance]);
-  
   useEffect(() => {
     refetch();
   }, [address, isConnected]);
@@ -45,11 +31,7 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
   const { sweepthreshHold } = useSweepThreshhold();
   const { price } = useGetETHPrice();
 
-  const selectedTokens = meetsThreshold(
-    serializedBalance,
-    price,
-    sweepthreshHold,
-  );
+  const selectedTokens = meetsThreshold(moralisAssets, price, sweepthreshHold);
 
   return (
     <>
@@ -132,14 +114,14 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
   );
 }
 function meetsThreshold(
-  data: WalletPortfolioClass | null,
+  data: MoralisAssetClass[] | null,
   price: number,
-  sweepthreshHold: string,
+  sweepthreshHold: string
 ) {
-  const noETH = data?.assets.filter(
-    (token) => token.symbol !== "ETH" && token.symbol !== "WETH",
+  const noETH = data?.filter(
+    (token) => token.symbol !== "ETH" && token.symbol !== "WETH"
   );
   return noETH?.filter(
-    (token) => token.quoteUSD / price < parseFloat(sweepthreshHold),
+    (token) => token.quoteUSD / price < parseFloat(sweepthreshHold)
   );
 }
