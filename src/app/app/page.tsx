@@ -18,8 +18,9 @@ const Sweep: React.FC = () => {
     isLoading,
     error,
     "serializedBalance",
-    serializedBalance,
+    serializedBalance
   );
+
   return (
     <ContainerWrapper>
       <Flex
