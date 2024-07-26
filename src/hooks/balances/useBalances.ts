@@ -1,27 +1,17 @@
-import { useEffect, useMemo, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../rtkHooks";
-import { RootState } from "@/store/store";
-import {
-  setUserWalletTokenWithBalance,
-  clearAllSelectedTokens,
-} from "@/store/sweep/sweepSlice";
-import { useWalletsPortfolio } from "../useMobula";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Address } from "viem";
-import { WalletPortfolioClass } from "@/utils/classes";
-import { AssetClass } from "@/utils/classes";
-import Moralis from "moralis";
+import { MoralisAssetClass, WalletPortfolioClass } from "@/utils/classes";
+import { MoralisAssetInterface } from "@/utils/interface";
 
 interface UseBalances {
   address: Address | undefined;
 }
 export const useBalances = ({ address }: UseBalances) => {
-  const dispatch = useAppDispatch();
-  const [serializedBalance, setSerializedBalance] =
-    useState<WalletPortfolioClass | null>(null);
+  const [moralisAssets, set_] = useState<MoralisAssetClass[] | null>(null);
 
   const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ["/walletBalance"],
+    queryKey: ["/walletBalance" + address],
     queryFn: () => {
       const queryParams = new URLSearchParams({
         chain: "base",
@@ -33,18 +23,31 @@ export const useBalances = ({ address }: UseBalances) => {
           headers: {
             "X-API-Key": process.env.NEXT_PUBLIC_MORALIS_API_KEY ?? "",
           },
-        },
+        }
       ).then((response) => response.json());
     },
-    // staleTime: ms("60s"),
-    // gcTime: ms("1h"),
     refetchOnWindowFocus: true,
     enabled: true,
   });
 
   useEffect(() => {
-    setSerializedBalance(data?.result);
-  }, [data, isLoading, isError, error]);
-  console.log("usebalance testings", data?.result, isLoading, isError, error);
-  return { serializedBalance, data, isLoading, isError, error, refetch };
+    if (data && address) {
+      const { result }: { result: MoralisAssetInterface[] } = data;
+      const assets = result.map((res) => new MoralisAssetClass(res));
+      set_(cleanSpam(assets));
+    }
+  }, [data, address]);
+
+  return {
+    data,
+    isLoading,
+    isError,
+    error,
+    refetch,
+    moralisAssets,
+  };
 };
+
+function cleanSpam(data: MoralisAssetClass[]) {
+  return data.filter((asset) => asset.isSpam === false);
+}

@@ -29,16 +29,12 @@ export const useBatchApprovals = ({
       functionName: "approve",
       args: [spender, amountBigInt],
     });
-    console.log("approve call data", approveCalldata);
     return {
       to: token.address as Address,
       data: approveCalldata,
       value: BigInt(0),
     };
   });
-
-  console.log("approveCalls call data", approveCalls);
-
   const approveTTokens = () =>
     sendCalls(
       {

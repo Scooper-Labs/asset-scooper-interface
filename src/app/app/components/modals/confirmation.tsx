@@ -33,7 +33,6 @@ import ErrorOccured from "./ErrorOccured";
 import { useBatchApprovals } from "@/hooks/approvals/useBatchApprovals";
 import { useSmartWallet } from "@/hooks/useSmartWallet";
 import { useParaSwap } from "@/hooks/swap/useParaswapSwap";
-import ModalComponent from "@/components/ModalComponent";
 
 function ConfirmationModal({
   tokensAllowanceStatus,
@@ -191,6 +190,7 @@ function ConfirmationModal({
                     color="#fff"
                     bg={tokensAllowanceStatus ? "#B5B4C6" : "#0099FB"}
                     onClick={() => approveTTokens()}
+                    disabled
                   >
                     Approve All
                   </Button>
