@@ -4,7 +4,7 @@ import { Address } from "viem";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { useToast } from "@chakra-ui/react";
 import { useEffect } from "react";
-import { error } from "console";
+import CustomToast from "@/components/CustomToast";
 
 export const useAssetScooperContractWrite = ({
   fn,
@@ -48,22 +48,20 @@ export const useAssetScooperContractWrite = ({
 
   useEffect(() => {
     if (isPending) {
-      toast({
-        title: "Transaction Pending...",
-        description: "Transaction Pending, Please confirm in wallet",
-        status: "info",
-        duration: 2000,
-        isClosable: true,
-      });
+      CustomToast(
+        toast,
+        "Transaction Pending, Please confirm in wallet",
+        2000,
+        "bottom-right"
+      );
     }
     if (isTrxSubmitted) {
-      toast({
-        title: "Transaction Submitted",
-        description: "Transaction has been submitted to the network",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
+      CustomToast(
+        toast,
+        "Transaction has been submitted to the network",
+        2000,
+        "bottom-right"
+      );
     }
     // if (isWriteContractError || isWaitTrxError) {
     //   toast({

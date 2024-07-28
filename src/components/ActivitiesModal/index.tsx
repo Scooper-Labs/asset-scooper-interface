@@ -32,9 +32,12 @@ import { useBalances } from "@/hooks/balances/useBalances";
 import Avatar from "@/assets/svg";
 import FormatNumber from "../FormatNumber";
 import { useWalletsPortfolio } from "@/hooks/useMobula";
-import { AssetClass } from "@/utils/classes";
+import { AssetClass, MoralisAssetClass } from "@/utils/classes";
 import { useQuery } from "@apollo/client";
 import { GET_ACCOUNT_TX } from "@/utils/queries";
+import { MdCheckCircleOutline } from "react-icons/md";
+import { HiOutlineDocumentDuplicate } from "react-icons/hi";
+import CopyToClipboard from "react-copy-to-clipboard";
 
 interface IModals {
   isOpen: boolean;
@@ -46,9 +49,10 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
   const [isBalanceVisible, setIsBalanceVisible] = useState<boolean>(true);
   const { address } = useAccount();
   const { disconnect } = useDisconnect();
-  const { data } = useWalletsPortfolio();
-  const [userWalletTokens, setUserWalletTokens] = useState<AssetClass[]>([]);
-
+  const { data, loading: loadPortfolio } = useWalletsPortfolio();
+  const { moralisAssets, isLoading } = useBalances({ address });
+  const [userWalletTokens, setWT] = useState<MoralisAssetClass[]>([]);
+  const [addressCopied, setAddressCopied] = useState(false);
   const {
     data: txns,
     loading,
@@ -58,15 +62,10 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
   });
 
   useEffect(() => {
-    if (data) {
-      setUserWalletTokens(data.assets);
+    if (moralisAssets) {
+      setWT(moralisAssets);
     }
-  }, [data]);
-
-  useBalances({
-    //@ts-ignore
-    account: address ?? "",
-  });
+  }, [moralisAssets]);
 
   const balanceVisibility = () => {
     setIsBalanceVisible(!isBalanceVisible);
@@ -115,14 +114,44 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
           <Flex justify="space-between">
             <HStack>
               <Avatar width={32} height={32} />
-              <Text
-                fontSize="16px"
-                lineHeight="19.2px"
-                fontWeight={502}
-                color="#151829"
+              <CopyToClipboard
+                text={address ?? ""}
+                onCopy={() => {
+                  setAddressCopied(true);
+                  setTimeout(() => {
+                    setAddressCopied(false);
+                  }, 800);
+                }}
               >
-                {truncate(address || "")}
-              </Text>
+                <HStack>
+                  <Text
+                    fontSize="16px"
+                    lineHeight="19.2px"
+                    fontWeight={502}
+                    color="#151829"
+                    cursor="pointer"
+                    _hover={{
+                      cursor: "pointer",
+                      color: "#9E829F",
+                    }}
+                  >
+                    {truncate(address || "")}
+                  </Text>
+
+                  {addressCopied ? (
+                    <MdCheckCircleOutline
+                      size={16}
+                      aria-hidden="true"
+                      color={COLORS.balTextColor}
+                    />
+                  ) : (
+                    <HiOutlineDocumentDuplicate
+                      size={16}
+                      style={{ cursor: "pointer" }}
+                    />
+                  )}
+                </HStack>
+              </CopyToClipboard>
             </HStack>
 
             <HStack>
@@ -178,35 +207,39 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
             </Box>
           </HStack>
 
-          <HStack>
-            <Text
-              fontWeight={400}
-              fontSize="36px"
-              color={COLORS.balTextColor}
-              lineHeight="43.2px"
-            >
-              {isBalanceVisible ? (
-                <FormatNumber pre="$" amount={data ? data.balance : 0} />
-              ) : (
-                "****"
-              )}
-            </Text>
-            <Box
-              background="#00BA8233"
-              color="#00976A"
-              py="10px"
-              px="10px"
-              borderRadius="28.5px"
-            >
-              <Text fontSize="12px" lineHeight="14.4px">
-                <FormatNumber
-                  pre={data ? (data.realized_pnl > 0 ? "-" : "+") : ""}
-                  amount={data ? data.realized_pnl : 0}
-                  suf="%"
-                />
+          {loadPortfolio ? (
+            <div>Loading Balances</div>
+          ) : (
+            <HStack>
+              <Text
+                fontWeight={400}
+                fontSize="36px"
+                color={COLORS.balTextColor}
+                lineHeight="43.2px"
+              >
+                {isBalanceVisible ? (
+                  <FormatNumber pre="$" amount={data ? data.balance : 0} />
+                ) : (
+                  "****"
+                )}
               </Text>
-            </Box>
-          </HStack>
+              <Box
+                background="#00BA8233"
+                color="#00976A"
+                py="10px"
+                px="10px"
+                borderRadius="28.5px"
+              >
+                <Text fontSize="12px" lineHeight="14.4px">
+                  <FormatNumber
+                    pre={data ? (data.realized_pnl > 0 ? "-" : "+") : ""}
+                    amount={data ? data.realized_pnl : 0}
+                    suf="%"
+                  />
+                </Text>
+              </Box>
+            </HStack>
+          )}
         </Box>
 
         <DrawerBody>
@@ -230,7 +263,11 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
 
             <TabPanels>
               <TabPanel>
-                <Tokens userWalletTOKENS={userWalletTokens} />
+                {isLoading ? (
+                  <div>Loading tokens</div>
+                ) : (
+                  <Tokens userWalletTOKENS={userWalletTokens} />
+                )}
               </TabPanel>
               <TabPanel>
                 <Transactions

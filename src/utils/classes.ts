@@ -1,6 +1,7 @@
 import { formatEther } from "viem";
 import {
   AssetsInterface,
+  MoralisAssetInterface,
   TXN_Interface,
   WalletPortfolioApiResInterface,
 } from "./interface";
@@ -100,4 +101,46 @@ export function groupTransactionsByBlock(
   return Object.values(blockMap).map(
     (txnsInBlock) => new BlockTransactions(txnsInBlock)
   );
+}
+
+export class MoralisAssetClass {
+  name: string;
+  symbol: string;
+  logoURI: string;
+  userBalance: number;
+  quoteUSD: number;
+  price: number;
+  price_change_24h: number;
+  chainId: number;
+  decimals: number;
+  address: string;
+  isEth: boolean;
+  isSpam: boolean;
+  constructor(ApiRes: MoralisAssetInterface) {
+    let {
+      name,
+      symbol,
+      logo,
+      balance_formatted,
+      usd_value,
+      usd_price,
+      usd_price_24hr_usd_change,
+      decimals,
+      token_address,
+      native_token,
+      possible_spam,
+    } = ApiRes;
+    this.name = name;
+    this.chainId = 8453;
+    this.symbol = symbol;
+    this.logoURI = logo;
+    this.userBalance = Number(balance_formatted);
+    this.quoteUSD = usd_value;
+    this.price = usd_price;
+    this.price_change_24h = usd_price_24hr_usd_change;
+    this.decimals = decimals;
+    this.address = token_address;
+    this.isEth = native_token;
+    this.isSpam = possible_spam;
+  }
 }

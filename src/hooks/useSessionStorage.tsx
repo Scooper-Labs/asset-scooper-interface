@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 
-// 300 seconds expiry
-const EXPIRY = 300 * 1000;
+// 30 seconds expiry
+const EXPIRY = 30 * 1000;
 
 interface ValuePair {
   value: object | null;
@@ -12,6 +12,7 @@ function useSessionStorage(key: string, valuePair: any) {
   const [value, setValue] = useState(() => {
     if (typeof window !== "undefined") {
       const storedValue = window.sessionStorage.getItem(key);
+      console.log("Stored Value", storedValue, valuePair);
       if (storedValue) {
         const parsedValue = JSON.parse(storedValue) as ValuePair;
         if (Date.now() < parsedValue.expiry) {
@@ -31,7 +32,7 @@ function useSessionStorage(key: string, valuePair: any) {
         JSON.stringify({ value, expiry: expiryTime })
       );
     }
-  }, [key, value]);
+  }, [key]);
 
   return { value, setValue };
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import useSessionStorage from "./useSessionStorage";
 import { useAccount } from "wagmi";
 import { WalletPortfolioClass } from "@/utils/classes";
@@ -18,9 +18,18 @@ export const useWalletsPortfolio = () => {
   const [loading, setLoading] = useState(false);
 
   const url = `/api/portfolio?wallets=${address}`;
-  const key = gen_key(url);
+  // const key = useMemo(
+  //   () => gen_key(`/api/portfolio?wallets=${address}`),
+  //   [address]
+  // );
 
-  const { value, setValue } = useSessionStorage(key, null);
+  // const { value, setValue } = useSessionStorage(key, null);
+  // console.log(value, "Outside value");
+
+  function updateData(data: any) {
+    setData(data);
+    // setValue(data);
+  }
 
   async function fetchWalletsPortfolio() {
     setLoading(true);
@@ -28,8 +37,7 @@ export const useWalletsPortfolio = () => {
       const response = await fetch(url);
       const { data, error } = await response.json();
       if (data) {
-        setData(data);
-        setValue(data);
+        updateData(data);
       } else {
         setError(error);
       }
@@ -41,6 +49,11 @@ export const useWalletsPortfolio = () => {
     }
   }
 
+  async function refetch() {
+    setData(null);
+    setError(null);
+    await fetchWalletsPortfolio();
+  }
   useEffect(() => {
     const handleEffect = async () => {
       if (address === undefined) {
@@ -49,19 +62,19 @@ export const useWalletsPortfolio = () => {
         return;
       }
 
-      if (value) {
-        console.log("Cache hit");
-        setData(value as WalletPortfolioClass);
-      } else {
-        console.log("Cache miss");
-        fetchWalletsPortfolio();
-      }
+      // if (value) {
+      //   console.log("Cache hit");
+      //   updateData(value);
+      // } else {
+      console.log("Cache miss");
+      await fetchWalletsPortfolio();
+      // }
     };
 
     handleEffect();
   }, [address]);
 
-  return { data, error, loading };
+  return { data, error, loading, refetch };
 };
 
 export const useWalletsHistory = () => {

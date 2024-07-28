@@ -7,14 +7,11 @@ import {
   optimism,
   scroll,
 } from "viem/chains";
-import { Chain, hardhat, sepolia } from "viem/chains";
+import { Chain } from "viem/chains";
 
-let chains = [mainnet, arbitrum, base, linea, polygon, optimism, scroll] as [
-  Chain,
-  ...Chain[]
-];
+let chains = [base] as [Chain, ...Chain[]];
 
-if (process.env.NODE_ENV !== "production") chains.push(sepolia, hardhat);
+// if (process.env.NODE_ENV !== "production") chains.push(sepolia, hardhat);
 
 export const ETH_CHAINS = chains;
 
@@ -33,7 +30,7 @@ export const NETWORK_COLORS = {
   },
   linea: {
     color: "slate",
-    bgVariant: "bg-slate-600",
+    bgVariant: "rgb(71 85 105)",
   },
   polygon: {
     color: "purple",
@@ -45,11 +42,11 @@ export const NETWORK_COLORS = {
   },
   scroll: {
     color: "amber",
-    bgVariant: "bg-amber-600",
+    bgVariant: "rgb(217 119 6)",
   },
   other: {
-    color: "gray",
-    bgVariant: "#4A5568",
+    color: "scooper-red",
+    bgVariant: "#940012",
   },
 };
 

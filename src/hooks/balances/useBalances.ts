@@ -1,60 +1,53 @@
-import { useEffect, useMemo } from "react";
-import { useAppDispatch, useAppSelector } from "../rtkHooks";
-import { RootState } from "@/store/store";
-import {
-  setUserWalletTokenWithBalance,
-  clearAllSelectedTokens,
-} from "@/store/sweep/sweepSlice";
-import { useWalletsPortfolio } from "../useMobula";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Address } from "viem";
-import { WalletPortfolioClass } from "@/utils/classes";
-import { AssetClass } from "@/utils/classes";
+import { MoralisAssetClass, WalletPortfolioClass } from "@/utils/classes";
+import { MoralisAssetInterface } from "@/utils/interface";
 
 interface UseBalances {
-  account: Address | undefined;
+  address: Address | undefined;
 }
-export const useBalances = ({ account }: UseBalances) => {
-  const dispatch = useAppDispatch();
+export const useBalances = ({ address }: UseBalances) => {
+  const [moralisAssets, set_] = useState<MoralisAssetClass[] | null>(null);
 
-  // const { data, error, loading } = useWalletsPortfolio();
+  const { data, isLoading, isError, error, refetch } = useQuery({
+    queryKey: ["/walletBalance" + address],
+    queryFn: () => {
+      const queryParams = new URLSearchParams({
+        chain: "base",
+      });
 
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["/walletBalance"],
-    queryFn: async () =>
-      fetch(`/api/portfolio?wallets=${account}`).then((response) =>
-        response.json(),
-      ),
-    // staleTime: ms("60s"),
-    // gcTime: ms("1h"),
+      return fetch(
+        `https://deep-index.moralis.io/api/v2.2/wallets/${address}/tokens?${queryParams.toString()}`,
+        {
+          headers: {
+            "X-API-Key": process.env.NEXT_PUBLIC_MORALIS_API_KEY ?? "",
+          },
+        }
+      ).then((response) => response.json());
+    },
     refetchOnWindowFocus: true,
     enabled: true,
   });
 
-  const filteredAssets = useMemo(() => {
-    if (data?.data?.assets) {
-      return data.data.assets.filter(
-        (asset: AssetClass) =>
-          asset.address !== "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-      );
-    }
-    return [];
-  }, [data]);
   useEffect(() => {
-    if (data) {
-      try {
-        dispatch(setUserWalletTokenWithBalance([]));
-        dispatch(clearAllSelectedTokens());
-        dispatch(setUserWalletTokenWithBalance(filteredAssets));
-      } catch (error) {
-        console.error("Error validating data:", error);
-      }
+    if (data && address) {
+      const { result }: { result: MoralisAssetInterface[] } = data;
+      const assets = result?.map((res) => new MoralisAssetClass(res));
+      set_(cleanSpam(assets));
     }
-  }, [data, isLoading]);
+  }, [data, address]);
 
   return {
-    walletBalance: filteredAssets as AssetClass[],
-    isError,
+    data,
     isLoading,
+    isError,
+    error,
+    refetch,
+    moralisAssets,
   };
 };
+
+function cleanSpam(data: MoralisAssetClass[]) {
+  return data?.filter((asset) => asset.isSpam === false);
+}
