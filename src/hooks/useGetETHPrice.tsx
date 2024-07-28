@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
 export default function useGetETHPrice() {
-  const [price, setPrice] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [price, setPrice] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<any>(null);
 
   useEffect(() => {

@@ -1,4 +1,6 @@
 "use client";
+
+import { COLORS } from "@/constants/theme";
 import { useAssetScooperContractWrite } from "@/hooks/useAssetScooperWriteContract";
 import { Token } from "@/lib/components/types";
 import {
@@ -56,7 +58,7 @@ function TokenRow({ token, refetch }: { token: Token; refetch: () => void }) {
     !!allowance && allowance >= parseUnits(userBalance.toString(), decimals);
   const isLoading = isAllowanceLoading || isApprovalPending || isConfirming;
 
-  console.log(isApproved, allowance, userBalance);
+  // console.log(isApproved, allowance, userBalance);
 
   useEffect(() => {
     if (isConfirmed) {
@@ -69,10 +71,9 @@ function TokenRow({ token, refetch }: { token: Token; refetch: () => void }) {
     <HStack
       width="100%"
       justifyContent="space-between"
-      padding="0.5rem"
-      border="1px solid #B5B4C6"
+      padding="0.5rem 1rem"
+      border="1px solid #E1C9E1"
       borderRadius="18px"
-      shadow=""
     >
       <HStack alignItems="center" gap="8px">
         <WrapItem>
@@ -80,10 +81,10 @@ function TokenRow({ token, refetch }: { token: Token; refetch: () => void }) {
         </WrapItem>
 
         <VStack gap="0" alignItems="start">
-          <Text fontWeight="700">
+          <Text fontSize="14px" fontWeight="700">
             {symbol.length > 6 ? `${symbol.substring(0, 5)}...` : symbol}
           </Text>
-          <Text color="#A8BBD6" fontSize="smaller">
+          <Text color="#A8BBD6" fontSize="14px">
             {name}
           </Text>
         </VStack>
@@ -93,13 +94,22 @@ function TokenRow({ token, refetch }: { token: Token; refetch: () => void }) {
         <Button
           onClick={handleApprove}
           isLoading={isLoading}
+          borderRadius="8px"
           isDisabled={isApproved}
+          width="100%"
+          color="#FDFDFD"
+          fontSize="16px"
+          fontWeight={500}
+          bg={COLORS.btnGradient}
+          _hover={{
+            bg: COLORS.btnGradient,
+          }}
         >
           {isApproved ? "Approved" : "Approve"}
         </Button>
 
         <Button onClick={() => refetchAllowance()}>
-          {isLoading ? <ClipLoader size={15} /> : <RxReload size={15} />}
+          {isLoading ? <ClipLoader size={20} /> : <RxReload size={20} />}
         </Button>
       </HStack>
     </HStack>
