@@ -34,6 +34,9 @@ import { PARASWAP_TRANSFER_PROXY } from "@/constants/contractAddress";
 import { Address, erc20Abi, parseUnits } from "viem";
 import { useSmartWallet } from "@/hooks/useSmartWallet";
 import { useWalletsPortfolio } from "@/hooks/useMobula";
+import { useEthPrice } from "@/hooks/useGetETHPrice2";
+import { ETH_ADDRESS } from "@/utils";
+import CustomTooltip from "@/components/CustomTooltip";
 
 export function ETHToReceive({ selectedTokens }: { selectedTokens: Token[] }) {
   const { price } = useGetETHPrice();
@@ -64,6 +67,10 @@ function SweepWidget() {
 
   const { getRate, buildSwap, swapsTrxData } = useParaSwap();
   const { refetch: refetchTokenBalance } = useWalletsPortfolio();
+
+  const { ethPrice } = useEthPrice({
+    address: ETH_ADDRESS,
+  });
 
   const handleSwap = async () => {
     const trade = await getRate({
@@ -176,7 +183,8 @@ function SweepWidget() {
               </Text>
             </Flex>
             <Text fontSize="12px" color={COLORS.tabTextColor}>
-              Update in 30 sec 1ETH ≈ {price} USDC{" "}
+              Update in 30 sec 1ETH ≈ {ethPrice} USDC
+              {/* 1ETH ≈ {price} USDC{" "} */}
             </Text>
           </Flex>
           <TokenSelector>
@@ -228,7 +236,9 @@ function SweepWidget() {
               >
                 You will receive..
               </Text>
-              <AiOutlineQuestionCircle color="#C9BCCA" />
+              <CustomTooltip label="Estimated Total Value you will receive in ETH(WETH)">
+                <AiOutlineQuestionCircle color="#C9BCCA" />
+              </CustomTooltip>
             </Flex>
 
             <ETHToReceive selectedTokens={selectedTokens} />
@@ -243,7 +253,9 @@ function SweepWidget() {
               >
                 Transaction fee
               </Text>
-              <AiOutlineQuestionCircle color="#C9BCCA" />
+              <CustomTooltip label="Estimated Transaction fee to process this transaction.">
+                <AiOutlineQuestionCircle color="#C9BCCA" />
+              </CustomTooltip>
             </Flex>
 
             <Text>__</Text>
@@ -258,7 +270,9 @@ function SweepWidget() {
               >
                 Estimated transaction time
               </Text>
-              <AiOutlineQuestionCircle color="#C9BCCA" />
+              <CustomTooltip label="Estimated Time taken for this transaction to be completed.">
+                <AiOutlineQuestionCircle color="#C9BCCA" />
+              </CustomTooltip>
             </Flex>
 
             <Text>3 seconds</Text>

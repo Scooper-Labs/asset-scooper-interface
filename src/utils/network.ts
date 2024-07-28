@@ -7,7 +7,7 @@ import {
   optimism,
   scroll,
 } from "viem/chains";
-import { Chain, hardhat, sepolia } from "viem/chains";
+import { Chain } from "viem/chains";
 
 let chains = [base] as [Chain, ...Chain[]];
 
@@ -30,7 +30,7 @@ export const NETWORK_COLORS = {
   },
   linea: {
     color: "slate",
-    bgVariant: "bg-slate-600",
+    bgVariant: "rgb(71 85 105)",
   },
   polygon: {
     color: "purple",
@@ -42,11 +42,11 @@ export const NETWORK_COLORS = {
   },
   scroll: {
     color: "amber",
-    bgVariant: "bg-amber-600",
+    bgVariant: "rgb(217 119 6)",
   },
   other: {
-    color: "gray",
-    bgVariant: "#4A5568",
+    color: "scooper-red",
+    bgVariant: "#940012",
   },
 };
 
