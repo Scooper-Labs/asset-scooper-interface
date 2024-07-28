@@ -7,19 +7,19 @@ import SweepWidget from "./components/sweep-widget";
 import { useBalances } from "@/hooks/balances/useBalances";
 
 const Sweep: React.FC = () => {
-  const { serializedBalance, data, isError, isLoading, error } = useBalances({
-    address: "0x26DDD68E8650A6cd11f6D47fa48c704A3b174a3D",
-  });
+  // const { serializedBalance, data, isError, isLoading, error } = useBalances({
+  //   address: "0x26DDD68E8650A6cd11f6D47fa48c704A3b174a3D",
+  // });
 
-  console.log(
-    "data moralizzzz abeg",
-    data?.result,
-    isError,
-    isLoading,
-    error,
-    "serializedBalance",
-    serializedBalance
-  );
+  // console.log(
+  //   "data moralizzzz abeg",
+  //   data?.result,
+  //   isError,
+  //   isLoading,
+  //   error,
+  //   "serializedBalance",
+  //   serializedBalance
+  // );
 
   return (
     <ContainerWrapper>
