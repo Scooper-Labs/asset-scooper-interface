@@ -10,7 +10,7 @@ import {
   Button,
   ModalCloseButton,
 } from "@chakra-ui/react";
-import ModalComponent from "@/components/ModalComponent";
+import ModalComponent from "@/components/ModalComponent/MobileViewModal";
 type ErrMsg = {
   message: string;
 };

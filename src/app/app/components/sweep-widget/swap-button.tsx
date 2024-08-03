@@ -1,8 +1,7 @@
 "use client";
 
 import { Button } from "@chakra-ui/react";
-import { useSelectedTokens } from "@/hooks/useSelectTokens";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { useReadContracts } from "wagmi";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
@@ -14,11 +13,12 @@ import {
 } from "@/constants/contractAddress";
 import { COLORS } from "@/constants/theme";
 import { useSmartWallet } from "@/hooks/useSmartWallet";
+import { TokenListProvider } from "@/provider/tokenListProvider";
 
 function SweepButton() {
   const { open } = useWeb3Modal();
   const { isSmartWallet } = useSmartWallet();
-  const { selectedTokens } = useSelectedTokens();
+  const { tokenList: selectedTokens } = useContext(TokenListProvider);
 
   const [tokensAllowance, setTokensAllowance] = useState(false);
 

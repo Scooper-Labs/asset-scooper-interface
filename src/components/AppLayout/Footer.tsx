@@ -10,9 +10,9 @@ import {
   Tag,
   TagLabel,
 } from "@chakra-ui/react";
-import { NetworkStatus } from "./NetworkStatus";
-import { LinkComponent } from "./LinkComponent";
-import ContainerWrapper from "./ContainerWrapper";
+import { NetworkStatus } from "../NetworkStatus";
+import { LinkComponent } from "../LinkComponent";
+import ContainerWrapper from "../ContainerWrapper";
 import { COLORS } from "@/constants/theme";
 import { RiExternalLinkLine } from "react-icons/ri";
 import { usePathname } from "next/navigation";

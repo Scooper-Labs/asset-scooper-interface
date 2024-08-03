@@ -1,7 +1,7 @@
 "use client";
 import { ReactNode } from "react";
-import AppNavbar from "@/components/AppNavbar";
-import { AppFooter } from "@/components/AppFooter";
+import AppNavbar from "@/components/AppLayout/Navbar";
+import { AppFooter } from "@/components/AppLayout/Footer";
 import { Flex, Box } from "@chakra-ui/react";
 interface MainAppLayoutProps {
   children: ReactNode;

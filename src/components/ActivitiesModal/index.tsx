@@ -24,10 +24,10 @@ import {
 import { COLORS } from "@/constants/theme";
 import { IoMdClose } from "react-icons/io";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
-import Tokens from "./components/Tokens";
-import Transactions from "./components/Transactions";
+import Tokens from "./Tokens";
+import Transactions from "./Transactions";
 import { useAccount, useDisconnect } from "wagmi";
-import { truncate } from "@/utils/address";
+import { truncateAddress } from "@/utils/walletUtils";
 import { useBalances } from "@/hooks/balances/useBalances";
 import Avatar from "@/assets/svg";
 import FormatNumber from "../FormatNumber";
@@ -72,7 +72,9 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
   };
 
   function disconnectAndCloseModal() {
+    console.log("Disconnecting wallet");
     disconnect();
+    console.log("Wallet disconnected");
     onClose();
   }
 
@@ -135,7 +137,7 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
                       color: "#9E829F",
                     }}
                   >
-                    {truncate(address || "")}
+                    {truncateAddress(address || "")}
                   </Text>
 
                   {addressCopied ? (

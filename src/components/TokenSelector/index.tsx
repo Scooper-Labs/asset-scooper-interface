@@ -9,13 +9,13 @@ import {
 import { COLORS } from "@/constants/theme";
 import { ReactNode, useEffect } from "react";
 import TokenSelectList from "./token-select-list";
-import TokenSelectorModalComponent from "./CustomModalComponent";
 import { TokenSelectFooter } from "./TokenSelectorFooter";
 import { useSweepThreshhold } from "@/hooks/settings/useThreshold";
 import useGetETHPrice from "@/hooks/useGetETHPrice";
 import { MoralisAssetClass } from "@/utils/classes";
 import { useBalances } from "@/hooks/balances/useBalances";
 import { useAccount } from "wagmi";
+import ModalComponent from "../ModalComponent/TabViewModal";
 
 export function TokenSelector({ children }: { children?: ReactNode }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -49,8 +49,7 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
       >
         {children}
       </Box>
-
-      <TokenSelectorModalComponent
+      <ModalComponent
         isOpen={isOpen}
         onClose={onClose}
         closeOnOverlayClick={false}
@@ -60,6 +59,10 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
           overflow: "hidden",
           border: `1px solid ${COLORS.borderColor}`,
           boxShadow: "#E9C7EA4D",
+          padding: "0",
+        }}
+        modalBodyStyle={{
+          padding: "0",
         }}
       >
         <ModalCloseButton
@@ -109,7 +112,7 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
             userWalletTokens={selectedTokens}
           />
         </VStack>
-      </TokenSelectorModalComponent>
+      </ModalComponent>
     </>
   );
 }

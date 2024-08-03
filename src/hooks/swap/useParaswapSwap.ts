@@ -1,16 +1,16 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useContext } from "react";
 import axios from "axios";
 import BigNumber from "bignumber.js";
 import { OptimalRate, SwapSide, ParaSwapVersion } from "@paraswap/core";
 import { PARASWAP_API_URL } from "@/constants/paraswap";
 import { Token } from "@/lib/components/types";
 import { useAccount } from "wagmi";
-import { useSelectedTokens } from "../useSelectTokens";
 import { useSendCalls } from "wagmi/experimental";
 import { useToast } from "@chakra-ui/react";
 import { Address } from "viem";
 import { useWalletsPortfolio } from "../useMobula";
-import CustomToast from "@/components/CustomToast";
+import CustomToast from "@/components/Toast";
+import { TokenListProvider } from "@/provider/tokenListProvider";
 
 const PARTNER = "chucknorrisv6";
 const SLIPPAGE = 1;
@@ -28,10 +28,8 @@ interface TransactionParams {
 export const useParaSwap = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [transactionRequest, setTransactionRequest] =
-    useState<TransactionParams | null>(null);
   const { address, chainId } = useAccount();
-  const { selectedTokens } = useSelectedTokens();
+  const { tokenList: selectedTokens } = useContext(TokenListProvider);
   const { refetch: refetchTokenBalance } = useWalletsPortfolio();
   const toast = useToast();
   const { sendCalls } = useSendCalls();
@@ -112,70 +110,6 @@ export const useParaSwap = () => {
     const { data } = await axios.post<TransactionParams>(txURL, txConfig);
     return data;
   };
-
-  // const getSwapTransaction = useCallback(
-  //   async ({
-  //     srcToken,
-  //     destToken,
-  //     srcAmount,
-  //     slippage = SLIPPAGE,
-  //     receiver,
-  //   }: {
-  //     srcToken: Token;
-  //     destToken: Token;
-  //     srcAmount: string;
-  //     slippage?: number;
-  //     receiver?: string;
-  //   }) => {
-  //     if (!chainId || !address) {
-  //       setError("Please connect wallet");
-  //       return;
-  //     }
-
-  //     setLoading(true);
-  //     setError(null);
-
-  //     try {
-  //       const networkID = chainId;
-  //       const srcAmountBN = new BigNumber(srcAmount)
-  //         .times(10 ** srcToken.decimals)
-  //         .toFixed(0);
-
-  //       // Get rate
-  //       const priceRoute = await getRate({
-  //         srcToken,
-  //         destToken,
-  //         srcAmount: srcAmountBN,
-  //         networkID,
-  //       });
-
-  //       // Calculate minimum amount
-  //       const minAmount = new BigNumber(priceRoute.destAmount)
-  //         .times(1 - slippage / 100)
-  //         .toFixed(0);
-
-  //       // Build swap transaction
-  //       const txParams = await buildSwap({
-  //         srcToken,
-  //         destToken,
-  //         srcAmount: srcAmountBN,
-  //         minAmount,
-  //         priceRoute,
-  //         userAddress: address,
-  //         receiver,
-  //         networkID,
-  //       });
-
-  //       setTransactionRequest(txParams);
-  //     } catch (e) {
-  //       console.error(e);
-  //       setError("An error occurred while getting swap transaction");
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   },
-  //   [chainId, address],
-  // );
 
   const swapsTrxData = async () => {
     if (!chainId || !address) {
