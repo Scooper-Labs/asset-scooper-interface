@@ -1,7 +1,7 @@
 "use client";
 
 import { TokenSelector } from "@/components/TokenSelector";
-import { ChevronDownIcon, InfoOutlineIcon } from "@chakra-ui/icons";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 import { AiOutlineQuestionCircle } from "react-icons/ai";
 import {
   Box,
@@ -15,10 +15,9 @@ import {
   TagLabel,
 } from "@chakra-ui/react";
 import Image from "next/image";
-import React from "react";
+import React, { useContext } from "react";
 import { SwapSettings } from "./swap-settings";
 import { COLORS } from "@/constants/theme";
-import { useSelectedTokens } from "@/hooks/useSelectTokens";
 import SweepButton from "./swap-button";
 import { useRouter } from "next/navigation";
 import { SweepIcon } from "@/assets/svg";
@@ -37,6 +36,7 @@ import { useWalletsPortfolio } from "@/hooks/useMobula";
 import { useEthPrice } from "@/hooks/useGetETHPrice2";
 import { ETH_ADDRESS } from "@/utils";
 import CustomTooltip from "@/components/CustomTooltip";
+import { TokenListProvider } from "@/provider/tokenListProvider";
 
 export function ETHToReceive({ selectedTokens }: { selectedTokens: Token[] }) {
   const { price } = useGetETHPrice();
@@ -58,11 +58,8 @@ export function ETHToReceive({ selectedTokens }: { selectedTokens: Token[] }) {
 
 function SweepWidget() {
   const { address } = useAccount();
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const { selectedTokens } = useSelectedTokens();
-  const { price } = useGetETHPrice();
+  const { tokenList: selectedTokens } = useContext(TokenListProvider);
 
-  // console.log("address", address);
   const router = useRouter();
 
   const { getRate, buildSwap, swapsTrxData } = useParaSwap();
@@ -79,8 +76,7 @@ function SweepWidget() {
       srcAmount: "10000",
       networkID: base.id,
     });
-    // console.log("trade test", trade);
-    // console.log("trade price route", trade);
+
     const swapBuild = await buildSwap({
       srcToken: selectedTokens[0],
       destToken: selectedTokens[1],
@@ -91,8 +87,6 @@ function SweepWidget() {
       receiver: address ?? "",
       networkID: base.id,
     });
-
-    // console.log("swapBuild swapBuild", swapBuild);
   };
 
   const handleBatchSwap = async () => {

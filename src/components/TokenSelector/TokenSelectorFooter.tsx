@@ -1,29 +1,23 @@
-import {
-  Button,
-  Flex,
-  Text,
-  HStack,
-  VStack,
-  Checkbox,
-  CheckboxGroup,
-  Box,
-} from "@chakra-ui/react";
+import { Button, Flex, Text, HStack, Checkbox } from "@chakra-ui/react";
 import { COLORS } from "@/constants/theme";
 import { FaArrowRight } from "react-icons/fa";
-import React, { useMemo } from "react";
-import { useSelectedTokens } from "@/hooks/useSelectTokens";
+import React, { useContext, useMemo } from "react";
 import { Token } from "@/lib/components/types";
-import { AssetClass } from "@/utils/classes";
+import { MoralisAssetClass } from "@/utils/classes";
+import { TokenListProvider } from "@/provider/tokenListProvider";
 
 export function TokenSelectFooter({
   userWalletTokens,
   onClose,
 }: {
-  userWalletTokens: AssetClass[] | undefined;
+  userWalletTokens: MoralisAssetClass[] | undefined;
   onClose: () => void;
 }) {
-  const { _selectAllToken, selectedTokens, _clearSelectedTokens } =
-    useSelectedTokens();
+  const {
+    selectAll,
+    tokenList: selectedTokens,
+    clearList,
+  } = useContext(TokenListProvider);
 
   const isAllSelected = Boolean(
     userWalletTokens?.length == selectedTokens.length
@@ -72,11 +66,11 @@ export function TokenSelectFooter({
             isAllSelected
               ? (e) => {
                   e.preventDefault();
-                  _clearSelectedTokens();
+                  clearList();
                 }
               : (e) => {
                   e.preventDefault();
-                  _selectAllToken(userWalletTokens!);
+                  selectAll(userWalletTokens!);
                 }
           }
         >

@@ -18,10 +18,11 @@ import {
   Flex,
   IconButton,
 } from "@chakra-ui/react";
-import { useSelectedTokens } from "@/hooks/useSelectTokens";
 import TokenRow from "./token-row";
 import { IoMdClose } from "react-icons/io";
-import ModalComponent from "@/components/ModalComponent";
+import ModalComponent from "@/components/ModalComponent/MobileViewModal";
+import { useContext } from "react";
+import { TokenListProvider } from "@/provider/tokenListProvider";
 
 function ApprovalModal({
   tokensAllowanceStatus,
@@ -31,7 +32,7 @@ function ApprovalModal({
   refetch: () => void;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { selectedTokens } = useSelectedTokens();
+  const { tokenList: selectedTokens } = useContext(TokenListProvider);
 
   return (
     <>

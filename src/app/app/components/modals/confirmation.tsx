@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import {
   chakra,
   Stack,
@@ -13,7 +13,6 @@ import {
   HStack,
   IconButton,
 } from "@chakra-ui/react";
-import { useSelectedTokens } from "@/hooks/useSelectTokens";
 import ApprovalModal from "./approval";
 import assetscooperAbi from "@/constants/abi/assetscooper.json";
 import {
@@ -31,9 +30,10 @@ import { useBatchApprovals } from "@/hooks/approvals/useBatchApprovals";
 import { useSmartWallet } from "@/hooks/useSmartWallet";
 import { useParaSwap } from "@/hooks/swap/useParaswapSwap";
 import { IoMdClose } from "react-icons/io";
-import ModalComponent from "@/components/ModalComponent";
+import ModalComponent from "@/components/ModalComponent/MobileViewModal";
 import { COLORS } from "@/constants/theme";
 import OverlappingImage, { getImageArray } from "../sweep-widget/ImageLap";
+import { TokenListProvider } from "@/provider/tokenListProvider";
 
 function ConfirmationModal({
   tokensAllowanceStatus,
@@ -60,7 +60,7 @@ function ConfirmationModal({
     SlippageToleranceStorageKey.Sweep
   );
 
-  const { selectedTokens } = useSelectedTokens();
+  const { tokenList: selectedTokens } = useContext(TokenListProvider);
   const { isSmartWallet } = useSmartWallet();
 
   //Batch approvals

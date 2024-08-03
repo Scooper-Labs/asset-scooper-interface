@@ -4,7 +4,7 @@ import { Address } from "viem";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { useToast } from "@chakra-ui/react";
 import { useEffect } from "react";
-import CustomToast from "@/components/CustomToast";
+import CustomToast from "@/components/Toast";
 
 export const useAssetScooperContractWrite = ({
   fn,
