@@ -58,8 +58,6 @@ function TokenRow({ token, refetch }: { token: Token; refetch: () => void }) {
     !!allowance && allowance >= parseUnits(userBalance.toString(), decimals);
   const isLoading = isAllowanceLoading || isApprovalPending || isConfirming;
 
-  // console.log(isApproved, allowance, userBalance);
-
   useEffect(() => {
     if (isConfirmed) {
       refetchAllowance();

@@ -2,13 +2,6 @@
 
 import { COLORS } from "@/constants/theme";
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
   Button,
   useDisclosure,
   Box,
@@ -18,11 +11,10 @@ import {
   Flex,
   IconButton,
 } from "@chakra-ui/react";
-import TokenRow from "./token-row";
+import TokenRow from "./TokenRow";
 import { IoMdClose } from "react-icons/io";
-import ModalComponent from "@/components/ModalComponent/MobileViewModal";
-import { useContext } from "react";
-import { TokenListProvider } from "@/provider/tokenListProvider";
+import ModalComponent from "@/components/ModalComponent/TabViewModal";
+import useSelectToken from "@/hooks/useSelectToken"
 
 function ApprovalModal({
   tokensAllowanceStatus,
@@ -32,7 +24,7 @@ function ApprovalModal({
   refetch: () => void;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { tokenList: selectedTokens } = useContext(TokenListProvider);
+  const { tokenList: selectedTokens } = useSelectToken();
 
   return (
     <>
@@ -60,7 +52,11 @@ function ApprovalModal({
         Approval
       </Button>
 
-      <ModalComponent isOpen={isOpen} onClose={onClose}>
+      <ModalComponent
+        isOpen={isOpen}
+        onClose={onClose}
+        // modalContentStyle={{ py: "0" }}
+      >
         <Flex justify="space-between" alignItems="center">
           <Box flex="1" textAlign="center">
             <Text fontWeight={700} fontSize="14px" color="#0D0D0D">

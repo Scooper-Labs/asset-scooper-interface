@@ -32,7 +32,7 @@ import { useBalances } from "@/hooks/balances/useBalances";
 import Avatar from "@/assets/svg";
 import FormatNumber from "../FormatNumber";
 import { useWalletsPortfolio } from "@/hooks/useMobula";
-import { AssetClass, MoralisAssetClass } from "@/utils/classes";
+import { MoralisAssetClass } from "@/utils/classes";
 import { useQuery } from "@apollo/client";
 import { GET_ACCOUNT_TX } from "@/utils/queries";
 import { MdCheckCircleOutline } from "react-icons/md";

@@ -13,24 +13,27 @@ import {
   HStack,
   IconButton,
 } from "@chakra-ui/react";
-import ApprovalModal from "./approval";
+import ApprovalModal from "./Approval";
 import assetscooperAbi from "@/constants/abi/assetscooper.json";
 import {
   assetscooper_contract,
   PARASWAP_TRANSFER_PROXY,
 } from "@/constants/contractAddress";
-import { useAssetScooperContractWrite } from "@/hooks/useAssetScooperWriteContract";
+import {
+  useAssetScooperContractWrite,
+  useSweepTokensSim,
+} from "@/hooks/useAssetScooperWriteContract";
 import { Address } from "viem";
 import { ETHToReceive } from "../sweep-widget";
 import { useSlippageTolerance } from "@/hooks/settings/slippage/useSlippage";
 import { SlippageToleranceStorageKey } from "@/hooks/settings/slippage/utils";
-import TransactionComplete from "./TransactionCompleted";
-import ErrorOccured from "./ErrorOccured";
+import TransactionComplete from "./Success";
+import ErrorOccured from "./Error";
 import { useBatchApprovals } from "@/hooks/approvals/useBatchApprovals";
 import { useSmartWallet } from "@/hooks/useSmartWallet";
 import { useParaSwap } from "@/hooks/swap/useParaswapSwap";
 import { IoMdClose } from "react-icons/io";
-import ModalComponent from "@/components/ModalComponent/MobileViewModal";
+import ModalComponent from "@/components/ModalComponent/TabViewModal";
 import { COLORS } from "@/constants/theme";
 import OverlappingImage, { getImageArray } from "../sweep-widget/ImageLap";
 import { TokenListProvider } from "@/provider/tokenListProvider";
@@ -74,6 +77,9 @@ function ConfirmationModal({
   const minAmountOut = selectedTokens.map((t) => 0n);
 
   //eoa swap
+  const args = [selectedTokens.map((token) => token.address), minAmountOut];
+  const { data: simData, refetch: resim } = useSweepTokensSim(args);
+  console.log(simData, "Simulated Data");
   const {
     write: sweepTokens,
     isPending: isSweeping,
@@ -86,7 +92,7 @@ function ConfirmationModal({
     WaitForTransactionReceiptError,
   } = useAssetScooperContractWrite({
     fn: "sweepTokens",
-    args: [selectedTokens.map((token) => token.address), minAmountOut],
+    args,
     abi: assetscooperAbi,
     contractAddress: assetscooper_contract as Address,
   });
@@ -94,8 +100,6 @@ function ConfirmationModal({
   const handlesweep = async () => {
     await sweepTokens();
   };
-
-  //Batch swap with paraswap
 
   const { executeBatchSwap } = useParaSwap();
 
@@ -114,13 +118,6 @@ function ConfirmationModal({
   const isLoading = isSweeping || isConfirming;
   const isDisabled = !tokensAllowanceStatus || isLoading;
 
-  // console.log(
-  //   isDisabled,
-  //   !tokensAllowanceStatus || isLoading,
-  //   tokensAllowanceStatus,
-  //   isLoading
-  // );
-
   return (
     <>
       <Button
@@ -138,6 +135,9 @@ function ConfirmationModal({
         closeOnOverlayClick={false}
         isOpen={isOpen}
         onClose={onClose}
+        modalContentStyle={{
+          py: "0",
+        }}
       >
         {/* ------------------------ Header section ---------------------- */}
         <Flex justify="space-between" alignItems="center">
@@ -214,15 +214,6 @@ function ConfirmationModal({
               Order Details:
             </Text>
 
-            {/* <HStack width="100%" justifyContent="space-between">
-              <Text color="#151829" fontSize="14px" fontWeight={500}>
-               Fee:
-              </Text>
-              <Text color="#674669" fontSize="14px" fontWeight={500}>
-                {slippageTolerance}%
-              </Text>
-            </HStack> */}
-
             <HStack width="100%" justifyContent="space-between">
               <Text color="#151829" fontSize="14px" fontWeight={500}>
                 Slippage
@@ -244,21 +235,6 @@ function ConfirmationModal({
               </Flex>
             </HStack>
           </VStack>
-
-          <Text
-            as="span"
-            color="#676C87"
-            fontWeight={500}
-            fontSize="14px"
-            mt="20px"
-            textAlign="center"
-          >
-            Your transaction has been processed and{" "}
-            <chakra.span color="#151515" fontWeight={600}>
-              0.04 ETH
-            </chakra.span>{" "}
-            has been deposited to your Wallet.
-          </Text>
 
           <HStack width="100%" mt="20px">
             {isSmartWallet ? (
@@ -343,15 +319,15 @@ function ConfirmationModal({
       </ModalComponent>
 
       {/* --------------------------- Transaction is Successful Modal ------------------------------- */}
-      <TransactionComplete
+      {/* <TransactionComplete
         isOpen={isConfirmed}
         onClose={onCloseConfirmed}
         hash={hash as `0x${string}`}
         Component={<ETHToReceive selectedTokens={selectedTokens} />}
-      />
+      /> */}
 
       {/* --------------------------- Error occur Modal ------------------------------- */}
-      <ErrorOccured
+      {/* <ErrorOccured
         isOpen={isOpenError && (isWriteContractError || isWaitTrxError)}
         onClose={onCloseError}
         error={
@@ -359,7 +335,7 @@ function ConfirmationModal({
             ? WriteContractError
             : WaitForTransactionReceiptError
         }
-      />
+      /> */}
     </>
   );
 }
