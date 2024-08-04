@@ -12,5 +12,6 @@ export const useSmartWallet = () => {
   }, [isConnected, connector?.id]);
   return {
     isSmartWallet,
+    connectorId: connector?.id
   };
 };

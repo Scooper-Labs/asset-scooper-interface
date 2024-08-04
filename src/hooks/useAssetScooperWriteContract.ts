@@ -1,9 +1,14 @@
 "use client";
 
-import { Address } from "viem";
-import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { Address, parseGwei } from "viem";
+import {
+  useWriteContract,
+  useWaitForTransactionReceipt,
+  useSimulateContract,
+  useAccount,
+} from "wagmi";
 import { useToast } from "@chakra-ui/react";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import CustomToast from "@/components/Toast";
 
 export const useAssetScooperContractWrite = ({
@@ -63,18 +68,6 @@ export const useAssetScooperContractWrite = ({
         "bottom-right"
       );
     }
-    // if (isWriteContractError || isWaitTrxError) {
-    //   toast({
-    //     title: "Transaction Error",
-    //     description:
-    //       WriteContractError?.message ||
-    //       ?.message ||
-    //       "An error occurred",
-    //     status: "error",
-    //     duration: 2000,
-    //     isClosable: true,
-    //   });
-    // }
   }, [
     isPending,
     isTrxSubmitted,
@@ -97,3 +90,42 @@ export const useAssetScooperContractWrite = ({
     WaitForTransactionReceiptError,
   };
 };
+
+import abi from "@/constants/abi/assetscooper.json";
+import { assetscooper_contract as assetscooper } from "@/constants/contractAddress";
+import { StateContext } from "@/app/app/Provider";
+import { publicClient } from "@/lib/config";
+
+// export function useSweepTokensSim(args: any[] = []) {
+//   const { address } = useAccount();
+//   const { setMessage, setType } = useContext(StateContext);
+//   const result = publicClient.simulateContract({
+//     functionName: "sweepTokens",
+//     args,
+//     abi,
+//     address: assetscooper,
+//     account: address,
+//   });
+//   useEffect(() => {
+//     console.log("result", result);
+//   // if (failureReason) {
+//   //   setMessage(failureReason);
+//   //   setType("result");
+//   // }
+//   }, [result]);
+//   return result;
+// }
+
+export function useSweepTokensSim(args: any[] = []) {
+  const simulateRes = useSimulateContract({
+    address: assetscooper,
+    abi: abi,
+    functionName: "sweepTokens",
+    args,
+  });
+  const { data, isError, refetch } = simulateRes;
+  useEffect(() => {
+    console.log("result", simulateRes);
+  }, [simulateRes]);
+  return {data,isError,refetch};
+}

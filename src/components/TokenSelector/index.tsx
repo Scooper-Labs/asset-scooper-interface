@@ -61,6 +61,7 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
           boxShadow: "#E9C7EA4D",
           padding: "0",
         }}
+        scrollBehavior={undefined}
         modalBodyStyle={{
           padding: "0",
         }}

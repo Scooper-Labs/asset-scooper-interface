@@ -1,4 +1,4 @@
-import { useState, useCallback, useContext } from "react";
+import { useState, useCallback } from "react";
 import axios from "axios";
 import BigNumber from "bignumber.js";
 import { OptimalRate, SwapSide, ParaSwapVersion } from "@paraswap/core";
@@ -10,7 +10,7 @@ import { useToast } from "@chakra-ui/react";
 import { Address } from "viem";
 import { useWalletsPortfolio } from "../useMobula";
 import CustomToast from "@/components/Toast";
-import { TokenListProvider } from "@/provider/tokenListProvider";
+import useSelectToken from "../useSelectToken";
 
 const PARTNER = "chucknorrisv6";
 const SLIPPAGE = 1;
@@ -26,10 +26,10 @@ interface TransactionParams {
 }
 
 export const useParaSwap = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [, setLoading] = useState(false);
+  const [, setError] = useState<string | null>(null);
   const { address, chainId } = useAccount();
-  const { tokenList: selectedTokens } = useContext(TokenListProvider);
+  const { tokenList: selectedTokens } = useSelectToken();
   const { refetch: refetchTokenBalance } = useWalletsPortfolio();
   const toast = useToast();
   const { sendCalls } = useSendCalls();
