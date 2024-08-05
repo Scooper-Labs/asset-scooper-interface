@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import {
-  chakra,
   Stack,
   Box,
   Button,
@@ -14,21 +13,15 @@ import {
   IconButton,
 } from "@chakra-ui/react";
 import ApprovalModal from "./Approval";
-import assetscooperAbi from "@/constants/abi/assetscooper.json";
+import { PARASWAP_TRANSFER_PROXY } from "@/constants/contractAddress";
 import {
-  assetscooper_contract,
-  PARASWAP_TRANSFER_PROXY,
-} from "@/constants/contractAddress";
-import {
-  useAssetScooperContractWrite,
-  useSweepTokensSim,
+  useSweepTokens,
+  useSweepTokensSimulation,
 } from "@/hooks/useAssetScooperWriteContract";
 import { Address } from "viem";
 import { ETHToReceive } from "../sweep-widget";
 import { useSlippageTolerance } from "@/hooks/settings/slippage/useSlippage";
 import { SlippageToleranceStorageKey } from "@/hooks/settings/slippage/utils";
-import TransactionComplete from "./Success";
-import ErrorOccured from "./Error";
 import { useBatchApprovals } from "@/hooks/approvals/useBatchApprovals";
 import { useSmartWallet } from "@/hooks/useSmartWallet";
 import { useParaSwap } from "@/hooks/swap/useParaswapSwap";
@@ -47,23 +40,12 @@ function ConfirmationModal({
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const {
-    onClose: onCloseConfirmed,
-    isOpen: isOpenConfirmed,
-    onOpen: onOpenConfirmed,
-  } = useDisclosure();
-
-  const {
-    onClose: onCloseError,
-    isOpen: isOpenError,
-    onOpen: onOpenError,
-  } = useDisclosure();
-
   const { slippageTolerance } = useSlippageTolerance(
     SlippageToleranceStorageKey.Sweep
   );
 
-  const { tokenList: selectedTokens } = useContext(TokenListProvider);
+  const { tokenList: selectedTokens, clearList } =
+    useContext(TokenListProvider);
   const { isSmartWallet } = useSmartWallet();
 
   //Batch approvals
@@ -78,46 +60,21 @@ function ConfirmationModal({
 
   //eoa swap
   const args = [selectedTokens.map((token) => token.address), minAmountOut];
-  const { data: simData, refetch: resim } = useSweepTokensSim(args);
-  console.log(simData, "Simulated Data");
-  const {
-    write: sweepTokens,
-    isPending: isSweeping,
-    isConfirming,
-    isConfirmed,
-    hash,
-    isWriteContractError,
-    WriteContractError,
-    isWaitTrxError,
-    WaitForTransactionReceiptError,
-  } = useAssetScooperContractWrite({
-    fn: "sweepTokens",
-    args,
-    abi: assetscooperAbi,
-    contractAddress: assetscooper_contract as Address,
-  });
-
+  const { data, resimulate, isPending } = useSweepTokensSimulation(args);
+  const { isLoading, isSuccess, sweepTokens } = useSweepTokens(data);
+  console.log(isPending);
   const handlesweep = async () => {
-    await sweepTokens();
+    const _result = await resimulate();
+    await sweepTokens(_result);
+    if (isSuccess) {
+      clearList();
+    }
   };
 
   const { executeBatchSwap } = useParaSwap();
 
-  useEffect(() => {
-    if (isConfirmed || isWriteContractError || isWaitTrxError) {
-      onClose();
-    }
-    if (isConfirmed) {
-      onOpenConfirmed();
-    }
-    if (isWriteContractError || isWaitTrxError) {
-      onOpenError();
-    }
-  }, [isConfirmed, isWriteContractError, isWaitTrxError]);
-
-  const isLoading = isSweeping || isConfirming;
-  const isDisabled = !tokensAllowanceStatus || isLoading;
-
+  const isSweeping = isPending || isLoading;
+  const isDisabled = !tokensAllowanceStatus || isSweeping;
   return (
     <>
       <Button
@@ -196,6 +153,7 @@ function ConfirmationModal({
             </Text>
           </VStack>
 
+          {/* ----------------- Transaction Details section ---------------- */}
           <VStack
             bg="#F6F9F9"
             width="100%"
@@ -236,6 +194,7 @@ function ConfirmationModal({
             </HStack>
           </VStack>
 
+          {/* ----------------- Button section ---------------- */}
           <HStack width="100%" mt="20px">
             {isSmartWallet ? (
               <Button
@@ -287,7 +246,6 @@ function ConfirmationModal({
                 height="2.5rem"
                 borderRadius="8px"
               >
-                {/* Execute Batch Swap */}
                 Sweep
               </Button>
             ) : (
@@ -311,31 +269,12 @@ function ConfirmationModal({
                 height="2.5rem"
                 borderRadius="8px"
               >
-                {isLoading ? "Sweeping" : "Sweep"}
+                {isSweeping ? "Sweeping" : "Sweep"}
               </Button>
             )}
           </HStack>
         </Stack>
       </ModalComponent>
-
-      {/* --------------------------- Transaction is Successful Modal ------------------------------- */}
-      {/* <TransactionComplete
-        isOpen={isConfirmed}
-        onClose={onCloseConfirmed}
-        hash={hash as `0x${string}`}
-        Component={<ETHToReceive selectedTokens={selectedTokens} />}
-      /> */}
-
-      {/* --------------------------- Error occur Modal ------------------------------- */}
-      {/* <ErrorOccured
-        isOpen={isOpenError && (isWriteContractError || isWaitTrxError)}
-        onClose={onCloseError}
-        error={
-          isWriteContractError
-            ? WriteContractError
-            : WaitForTransactionReceiptError
-        }
-      /> */}
     </>
   );
 }

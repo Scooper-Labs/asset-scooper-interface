@@ -19,9 +19,15 @@ export function TokenSelectFooter({
     clearList,
   } = useContext(TokenListProvider);
 
-  const isAllSelected = Boolean(
-    userWalletTokens?.length == selectedTokens.length
-  );
+  const isAllSelected = (() => {
+    if (userWalletTokens) {
+      return (
+        userWalletTokens.length > 0 &&
+        userWalletTokens.length == selectedTokens.length
+      );
+    }
+    return false;
+  })();
 
   const calculateTotalUSDValue = (tokens: Token[]) => {
     return tokens.reduce((total, token) => {
