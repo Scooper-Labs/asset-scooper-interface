@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 import AppNavbar from "@/components/AppLayout/Navbar";
 import { AppFooter } from "@/components/AppLayout/Footer";
 import { Flex, Box } from "@chakra-ui/react";
-import { StateContextProvider } from "./Provider";
+import { StateContextProvider } from "@/provider/AppProvider";
 
 interface MainAppLayoutProps {
   children: ReactNode;

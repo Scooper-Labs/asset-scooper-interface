@@ -1,31 +1,29 @@
 "use client";
 
+import ErrorOccured from "@/app/app/components/modals/Error";
+import TransactionComplete from "@/app/app/components/modals/Success";
+import { ETHToReceive } from "@/app/app/components/sweep-widget";
+import useSelectToken from "@/hooks/useSelectToken";
 import { useDisclosure } from "@chakra-ui/react";
 import { createContext, useEffect, useState } from "react";
-import TransactionComplete from "./components/modals/Success";
-import ErrorOccured from "./components/modals/Error";
 
-enum Types {
+export enum Types {
   NONE,
   SUCCESS,
   ERROR,
 }
-interface StateContextProps {
-  type: Types;
+type MessageType = {
+  title?: string;
   message: string;
-  Component: React.JSX.Element;
+};
+interface StateContextProps {
   setType: (type: Types) => void;
-  setMessage: (msg: string) => void;
-  setComponent: (component: React.JSX.Element) => void;
+  setMessage: (msg: string | MessageType) => void;
 }
 
 export const StateContext = createContext<StateContextProps>({
-  type: Types.NONE,
-  message: "",
-  Component: <></>,
   setType: () => {},
   setMessage: () => {},
-  setComponent: () => {},
 });
 
 export function StateContextProvider({
@@ -34,9 +32,9 @@ export function StateContextProvider({
   children: React.ReactNode;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { tokenList } = useSelectToken();
   const [type, setType] = useState<Types>(Types.NONE);
-  const [message, setMessage] = useState("");
-  const [Component, setComponent] = useState(<></>);
+  const [message, setMessage] = useState<string | MessageType>("");
 
   useEffect(() => {
     if (type !== Types.NONE) {
@@ -44,27 +42,32 @@ export function StateContextProvider({
     }
   }, [type]);
 
+  function close() {
+    setType(Types.NONE);
+    onClose();
+  }
+
   const MODAL =
     type === Types.SUCCESS ? (
       <TransactionComplete
         isOpen={isOpen}
-        onClose={onClose}
-        hash={message as `0x${string}`}
-        Component={Component}
+        onClose={close}
+        hash={message as string as `0x${string}`}
+        Component={<ETHToReceive selectedTokens={tokenList} />}
       />
     ) : (
-      <ErrorOccured isOpen={isOpen} onClose={onClose} error={{ message }} />
+      <ErrorOccured
+        isOpen={isOpen}
+        onClose={close}
+        error={message as MessageType}
+      />
     );
 
   return (
     <StateContext.Provider
       value={{
-        type,
-        message,
-        Component,
         setType,
         setMessage,
-        setComponent,
       }}
     >
       {MODAL}

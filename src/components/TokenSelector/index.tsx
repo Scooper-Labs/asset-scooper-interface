@@ -11,11 +11,12 @@ import { ReactNode, useEffect } from "react";
 import TokenSelectList from "./token-select-list";
 import { TokenSelectFooter } from "./TokenSelectorFooter";
 import { useSweepThreshhold } from "@/hooks/settings/useThreshold";
-import useGetETHPrice from "@/hooks/useGetETHPrice";
+import { useEthPrice } from "@/hooks/useGetETHPrice2";
 import { MoralisAssetClass } from "@/utils/classes";
 import { useBalances } from "@/hooks/balances/useBalances";
 import { useAccount } from "wagmi";
 import ModalComponent from "../ModalComponent/TabViewModal";
+import { ETH_ADDRESS } from "@/utils";
 
 export function TokenSelector({ children }: { children?: ReactNode }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -29,9 +30,15 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
   }, [address, isConnected]);
 
   const { sweepthreshHold } = useSweepThreshhold();
-  const { price } = useGetETHPrice();
+  const { ethPrice } = useEthPrice({
+    address: ETH_ADDRESS,
+  });
 
-  const selectedTokens = meetsThreshold(moralisAssets, price, sweepthreshHold);
+  const selectedTokens = meetsThreshold(
+    moralisAssets,
+    ethPrice,
+    sweepthreshHold
+  );
 
   return (
     <>
