@@ -3,7 +3,7 @@ import { Token } from "@/lib/components/types";
 import { Address, encodeFunctionData, erc20Abi, parseUnits } from "viem";
 import { useSendCalls } from "wagmi/experimental";
 import { useToast } from "@chakra-ui/react";
-import CustomToast from "@/components/CustomToast";
+import CustomToast from "@/components/Toast";
 
 export const useBatchApprovals = ({
   tokens,

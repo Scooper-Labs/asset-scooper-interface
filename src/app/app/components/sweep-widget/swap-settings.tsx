@@ -20,7 +20,7 @@ import { RiListSettingsLine } from "react-icons/ri";
 import { useSlippageTolerance } from "@/hooks/settings/slippage/useSlippage";
 import { SlippageToleranceStorageKey } from "@/hooks/settings/slippage/utils";
 import { useSweepThreshhold } from "@/hooks/settings/useThreshold";
-import ModalMobileComponent from "@/components/ModalMobileComponent";
+import ModalMobileComponent from "@/components/ModalComponent/MobileViewModal";
 
 export function SwapSettings() {
   const [activeButton, setActiveButton] = useState<string>("auto");

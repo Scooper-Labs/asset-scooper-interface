@@ -1,6 +1,6 @@
 import { Button } from "@chakra-ui/react";
 import Avatar from "@/assets/svg";
-import { truncate } from "@/utils/address";
+import { truncateAddress } from "@/utils/walletUtils";
 import { useAccount } from "wagmi";
 import { COLORS } from "@/constants/theme";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
@@ -37,7 +37,7 @@ function CustomConnectButton({ onOpen, address }: Props) {
   return (
     <span onClick={onOpen} className="customConnectSpan">
       <Avatar />
-      <button>{truncate(address || "")}</button>
+      <button>{truncateAddress(address || "")}</button>
     </span>
   );
 }

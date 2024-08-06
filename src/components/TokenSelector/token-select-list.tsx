@@ -1,13 +1,12 @@
 import React from "react";
 import { Box, VStack, Text, HStack } from "@chakra-ui/react";
 import TokenSelectListRow from "./token-select-row";
-// import { useBalances } from "@/hooks/balances/useBalances";
 import { useAccount } from "wagmi";
-import { AssetClass } from "@/utils/classes";
+import { MoralisAssetClass } from "@/utils/classes";
 import { Skeleton, SkeletonCircle } from "@chakra-ui/react";
 
 interface TokenSelectListProps {
-  userWalletTokens: AssetClass[] | undefined;
+  userWalletTokens: MoralisAssetClass[] | undefined;
   loading: boolean;
   error: boolean;
 }
@@ -16,7 +15,7 @@ interface ListContentProps {
   address: string | undefined;
   loading: boolean;
   error: boolean;
-  walletBalance: AssetClass[] | undefined;
+  walletBalance: MoralisAssetClass[] | undefined;
 }
 
 function TokenSelectList({
@@ -25,9 +24,6 @@ function TokenSelectList({
   loading,
 }: TokenSelectListProps) {
   const { address } = useAccount();
-  // const { walletBalance, isError, isLoading } = useBalances({
-  //   account: address,
-  // });
 
   return (
     <VStack
@@ -82,7 +78,14 @@ const ListContent: React.FC<ListContentProps> = ({
     );
   }
 
-  if (!walletBalance && error) {
+  if (error) {
+    return (
+      <Box>
+        <Text>An error occurred while fetching balance</Text>
+      </Box>
+    );
+  }
+  if (!walletBalance) {
     return (
       <Box>
         <Text>An error occurred while fetching balance</Text>
@@ -92,7 +95,7 @@ const ListContent: React.FC<ListContentProps> = ({
 
   return (
     <>
-      {walletBalance?.map((token, i) => (
+      {walletBalance.map((token, i) => (
         <Box key={i} width="100%">
           <TokenSelectListRow token={token} />
         </Box>

@@ -2,13 +2,17 @@
 
 import { FC, ReactNode } from "react";
 import ChakraProvider from "./chakra";
-import ReduxProviders from "./redux";
-import ApolloClientProvider from "./apolloProder";
+import TokenListProvider from "./tokenListProvider";
+import ApolloClientProvider from "./apolloProvider";
 
 export const RootProvider = ({ children }: { children: ReactNode }) => {
   return (
-    <ReduxProviders>
-      <ChakraProvider><ApolloClientProvider>{children}</ApolloClientProvider></ChakraProvider>
-    </ReduxProviders>
+    <TokenListProvider>
+      <ChakraProvider>
+        <ApolloClientProvider>
+          {children}
+        </ApolloClientProvider>
+      </ChakraProvider>
+    </TokenListProvider>
   );
 };

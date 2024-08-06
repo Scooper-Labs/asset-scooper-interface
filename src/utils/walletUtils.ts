@@ -17,3 +17,7 @@ export function gen_key(key: string) {
 
   return generatedKey;
 }
+
+export function compareAddress(addr1: string, addr2: string) {
+  return addr1.toLowerCase() === addr2.toLowerCase();
+}

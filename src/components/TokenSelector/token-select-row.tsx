@@ -1,7 +1,5 @@
-import { useSelectedTokens } from "@/hooks/useSelectTokens";
-import { Token } from "@/lib/components/types";
+"use client"
 import {
-  Box,
   Checkbox,
   HStack,
   Text,
@@ -9,22 +7,23 @@ import {
   WrapItem,
   Avatar,
 } from "@chakra-ui/react";
-import Image from "next/image";
-import React from "react";
+import React, { useContext } from "react";
 import FormatNumber from "../FormatNumber";
+import { TokenListProvider } from "@/provider/tokenListProvider";
+import { MoralisAssetClass } from "@/utils/classes";
 
-function TokenSelectListRow({ token }: { token: Token }) {
-  const { address, logoURI, name, symbol, decimals, quoteUSD, userBalance } =
-    token;
+function TokenSelectListRow({ token }: { token: MoralisAssetClass }) {
+  const { logoURI, name, symbol, quoteUSD, userBalance } = token;
 
-  const { isSelected, _selectToken, _unSelectToken } = useSelectedTokens();
+  const { isTokenSelected, addTokenList, removeTokenList } =
+    useContext(TokenListProvider);
 
   return (
     <HStack
       justifyContent="space-between"
       width="100%"
       whiteSpace="nowrap"
-      bg={isSelected(token) ? "gray.100" : ""}
+      bg={isTokenSelected(token) ? "gray.100" : ""}
       borderRadius="12px"
       padding="8px"
       cursor="pointer"
@@ -32,19 +31,19 @@ function TokenSelectListRow({ token }: { token: Token }) {
       transition="color"
       transitionDuration="500ms"
       onClick={
-        isSelected(token)
+        isTokenSelected(token)
           ? (e) => {
               e.preventDefault();
-              _unSelectToken(token);
+              removeTokenList(token);
             }
           : (e) => {
               e.preventDefault();
-              _selectToken(token);
+              addTokenList(token);
             }
       }
     >
       <Checkbox
-        isChecked={isSelected(token)}
+        isChecked={isTokenSelected(token)}
         colorScheme="#fff"
         iconColor={"#7F56D9"}
       >

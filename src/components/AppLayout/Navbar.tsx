@@ -20,7 +20,7 @@ import ActivitiesModal from "../ActivitiesModal";
 
 import LogoSvg from "@/assets/icons/LogoSVG.svg";
 import { tabs } from "@/assets/site";
-import ConnectButton from "../Buttons/connectButton";
+import ConnectButton from "../Buttons/ConnectButton";
 import { CustomConnectButton } from "../Buttons/SmartWalletButton";
 import { useAccount } from "wagmi";
 import { COLORS } from "@/constants/theme";

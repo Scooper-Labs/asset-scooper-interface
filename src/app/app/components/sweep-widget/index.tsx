@@ -1,7 +1,7 @@
 "use client";
 
 import { TokenSelector } from "@/components/TokenSelector";
-import { ChevronDownIcon, InfoOutlineIcon } from "@chakra-ui/icons";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 import { AiOutlineQuestionCircle } from "react-icons/ai";
 import {
   Box,
@@ -10,36 +10,30 @@ import {
   HStack,
   Text,
   VStack,
-  useDisclosure,
   Tag,
   TagLabel,
 } from "@chakra-ui/react";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect } from "react";
 import { SwapSettings } from "./swap-settings";
 import { COLORS } from "@/constants/theme";
-import { useSelectedTokens } from "@/hooks/useSelectTokens";
 import SweepButton from "./swap-button";
 import { useRouter } from "next/navigation";
 import { SweepIcon } from "@/assets/svg";
 import OverlappingImage, { getImageArray } from "./ImageLap";
-import useGetETHPrice from "@/hooks/useGetETHPrice";
 import FormatNumber from "@/components/FormatNumber";
 import { Token } from "@/lib/components/types";
-import { useParaSwap } from "@/hooks/swap/useParaswapSwap";
-import { base } from "viem/chains";
-import { useAccount } from "wagmi";
-import { useAssetScooperContractWrite } from "@/hooks/useAssetScooperWriteContract";
-import { PARASWAP_TRANSFER_PROXY } from "@/constants/contractAddress";
-import { Address, erc20Abi, parseUnits } from "viem";
-import { useSmartWallet } from "@/hooks/useSmartWallet";
+import { useAccount, useEstimateFeesPerGas } from "wagmi";
 import { useWalletsPortfolio } from "@/hooks/useMobula";
 import { useEthPrice } from "@/hooks/useGetETHPrice2";
 import { ETH_ADDRESS } from "@/utils";
 import CustomTooltip from "@/components/CustomTooltip";
+import useSelectToken from "@/hooks/useSelectToken";
 
 export function ETHToReceive({ selectedTokens }: { selectedTokens: Token[] }) {
-  const { price } = useGetETHPrice();
+  const { ethPrice } = useEthPrice({
+    address: ETH_ADDRESS,
+  });
   const quoteAllTokens = selectedTokens.reduce(
     (total, selectedToken) => total + selectedToken.quoteUSD,
     0
@@ -47,10 +41,10 @@ export function ETHToReceive({ selectedTokens }: { selectedTokens: Token[] }) {
 
   return (
     <>
-      {price === 0 ? (
+      {ethPrice === 0 ? (
         "__"
       ) : (
-        <FormatNumber amount={quoteAllTokens / price} suf="ETH" />
+        <FormatNumber amount={quoteAllTokens / ethPrice} suf="ETH" />
       )}
     </>
   );
@@ -58,66 +52,22 @@ export function ETHToReceive({ selectedTokens }: { selectedTokens: Token[] }) {
 
 function SweepWidget() {
   const { address } = useAccount();
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const { selectedTokens } = useSelectedTokens();
-  const { price } = useGetETHPrice();
+  const { tokenList: selectedTokens, clearList } = useSelectToken();
+  const { data } = useEstimateFeesPerGas();
 
-  // console.log("address", address);
   const router = useRouter();
 
-  const { getRate, buildSwap, swapsTrxData } = useParaSwap();
   const { refetch: refetchTokenBalance } = useWalletsPortfolio();
 
   const { ethPrice } = useEthPrice({
     address: ETH_ADDRESS,
   });
 
-  const handleSwap = async () => {
-    const trade = await getRate({
-      srcToken: selectedTokens[0],
-      destToken: selectedTokens[1],
-      srcAmount: "10000",
-      networkID: base.id,
-    });
-    // console.log("trade test", trade);
-    // console.log("trade price route", trade);
-    const swapBuild = await buildSwap({
-      srcToken: selectedTokens[0],
-      destToken: selectedTokens[1],
-      srcAmount: "10000",
-      minAmount: "10000",
-      priceRoute: trade,
-      userAddress: address ?? "",
-      receiver: address ?? "",
-      networkID: base.id,
-    });
-
-    // console.log("swapBuild swapBuild", swapBuild);
-  };
-
-  const handleBatchSwap = async () => {
-    const swapTransactions = await swapsTrxData();
-    if (swapTransactions) {
-      console.log("this is batch swap data", swapTransactions);
+  useEffect(() => {
+    if (address === undefined) {
+      clearList();
     }
-  };
-
-  const {
-    write: approveToken,
-    isPending: isApprovalPending,
-    isConfirmed: isConfirmed,
-    isConfirming,
-  } = useAssetScooperContractWrite({
-    fn: "approve",
-    args: [PARASWAP_TRANSFER_PROXY as Address, parseUnits("100000000000", 18)],
-    abi: erc20Abi,
-    contractAddress:
-      selectedTokens.length > 0
-        ? (selectedTokens[0].address as Address)
-        : "0xE3c347cEa95B7BfdB921074bdb39b8571F905f6D",
-  });
-
-  const { isSmartWallet } = useSmartWallet();
+  }, [address]);
 
   return (
     <VStack gap="12px">
@@ -143,6 +93,7 @@ function SweepWidget() {
             onClick={() => {
               refetchTokenBalance();
               router.refresh();
+              clearList();
             }}
             _hover={{
               bg: `${COLORS.btnBGGradient}`,
@@ -183,8 +134,7 @@ function SweepWidget() {
               </Text>
             </Flex>
             <Text fontSize="12px" color={COLORS.tabTextColor}>
-              Update in 30 sec 1ETH ≈ {ethPrice} USDC
-              {/* 1ETH ≈ {price} USDC{" "} */}
+              Update in 5 min 1ETH ≈ {ethPrice} USDC
             </Text>
           </Flex>
           <TokenSelector>
@@ -251,14 +201,14 @@ function SweepWidget() {
                 fontWeight={500}
                 color={COLORS.tabTextColor}
               >
-                Transaction fee
+                Max fee per gas
               </Text>
               <CustomTooltip label="Estimated Transaction fee to process this transaction.">
                 <AiOutlineQuestionCircle color="#C9BCCA" />
               </CustomTooltip>
             </Flex>
 
-            <Text>__</Text>
+            <Text>{data ? data.formatted.maxFeePerGas : "__"}ETH</Text>
           </Flex>
 
           <Flex width="100%" justifyContent="space-between">

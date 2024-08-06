@@ -33,7 +33,7 @@ export const useBalances = ({ address }: UseBalances) => {
   useEffect(() => {
     if (data && address) {
       const { result }: { result: MoralisAssetInterface[] } = data;
-      const assets = result?.map((res) => new MoralisAssetClass(res));
+      const assets = result.map((res) => new MoralisAssetClass(res));
       set_(cleanSpam(assets));
     }
   }, [data, address]);
