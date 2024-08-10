@@ -6,7 +6,7 @@ import { useAccount } from "wagmi";
 import { useReadContracts } from "wagmi";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { erc20Abi, Address, formatUnits } from "viem";
-import ConfirmationModal from "../modals/Confirmation";
+import ConfirmationModal from "../modals/confirmation";
 import {
   assetscooper_contract,
   PARASWAP_TRANSFER_PROXY,
