@@ -12,7 +12,7 @@ import {
   HStack,
   IconButton,
 } from "@chakra-ui/react";
-import ApprovalModal from "./Approval";
+import ApprovalModal from "./approval";
 import { PARASWAP_TRANSFER_PROXY } from "@/constants/contractAddress";
 import {
   useSweepTokens,
