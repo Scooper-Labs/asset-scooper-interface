@@ -1,20 +1,18 @@
 import type { Metadata, Viewport } from "next";
 import {
   SITE_DESCRIPTION,
-  SITE_INFO,
   SITE_NAME,
   SITE_URL,
   SOCIAL_TWITTER,
 } from "@/utils/site";
 import localFont from "next/font/local";
-import AppHome from "@/components/HomeView/appview";
 import { RootProvider } from "@/provider";
 
 import { cookieToInitialState } from "wagmi";
 
 import { headers } from "next/headers";
 import { WALLETCONNECT_CONFIG } from "@/constants/config";
-import { Web3Modal } from "@/provider/web3-provider";
+import { Web3Modal } from "@/provider/web3Provider";
 
 import "./globals.css";
 
@@ -94,7 +92,7 @@ export default function RootLayout({
       <body className={myFont.className}>
         <RootProvider>
           <Web3Modal initialState={initialState}>
-            <AppHome>{children}</AppHome>
+            <main>{children}</main>
           </Web3Modal>
         </RootProvider>
       </body>

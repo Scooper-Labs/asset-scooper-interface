@@ -11,14 +11,16 @@ import { FC, PropsWithChildren } from "react";
 
 interface ModalComponentProps extends PropsWithChildren<ModalProps> {
   isOpen: boolean;
+  bg?: string;
   confetti?: boolean;
   onClose(): void;
   modalContentStyle?: ModalContentProps;
   modalBodyStyle?: ModalBodyProps;
 }
 
-const TokenSelectorModalComponent: FC<ModalComponentProps> = ({
+const ModalComponent: FC<ModalComponentProps> = ({
   children,
+  bg,
   isOpen,
   confetti,
   onClose,
@@ -31,23 +33,28 @@ const TokenSelectorModalComponent: FC<ModalComponentProps> = ({
       <Modal
         isCentered
         blockScrollOnMount={true}
+        scrollBehavior={"inside"}
         isOpen={isOpen}
         size={"sm"}
         onClose={onClose}
         motionPreset="scale"
         {...props}
       >
-        <ModalOverlay bg="#00000020" backdropFilter="auto" backdropBlur="2px" />
+        <ModalOverlay
+          bg={bg ? bg : "#06081A80"}
+          backdropFilter="auto"
+          backdropBlur="2px"
+        />
         <ModalContent
-          w={{ base: "90vw", md: "70vw" }}
-          borderRadius={10}
+          w={{ base: "90vw", md: "60vw" }}
+          borderRadius="24px"
           py="1%"
           position={{ base: "fixed" }}
           bottom={{ base: "0" }}
           mb={{ base: "40px" }}
           {...modalContentStyle}
         >
-          <ModalBody padding="0" py="0" px="0" {...modalBodyStyle}>
+          <ModalBody {...modalBodyStyle}>
             <>{children}</>
           </ModalBody>
         </ModalContent>
@@ -56,4 +63,4 @@ const TokenSelectorModalComponent: FC<ModalComponentProps> = ({
   );
 };
 
-export default TokenSelectorModalComponent;
+export default ModalComponent;
