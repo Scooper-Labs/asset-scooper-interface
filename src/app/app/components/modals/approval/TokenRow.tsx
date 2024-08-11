@@ -1,7 +1,6 @@
 "use client";
 
 import { COLORS } from "@/constants/theme";
-import { useAssetScooperContractWrite } from "@/hooks/useAssetScooperWriteContract";
 import { Token } from "@/lib/components/types";
 import {
   HStack,
@@ -17,6 +16,7 @@ import { useAccount, useReadContract } from "wagmi";
 import { ClipLoader } from "react-spinners";
 import { RxReload } from "react-icons/rx";
 import { assetscooper_contract } from "@/constants/contractAddress";
+import { useApprove } from "@/hooks/useAssetScooperWriteContract";
 
 function TokenRow({ token, refetch }: { token: Token; refetch: () => void }) {
   const {
@@ -40,32 +40,27 @@ function TokenRow({ token, refetch }: { token: Token; refetch: () => void }) {
   });
 
   const {
-    write: approveToken,
-    isPending: isApprovalPending,
-    isConfirmed: isConfirmed,
-    isConfirming,
-  } = useAssetScooperContractWrite({
-    fn: "approve",
-    args: [assetscooper_contract, parseUnits(userBalance.toString(), decimals)],
-    abi: erc20Abi,
-    contractAddress: tokenAddress as Address,
-  });
+    approve,
+    isLoading: isPendingApproval,
+    isSuccess,
+  } = useApprove(tokenAddress as Address, [
+    assetscooper_contract,
+    parseUnits(userBalance.toString(), decimals),
+  ]);
   const handleApprove = async () => {
-    await approveToken();
+    await approve();
   };
 
   const isApproved =
     !!allowance && allowance >= parseUnits(userBalance.toString(), decimals);
-  const isLoading = isAllowanceLoading || isApprovalPending || isConfirming;
-
-  // console.log(isApproved, allowance, userBalance);
+  const isLoading = isAllowanceLoading || isPendingApproval;
 
   useEffect(() => {
-    if (isConfirmed) {
+    if (isSuccess) {
       refetchAllowance();
       refetch();
     }
-  }, [isConfirmed]);
+  }, [isSuccess]);
 
   return (
     <HStack

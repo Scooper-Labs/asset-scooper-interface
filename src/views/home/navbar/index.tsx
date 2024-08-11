@@ -15,7 +15,7 @@ import Action from "./appAction";
 import { NavLink } from "./type";
 import Menu from "./menu";
 import useScreenSize from "@/hooks/useScreenSize";
-import Hamburger from "@/components/hamburger";
+import Hamburger from "@/assets/svg/hamburger";
 import { SCOOPER_SVG } from "@/assets/svg";
 import { COLORS } from "@/constants/theme";
 import { useRouter } from "next/router";
