@@ -12,6 +12,7 @@ import {
   VStack,
   Tag,
   TagLabel,
+  Spinner,
 } from "@chakra-ui/react";
 import Image from "next/image";
 import React, { useEffect } from "react";
@@ -59,7 +60,7 @@ function SweepWidget() {
 
   const { refetch: refetchTokenBalance } = useWalletsPortfolio();
 
-  const { ethPrice } = useEthPrice({
+  const { isLoading, ethPrice } = useEthPrice({
     address: ETH_ADDRESS,
   });
 
@@ -105,7 +106,7 @@ function SweepWidget() {
         </HStack>
       </Flex>
 
-      {/* mainbox */}
+      {/* ----------- mainbox ---------- */}
       <VStack
         border="1px solid #E1C9E1"
         padding="16px"
@@ -134,7 +135,13 @@ function SweepWidget() {
               </Text>
             </Flex>
             <Text fontSize="12px" color={COLORS.tabTextColor}>
-              Update in 5 min 1ETH ≈ {ethPrice} USDC
+              <Text fontSize="12px" color={COLORS.tabTextColor}>
+                {isLoading ? (
+                  <Spinner size="sm" color="#E7BFE7" />
+                ) : (
+                  `Update in 5 min 1ETH(WETH) ≈ ${ethPrice} USDC`
+                )}
+              </Text>
             </Text>
           </Flex>
           <TokenSelector>

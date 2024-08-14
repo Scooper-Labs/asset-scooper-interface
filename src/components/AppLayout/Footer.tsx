@@ -27,7 +27,7 @@ export function AppFooter() {
       w="100%"
       h="72px"
       py="10px"
-      mt="40px"
+      mt="35px"
       borderTop={{ base: "1px solid #EDEEF2", md: "none" }}
     >
       <ContainerWrapper>
@@ -89,10 +89,7 @@ export function AppFooter() {
               <Text color="#0E111B" fontSize="14px">
                 Blog
               </Text>
-              <LinkComponent
-                href={`#`}
-                // href={`https://github.com/${SOCIAL_GITHUB}`}
-              >
+              <LinkComponent href="https://mirror.xyz/0x41aDd734d7f63e01FCc336a4030817fdF643D754">
                 <RiExternalLinkLine />
               </LinkComponent>
             </HStack>

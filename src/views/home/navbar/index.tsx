@@ -34,7 +34,7 @@ const LandingHeader = () => {
     { name: "Home", href: "#" },
     {
       name: "Features",
-      href: "#",
+      href: "#features",
     },
     { name: "Docs", href: "#" },
   ];
@@ -71,7 +71,7 @@ const LandingHeader = () => {
       display="flex"
       justifyContent="center"
       alignItems="center"
-      pt={3}
+      pt={10}
       px={4}
     >
       <Flex

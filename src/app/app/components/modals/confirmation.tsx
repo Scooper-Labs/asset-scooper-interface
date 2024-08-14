@@ -6,11 +6,13 @@ import {
   Box,
   Button,
   useDisclosure,
+  chakra,
   VStack,
   Flex,
   Text,
   HStack,
   IconButton,
+  Spinner,
 } from "@chakra-ui/react";
 import ApprovalModal from "./approval";
 import { PARASWAP_TRANSFER_PROXY } from "@/constants/contractAddress";
@@ -160,7 +162,7 @@ function ConfirmationModal({
             padding="1rem"
             borderRadius="18px"
             fontSize="small"
-            mt="20px"
+            mt="10px"
           >
             <Text
               fontWeight="700"
@@ -194,8 +196,23 @@ function ConfirmationModal({
             </HStack>
           </VStack>
 
+          <Text
+            mt="10px"
+            fontSize="14px"
+            color="#676C87"
+            fontWeight="500"
+            textAlign="center"
+          >
+            Your transaction is on way to be been processed and{" "}
+            <chakra.span color="#151515" fontWeight={600} fontSize="14px">
+              {" "}
+              <ETHToReceive selectedTokens={selectedTokens} />
+            </chakra.span>{" "}
+            will be deposited to your Wallet.
+          </Text>
+
           {/* ----------------- Button section ---------------- */}
-          <HStack width="100%" mt="20px">
+          <HStack width="100%" mt="10px" mb="20px">
             {isSmartWallet ? (
               <Button
                 borderRadius="8px"
@@ -269,7 +286,14 @@ function ConfirmationModal({
                 height="2.5rem"
                 borderRadius="8px"
               >
-                {isSweeping ? "Sweeping" : "Sweep"}
+                {isSweeping ? (
+                  <HStack spacing={2}>
+                    <Spinner size="sm" color="white" />
+                    <Text>Sweeping</Text>
+                  </HStack>
+                ) : (
+                  "Sweep"
+                )}
               </Button>
             )}
           </HStack>

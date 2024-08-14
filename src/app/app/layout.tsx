@@ -14,7 +14,9 @@ const MainAppLayout: React.FC<MainAppLayoutProps> = ({ children }) => {
     <StateContextProvider>
       <Flex as="div" direction="column" minH="100vh">
         <AppNavbar />
-        <Box flex="1">{children}</Box>
+        <Box flex="1" overflow="auto">
+          {children}
+        </Box>
         <AppFooter />
       </Flex>
     </StateContextProvider>

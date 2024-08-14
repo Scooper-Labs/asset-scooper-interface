@@ -13,8 +13,4 @@ export const tabs: TabsProps[] = [
     name: "Docs",
     link: "#",
   },
-  {
-    name: "Transaction activity",
-    link: "#",
-  },
 ];
