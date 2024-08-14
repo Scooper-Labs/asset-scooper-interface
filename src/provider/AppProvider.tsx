@@ -12,10 +12,12 @@ export enum Types {
   SUCCESS,
   ERROR,
 }
+
 type MessageType = {
   title?: string;
   message: string;
 };
+
 interface StateContextProps {
   setType: (type: Types) => void;
   setMessage: (msg: string | MessageType) => void;

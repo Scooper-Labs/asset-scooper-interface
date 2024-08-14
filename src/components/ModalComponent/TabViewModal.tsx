@@ -33,7 +33,7 @@ const ModalComponent: FC<ModalComponentProps> = ({
       <Modal
         isCentered
         blockScrollOnMount={true}
-        scrollBehavior={"inside"}
+        scrollBehavior={"outside"}
         isOpen={isOpen}
         size={"sm"}
         onClose={onClose}

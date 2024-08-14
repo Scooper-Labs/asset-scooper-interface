@@ -8,6 +8,7 @@ import {
   Text,
   Box,
   Circle,
+  Spinner,
   HStack,
   DrawerContent,
   Flex,
@@ -210,7 +211,10 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
           </HStack>
 
           {loadPortfolio ? (
-            <div>Loading Balances</div>
+            <HStack spacing={2}>
+              <Spinner size="sm" color="teal.500" />
+              <Text fontSize="14px">Loading Balances</Text>
+            </HStack>
           ) : (
             <HStack>
               <Text

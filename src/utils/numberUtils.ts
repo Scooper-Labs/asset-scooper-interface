@@ -10,15 +10,15 @@ export function stripPrice(_price: number) {
   const [, decimal] = price.split(".");
 
   // Remove trailing zeros
-  const value = decimal.replace(/^0+/, "");
+  const value = decimal?.replace(/^0+/, "");
 
   // Get substring of just zeros
-  const zeros = decimal.slice(0, -value.length);
+  const zeros = decimal?.slice(0, -value.length);
 
   // Add subscript with zeros count - 1
-  const subscript = zeros.length - 1;
+  const subscript = zeros?.length - 1;
 
-  return { subscript: subscript.toString(), value: value.slice(0, 2) };
+  return { subscript: subscript.toString(), value: value?.slice(0, 2) };
 }
 
 export function formatVolume(volume: string) {

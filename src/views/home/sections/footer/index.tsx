@@ -58,10 +58,7 @@ const Footer = () => {
                 Resources
               </Text>
 
-              <LinkComponent
-                // href="https://mirror.xyz/0x41aDd734d7f63e01FCc336a4030817fdF643D754"
-                href="#"
-              >
+              <LinkComponent href="https://mirror.xyz/0x41aDd734d7f63e01FCc336a4030817fdF643D754">
                 <Text color={COLORS.tabTextColor}>Blog</Text>
               </LinkComponent>
             </Flex>
@@ -139,10 +136,7 @@ const Footer = () => {
               Resources
             </Text>
 
-            <LinkComponent
-              // href="https://mirror.xyz/0x41aDd734d7f63e01FCc336a4030817fdF643D754"
-              href="#home"
-            >
+            <LinkComponent href="https://mirror.xyz/0x41aDd734d7f63e01FCc336a4030817fdF643D754">
               <Text color={COLORS.tabTextColor} mt="8px">
                 Blog
               </Text>

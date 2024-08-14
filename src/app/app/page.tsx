@@ -2,12 +2,10 @@
 
 import React from "react";
 import ContainerWrapper from "@/components/ContainerWrapper";
-import {Flex } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import SweepWidget from "./components/sweep-widget";
 
 const Sweep: React.FC = () => {
-  
-
   return (
     <ContainerWrapper>
       <Flex
