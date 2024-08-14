@@ -106,7 +106,7 @@ function SweepWidget() {
         </HStack>
       </Flex>
 
-      {/* mainbox */}
+      {/* ----------- mainbox ---------- */}
       <VStack
         border="1px solid #E1C9E1"
         padding="16px"
