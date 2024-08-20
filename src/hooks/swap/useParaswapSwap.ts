@@ -111,7 +111,7 @@ export const useParaSwap = () => {
 
     const { data } = await axios.post<TransactionParams>(txURL, txConfig);
 
-    console.log(data, "this is data2");
+    // console.log(data, "this is data2");
     return data;
   };
 
