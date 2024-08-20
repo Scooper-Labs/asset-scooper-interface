@@ -3,6 +3,7 @@ import {
   Text,
   HStack,
   Avatar,
+  Image,
   Button,
   Flex,
   Heading,
@@ -10,9 +11,7 @@ import {
   Circle,
 } from "@chakra-ui/react";
 import Link from "next/link";
-import Image from "next/image";
 import { HiExternalLink } from "react-icons/hi";
-import SweepTransactionIcon from "@/assets/icons/sweeptransactionIcon.png";
 import { TXN_Interface } from "@/utils/interface";
 import { ApolloError } from "@apollo/client";
 import { groupTransactionsByBlock } from "@/utils/classes";
@@ -27,7 +26,20 @@ function Transactions({ txns, loading, error }: ITransactions) {
   if (loading) return <Text>Loading...</Text>;
   if (error) return <Text>Error: {error.message}</Text>;
   if (txns === undefined || txns.length === 0)
-    return <Text>No transactions found</Text>;
+    return (
+      <>
+        <Flex mt="20px" justify="center" alignItems="center" flexDir="column">
+          <Image
+            src="/image/Transaction_not_found_svg.png"
+            w={"80px"}
+            alt="an image"
+          />
+          <Text mt="20px" color="#9E829F" fontSize="14px">
+            No Transaction Found
+          </Text>
+        </Flex>
+      </>
+    );
 
   const transactions = groupTransactionsByBlock(txns);
   return (
@@ -42,7 +54,12 @@ function Transactions({ txns, loading, error }: ITransactions) {
         >
           <HStack>
             <Circle>
-              <Image alt="" src={SweepTransactionIcon} width={35} height={35} />
+              <Image
+                alt=""
+                src={"/image/sweeptransactionIcon.png"}
+                width={35}
+                height={35}
+              />
             </Circle>
             <Flex flexDir="column">
               <Heading fontSize="15px" fontWeight={500}>

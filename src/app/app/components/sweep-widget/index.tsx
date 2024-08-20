@@ -148,7 +148,7 @@ function SweepWidget() {
             <Flex
               width="100%"
               border={`1px solid ${
-                selectedTokens.length === 0 ? "#E7BFE7" : "#0F04D7"
+                selectedTokens?.length === 0 ? "#E7BFE7" : "#0F04D7"
               }`}
               backgroundColor="#fff"
               justifyContent="space-between"
@@ -158,7 +158,7 @@ function SweepWidget() {
               borderRadius="6px"
               alignItems="center"
             >
-              {selectedTokens.length > 0 ? (
+              {selectedTokens?.length > 0 ? (
                 <Flex alignItems="center" gap="6px">
                   <OverlappingImage
                     imageArray={getImageArray(selectedTokens)}
@@ -215,7 +215,7 @@ function SweepWidget() {
               </CustomTooltip>
             </Flex>
 
-            <Text>{data ? data.formatted.maxFeePerGas : "__"}ETH</Text>
+            <Text>{data ? data.formatted.maxFeePerGas : "__"} ETH</Text>
           </Flex>
 
           <Flex width="100%" justifyContent="space-between">

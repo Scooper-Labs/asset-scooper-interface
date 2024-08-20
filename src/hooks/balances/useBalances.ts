@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Address } from "viem";
-import { MoralisAssetClass, WalletPortfolioClass } from "@/utils/classes";
+import { MoralisAssetClass } from "@/utils/classes";
 import { MoralisAssetInterface } from "@/utils/interface";
 
 interface UseBalances {
@@ -33,10 +33,12 @@ export const useBalances = ({ address }: UseBalances) => {
   useEffect(() => {
     if (data && address) {
       const { result }: { result: MoralisAssetInterface[] } = data;
-      const assets = result.map((res) => new MoralisAssetClass(res));
+      const assets = result?.map((res) => new MoralisAssetClass(res));
       set_(cleanSpam(assets));
     }
   }, [data, address]);
+
+  // console.log(data, "this is data");
 
   return {
     data,

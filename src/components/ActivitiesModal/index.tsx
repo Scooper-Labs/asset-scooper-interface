@@ -38,6 +38,7 @@ import { useQuery } from "@apollo/client";
 import { GET_ACCOUNT_TX } from "@/utils/queries";
 import { MdCheckCircleOutline } from "react-icons/md";
 import { HiOutlineDocumentDuplicate } from "react-icons/hi";
+import Cookies from "js-cookie";
 import CopyToClipboard from "react-copy-to-clipboard";
 
 interface IModals {
@@ -68,14 +69,25 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
     }
   }, [moralisAssets]);
 
+  useEffect(() => {
+    // Load the state from cookies on component mount
+    const savedVisibility = Cookies.get("balanceVisibility");
+    if (savedVisibility !== undefined) {
+      setIsBalanceVisible(savedVisibility === "true");
+    }
+  }, []);
+
   const balanceVisibility = () => {
-    setIsBalanceVisible(!isBalanceVisible);
+    setIsBalanceVisible((prev) => {
+      const newState = !prev;
+      // storing the newstate in cookies
+      Cookies.set("balanceVisibility", newState.toString(), { expires: 7 }); // Expires in 7 days
+      return newState;
+    });
   };
 
   function disconnectAndCloseModal() {
-    console.log("Disconnecting wallet");
     disconnect();
-    console.log("Wallet disconnected");
     onClose();
   }
 
@@ -193,11 +205,7 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
           </Flex>
 
           <HStack mt="40px">
-            <Text
-              fontWeight={400}
-              fontSize="24px"
-              style={{ fontFamily: "Dellamor, sans-serif" }}
-            >
+            <Text fontWeight={400} fontSize="24px" className="fontBalance">
               Balance
             </Text>
 

@@ -1,10 +1,9 @@
 import { useCallback, useEffect } from "react";
-import { useAccount, useChainId, useConnect, useSwitchChain } from "wagmi";
+import { useAccount, useConnect, useSwitchChain } from "wagmi";
 import { base } from "viem/chains";
 
 import { Button } from "@chakra-ui/react";
 import { reloadIfNeeded } from "@/utils/reload";
-import { log } from "console";
 
 export function CustomConnectButton({
   className,

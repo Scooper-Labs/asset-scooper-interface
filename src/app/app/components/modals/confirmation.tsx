@@ -64,7 +64,8 @@ function ConfirmationModal({
   const args = [selectedTokens.map((token) => token.address), minAmountOut];
   const { data, resimulate, isPending } = useSweepTokensSimulation(args);
   const { isLoading, isSuccess, sweepTokens } = useSweepTokens(data);
-  console.log(isPending);
+  // console.log(isPending);
+
   const handlesweep = async () => {
     const _result = await resimulate();
     await sweepTokens(_result);
@@ -77,6 +78,7 @@ function ConfirmationModal({
 
   const isSweeping = isPending || isLoading;
   const isDisabled = !tokensAllowanceStatus || isSweeping;
+
   return (
     <>
       <Button

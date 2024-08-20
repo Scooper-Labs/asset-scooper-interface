@@ -11,10 +11,12 @@ import {
   ModalCloseButton,
 } from "@chakra-ui/react";
 import ModalComponent from "@/components/ModalComponent/MobileViewModal";
+
 type ErrMsg = {
-  title?: string
+  title?: string;
   message: string;
 };
+
 const ErrorOccured = ({
   isOpen,
   onClose,
@@ -40,7 +42,8 @@ const ErrorOccured = ({
           <Image src="/image/error_info_icon.png" w={"100px"} alt="an image" />
 
           <Box w={"100%"} textAlign="center">
-            <Text fontWeight={600} mt="10px" fontSize="18px" color="#0D0D0D">An Error has occured
+            <Text fontWeight={600} mt="10px" fontSize="18px" color="#0D0D0D">
+              An Error has occured
               {error ? error.title : "“An Error has occured”"}
             </Text>
             <Text as="span" color="#E2001B" fontSize="14px">

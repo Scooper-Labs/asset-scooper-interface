@@ -59,6 +59,8 @@ export const useParaSwap = () => {
 
     const pricesURL = `${PARASWAP_API_URL}/prices/?${queryParams}`;
     const { data } = await axios.get<{ priceRoute: OptimalRate }>(pricesURL);
+
+    // console.log(data, "this is data");
     return data.priceRoute;
   };
 
@@ -108,6 +110,8 @@ export const useParaSwap = () => {
     };
 
     const { data } = await axios.post<TransactionParams>(txURL, txConfig);
+
+    // console.log(data, "this is data2");
     return data;
   };
 

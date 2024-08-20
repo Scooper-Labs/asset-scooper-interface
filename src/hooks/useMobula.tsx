@@ -96,9 +96,8 @@ export const useWalletsHistory = () => {
         setLoading(false);
         return;
       } else {
-await fetchWalletsHistory()
+        await fetchWalletsHistory();
       }
-
     };
 
     handleEffect();

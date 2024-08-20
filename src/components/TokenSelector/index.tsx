@@ -100,12 +100,21 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
               pt="1rem"
               pb="0.7rem"
             >
-              <Text>Convert Low Balance </Text>
-              <Text fontSize="small" fontWeight="100" color="#9E829F">
-                {selectedTokens ? selectedTokens.length : 0} Token(s) with
-                balance below {sweepthreshHold}
-                ETH
+              <Text color="#2C333B" fontWeight={500}>
+                Convert Low Balance
               </Text>
+              {address ? (
+                <>
+                  <Text fontSize="small" fontWeight="100" color="#9E829F">
+                    {selectedTokens ? selectedTokens.length : 0} Token(s) with
+                    balance below {sweepthreshHold} ETH
+                  </Text>
+                </>
+              ) : (
+                <Text fontSize="small" color="#9E829F">
+                  No Tokens detected
+                </Text>
+              )}
             </VStack>
 
             <TokenSelectList

@@ -7,12 +7,13 @@ import {
 } from "@/utils/site";
 import localFont from "next/font/local";
 import { RootProvider } from "@/provider";
+// import { cookieToInitialState } from "wagmi";
 
-import { cookieToInitialState } from "wagmi";
+// import { headers } from "next/headers";
+// import { WALLETCONNECT_CONFIG } from "@/constants/config";
+// import { Web3Modal } from "@/provider/web3Provider";
 
-import { headers } from "next/headers";
-import { WALLETCONNECT_CONFIG } from "@/constants/config";
-import { Web3Modal } from "@/provider/web3Provider";
+import { RainbowKitModal } from "@/constants/rainbowkitConfig";
 
 import "./globals.css";
 
@@ -81,19 +82,19 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const initialState = cookieToInitialState(
-    WALLETCONNECT_CONFIG,
-    headers().get("cookie")
-  );
+  // const initialState = cookieToInitialState(
+  //   WALLETCONNECT_CONFIG,
+  //   headers().get("cookie")
+  // );
 
   return (
     <html lang="en">
       <head />
       <body className={myFont.className}>
         <RootProvider>
-          <Web3Modal initialState={initialState}>
+          <RainbowKitModal>
             <main>{children}</main>
-          </Web3Modal>
+          </RainbowKitModal>
         </RootProvider>
       </body>
     </html>
