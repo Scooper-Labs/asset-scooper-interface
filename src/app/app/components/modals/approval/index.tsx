@@ -14,7 +14,7 @@ import {
 import TokenRow from "./TokenRow";
 import { IoMdClose } from "react-icons/io";
 import ModalComponent from "@/components/ModalComponent/TabViewModal";
-import useSelectToken from "@/hooks/useSelectToken"
+import useSelectToken from "@/hooks/useSelectToken";
 
 function ApprovalModal({
   tokensAllowanceStatus,
@@ -45,9 +45,7 @@ function ApprovalModal({
             ? `${COLORS.inputBgcolor}`
             : `${COLORS.btnGradient}`,
         }}
-        onClick={() => {
-          onOpen();
-        }}
+        onClick={() => open()}
       >
         Approval
       </Button>
@@ -76,7 +74,7 @@ function ApprovalModal({
         </Flex>
 
         <Stack w="100%" mt="15px">
-          <VStack width="100%" gap="4px">
+          <VStack width="100%" gap="4px" position="relative">
             {selectedTokens.map((token) => (
               <Box width="100%" key={token.address}>
                 <TokenRow token={token} refetch={refetch} />

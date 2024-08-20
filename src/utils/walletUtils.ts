@@ -2,8 +2,8 @@ import CryptoJS from "crypto-js";
 
 export function truncateAddress(
   address: string,
-  startLength = 7,
-  endLength = 5
+  startLength = 4,
+  endLength = 6
 ) {
   const truncatedStart = address.slice(0, startLength);
   const truncatedEnd = address.slice(-endLength);

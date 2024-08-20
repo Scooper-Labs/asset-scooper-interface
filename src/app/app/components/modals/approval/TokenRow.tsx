@@ -27,7 +27,9 @@ function TokenRow({ token, refetch }: { token: Token; refetch: () => void }) {
     userBalance,
     decimals,
   } = token;
+
   const { address } = useAccount();
+
   const {
     data: allowance,
     isLoading: isAllowanceLoading,
@@ -47,6 +49,7 @@ function TokenRow({ token, refetch }: { token: Token; refetch: () => void }) {
     assetscooper_contract,
     parseUnits(userBalance.toString(), decimals),
   ]);
+
   const handleApprove = async () => {
     await approve();
   };

@@ -13,15 +13,16 @@ import {
 import { useToast } from "@chakra-ui/react";
 import { useContext, useEffect, useState } from "react";
 import CustomToast from "@/components/Toast";
+import { BaseError } from "@wagmi/core";
 
 import abi from "@/constants/abi/assetscooper.json";
 import { assetscooper_contract as assetscooper } from "@/constants/contractAddress";
 import { Types, StateContext } from "@/provider/AppProvider";
-import useSelectToken from "./useSelectToken";
 
 type ExtendedErrorType = SimulateContractErrorType & {
   shortMessage?: string;
 };
+
 export function useSweepTokensSimulation(args: any[] = []) {
   const { setMessage, setType } = useContext(StateContext);
 
@@ -34,7 +35,7 @@ export function useSweepTokensSimulation(args: any[] = []) {
   });
   const { data, refetch, isLoading } = simulateRes;
 
-  const setError = (error: ExtendedErrorType) => {
+  const setError = (error: BaseError) => {
     const message = error.shortMessage ? error.shortMessage : error.message;
     const title = error.name as string;
     setMessage({ title, message: message ?? "An unknown error occurred" });
@@ -44,7 +45,7 @@ export function useSweepTokensSimulation(args: any[] = []) {
   async function resimulate() {
     const { data: newRes, failureReason: newFail } = await refetch();
     if (newFail) {
-      setError(newFail as ExtendedErrorType);
+      setError(newFail as BaseError);
     }
     return newRes;
   }
@@ -61,6 +62,7 @@ export function useApprove(
     hash,
     confirmations: 2,
   });
+
   const approve = async () => {
     writeContractAsync({
       address,

@@ -17,11 +17,12 @@ const queryClient = new QueryClient();
 
 if (!WALLETCONNECT_PROJECT_ID) {
   console.warn(
-    "You need to provide a NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID env variable",
+    "You need to provide a NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID env variable"
   );
 }
 
 createWeb3Modal({
+  //@ts-ignore
   wagmiConfig: WALLETCONNECT_CONFIG,
   //@ts-ignore
   projectId: WALLETCONNECT_PROJECT_ID,
