@@ -7,14 +7,10 @@ import {
 } from "@/utils/site";
 import localFont from "next/font/local";
 import { RootProvider } from "@/provider";
-// import { cookieToInitialState } from "wagmi";
 
-// import { headers } from "next/headers";
-// import { WALLETCONNECT_CONFIG } from "@/constants/config";
-// import { Web3Modal } from "@/provider/web3Provider";
-
-import { RainbowKitModal } from "@/constants/rainbowkitConfig";
-
+import { cookieToInitialState } from "wagmi";
+import { config } from "@/constants/config";
+import { headers } from "next/headers";
 import "./globals.css";
 
 const myFont = localFont({
@@ -82,19 +78,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // const initialState = cookieToInitialState(
-  //   WALLETCONNECT_CONFIG,
-  //   headers().get("cookie")
-  // );
+  const initialState = cookieToInitialState(config, headers().get("cookie"));
 
   return (
     <html lang="en">
       <head />
       <body className={myFont.className}>
-        <RootProvider>
-          <RainbowKitModal>
-            <main>{children}</main>
-          </RainbowKitModal>
+        <RootProvider initialState={initialState}>
+          <main>{children}</main>
         </RootProvider>
       </body>
     </html>

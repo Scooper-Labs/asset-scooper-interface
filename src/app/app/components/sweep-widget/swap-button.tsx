@@ -5,7 +5,7 @@ import { useContext, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { useReadContracts } from "wagmi";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+// import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { erc20Abi, Address, formatUnits } from "viem";
 import ConfirmationModal from "../modals/confirmation";
 import {
@@ -17,8 +17,8 @@ import { useSmartWallet } from "@/hooks/useSmartWallet";
 import { TokenListProvider } from "@/provider/tokenListProvider";
 
 function SweepButton() {
-  // const { open } = useWeb3Modal();
-  const { openConnectModal } = useConnectModal();
+  const { open } = useWeb3Modal();
+  // const { openConnectModal } = useConnectModal();
   const { isSmartWallet } = useSmartWallet();
   const { tokenList: selectedTokens } = useContext(TokenListProvider);
 
@@ -79,7 +79,7 @@ function SweepButton() {
           color="white"
           fontWeight={400}
           borderRadius="8px"
-          onClick={openConnectModal}
+          onClick={() => open({ view: "Connect" })}
         >
           Connect wallet
         </Button>
