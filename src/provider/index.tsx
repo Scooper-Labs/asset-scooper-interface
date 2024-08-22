@@ -15,11 +15,11 @@ export const RootProvider = ({
 }) => {
   return (
     <AppKitProvider initialState={initialState}>
-      {/* <TokenListProvider> */}
+      <TokenListProvider>
         <ChakraProvider>
           <ApolloClientProvider>{children}</ApolloClientProvider>
         </ChakraProvider>
-      {/* </TokenListProvider> */}
+      </TokenListProvider>
     </AppKitProvider>
   );
 };

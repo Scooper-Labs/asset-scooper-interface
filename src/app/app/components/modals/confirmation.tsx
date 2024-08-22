@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import {
   Stack,
   Box,
@@ -13,6 +13,7 @@ import {
   HStack,
   IconButton,
   Spinner,
+  Avatar,
 } from "@chakra-ui/react";
 import ApprovalModal from "./approval";
 import { PARASWAP_TRANSFER_PROXY } from "@/constants/contractAddress";
@@ -32,6 +33,9 @@ import ModalComponent from "@/components/ModalComponent/TabViewModal";
 import { COLORS } from "@/constants/theme";
 import OverlappingImage, { getImageArray } from "../sweep-widget/ImageLap";
 import { TokenListProvider } from "@/provider/tokenListProvider";
+import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
+import { Token } from "@/lib/components/types";
+import { MoralisAssetClass } from "@/utils/classes";
 
 function ConfirmationModal({
   tokensAllowanceStatus,
@@ -40,10 +44,23 @@ function ConfirmationModal({
   tokensAllowanceStatus: boolean;
   refetch: () => void;
 }) {
+  const {
+    getTokensWithLiquidity,
+    executeBatchSwap,
+    loading: paraswapDataLoading,
+  } = useParaSwap();
+  const [tokensWithLiquidity, setTokensWithLiquidity] = React.useState<
+    MoralisAssetClass[]
+  >([]);
+  const [tokensWithoutLiquidity, setTokensWithoutLiquidity] = React.useState<
+    MoralisAssetClass[]
+  >([]);
+
+  const [previewState, setPreviewState] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const { slippageTolerance } = useSlippageTolerance(
-    SlippageToleranceStorageKey.Sweep
+    SlippageToleranceStorageKey.Sweep,
   );
 
   const { tokenList: selectedTokens, clearList } =
@@ -61,7 +78,11 @@ function ConfirmationModal({
   const minAmountOut = selectedTokens.map((t) => 0n);
 
   //eoa swap
-  const args = [selectedTokens.map((token) => token.address), minAmountOut];
+  // const args = [selectedTokens.map((token) => token.address), minAmountOut];
+  const args = [
+    tokensWithLiquidity.map((token) => token.address),
+    minAmountOut,
+  ];
   const { data, resimulate, isPending } = useSweepTokensSimulation(args);
   const { isLoading, isSuccess, sweepTokens } = useSweepTokens(data);
   // console.log(isPending);
@@ -74,7 +95,18 @@ function ConfirmationModal({
     }
   };
 
-  const { executeBatchSwap } = useParaSwap();
+  const handlePreviewTokens = async () => {
+    const { tokensWithLiquidity, tokensWithoutLiquidity } =
+      await getTokensWithLiquidity();
+    setTokensWithLiquidity(tokensWithLiquidity);
+    setTokensWithoutLiquidity(tokensWithoutLiquidity);
+    console.log(
+      "tokensWithLiquidity",
+      tokensWithLiquidity,
+      "tokensWithoutLiquidity",
+      tokensWithoutLiquidity,
+    );
+  };
 
   const isSweeping = isPending || isLoading;
   const isDisabled = !tokensAllowanceStatus || isSweeping;
@@ -158,60 +190,147 @@ function ConfirmationModal({
           </VStack>
 
           {/* ----------------- Transaction Details section ---------------- */}
-          <VStack
-            bg="#F6F9F9"
-            width="100%"
-            padding="1rem"
-            borderRadius="18px"
-            fontSize="small"
-            mt="10px"
-          >
-            <Text
-              fontWeight="700"
-              fontSize="14px"
-              color="#281629"
-              width="100%"
-              textAlign="start"
-            >
-              Order Details:
-            </Text>
+          {previewState ? (
+            <>
+              {paraswapDataLoading ? (
+                <Box>
+                  <Text>Please wait, trade data is loading....</Text>
+                </Box>
+              ) : (
+                <VStack>
+                  <Text>The following Tokens are swappable</Text>
+                  {tokensWithLiquidity.length ? (
+                    <VStack>
+                      {tokensWithLiquidity.map((token) => {
+                        return (
+                          <HStack alignItems="center" key={token.address}>
+                            <Avatar
+                              size="sm"
+                              name={token.name}
+                              src={token.logoURI}
+                            />
+                            <HStack alignItems="center">
+                              <Text fontWeight="500" color="#281629">
+                                {token.symbol.length > 6
+                                  ? `${token.symbol.substring(0, 5)}...`
+                                  : token.symbol}
+                              </Text>
+                              <Text
+                                color="#A8BBD6"
+                                fontSize="13px"
+                                fontWeight={500}
+                              >
+                                {token.name}
+                              </Text>
+                            </HStack>
+                          </HStack>
+                        );
+                      })}
 
-            <HStack width="100%" justifyContent="space-between">
-              <Text color="#151829" fontSize="14px" fontWeight={500}>
-                Slippage
-              </Text>
-              <Text color="#674669" fontSize="14px" fontWeight={500}>
-                {slippageTolerance}%
-              </Text>
-            </HStack>
-
-            <HStack width="100%" justifyContent="space-between" mt="6px">
-              <Text color="#151829" fontSize="14px" fontWeight={500}>
-                Estimated Transaction Time:
-              </Text>
-
-              <Flex>
-                <Text color="#674669" fontSize="14px" fontWeight={500}>
-                  {3 * selectedTokens.length} seconds
-                </Text>
-              </Flex>
-            </HStack>
-          </VStack>
-
-          <Text
-            mt="10px"
-            fontSize="14px"
-            color="#676C87"
-            fontWeight="500"
-            textAlign="center"
-          >
-            Your transaction is on way to be been processed and{" "}
-            <chakra.span color="#151515" fontWeight={600} fontSize="14px">
+                      {tokensWithoutLiquidity && (
+                        <VStack>
+                          <Text>
+                            The following tokens can't be swapped because they
+                            have inssufficient liquidity or will lead to a high
+                            price impact
+                          </Text>
+                          {tokensWithoutLiquidity.map((token) => {
+                            return (
+                              <HStack key={token.address} alignItems="center">
+                                <Avatar
+                                  size="sm"
+                                  name={token.name}
+                                  src={token.logoURI}
+                                />
+                                <HStack>
+                                  <Text fontWeight="500" color="#281629">
+                                    {token.symbol.length > 6
+                                      ? `${token.symbol.substring(0, 5)}...`
+                                      : token.symbol}
+                                  </Text>
+                                  <Text
+                                    color="#A8BBD6"
+                                    fontSize="13px"
+                                    fontWeight={500}
+                                  >
+                                    {token.name}
+                                  </Text>
+                                </HStack>
+                              </HStack>
+                            );
+                          })}
+                        </VStack>
+                      )}
+                    </VStack>
+                  ) : (
+                    <Box>
+                      <Text>
+                        Insufficient Liquidity for the selected tokens or trade
+                        will lead to a high price impact
+                      </Text>
+                    </Box>
+                  )}
+                </VStack>
+              )}
+            </>
+          ) : (
+            <>
               {" "}
-              <ETHToReceive selectedTokens={selectedTokens} />
-            </chakra.span>{" "}
-            will be deposited to your Wallet.
-          </Text>
+              <VStack
+                bg="#F6F9F9"
+                width="100%"
+                padding="1rem"
+                borderRadius="18px"
+                fontSize="small"
+                mt="10px"
+              >
+                <Text
+                  fontWeight="700"
+                  fontSize="14px"
+                  color="#281629"
+                  width="100%"
+                  textAlign="start"
+                >
+                  Order Details:
+                </Text>
+
+                <HStack width="100%" justifyContent="space-between">
+                  <Text color="#151829" fontSize="14px" fontWeight={500}>
+                    Slippage
+                  </Text>
+                  <Text color="#674669" fontSize="14px" fontWeight={500}>
+                    {slippageTolerance}%
+                  </Text>
+                </HStack>
+
+                <HStack width="100%" justifyContent="space-between" mt="6px">
+                  <Text color="#151829" fontSize="14px" fontWeight={500}>
+                    Estimated Transaction Time:
+                  </Text>
+
+                  <Flex>
+                    <Text color="#674669" fontSize="14px" fontWeight={500}>
+                      {3 * selectedTokens.length} seconds
+                    </Text>
+                  </Flex>
+                </HStack>
+              </VStack>
+              <Text
+                mt="10px"
+                fontSize="14px"
+                color="#676C87"
+                fontWeight="500"
+                textAlign="center"
+              >
+                Your transaction is on way to be been processed and{" "}
+                <chakra.span color="#151515" fontWeight={600} fontSize="14px">
+                  {" "}
+                  <ETHToReceive selectedTokens={selectedTokens} />
+                </chakra.span>{" "}
+                will be deposited to your Wallet.
+              </Text>
+            </>
+          )}
 
           {/* ----------------- Button section ---------------- */}
           <HStack width="100%" mt="10px" mb="20px">
@@ -244,58 +363,71 @@ function ConfirmationModal({
                 refetch={refetch}
               />
             )}
-            {isSmartWallet ? (
-              <Button
-                onClick={() => executeBatchSwap()}
-                disabled={isDisabled}
-                width="100%"
-                color="#FDFDFD"
-                fontSize="16px"
-                fontWeight={500}
-                _hover={{
-                  bg: tokensAllowanceStatus
-                    ? `${COLORS.btnGradient}`
-                    : `${COLORS.inputBgcolor}`,
-                }}
-                bg={
-                  tokensAllowanceStatus
-                    ? `${COLORS.btnGradient}`
-                    : `${COLORS.inputBgcolor}`
-                }
-                height="2.5rem"
-                borderRadius="8px"
-              >
-                Sweep
-              </Button>
+            {previewState === true ? (
+              <>
+                {isSmartWallet ? (
+                  <Button
+                    onClick={() => executeBatchSwap()}
+                    disabled={isDisabled}
+                    width="100%"
+                    color="#FDFDFD"
+                    fontSize="16px"
+                    fontWeight={500}
+                    _hover={{
+                      bg: tokensAllowanceStatus
+                        ? `${COLORS.btnGradient}`
+                        : `${COLORS.inputBgcolor}`,
+                    }}
+                    bg={
+                      tokensAllowanceStatus
+                        ? `${COLORS.btnGradient}`
+                        : `${COLORS.inputBgcolor}`
+                    }
+                    height="2.5rem"
+                    borderRadius="8px"
+                  >
+                    Sweep
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handlesweep}
+                    disabled={isDisabled}
+                    width="100%"
+                    color="#FDFDFD"
+                    fontSize="16px"
+                    fontWeight={400}
+                    _hover={{
+                      bg: tokensAllowanceStatus
+                        ? `${COLORS.btnGradient}`
+                        : `${COLORS.inputBgcolor}`,
+                    }}
+                    bg={
+                      tokensAllowanceStatus
+                        ? `${COLORS.btnGradient}`
+                        : `${COLORS.inputBgcolor}`
+                    }
+                    height="2.5rem"
+                    borderRadius="8px"
+                  >
+                    {isSweeping ? (
+                      <HStack spacing={2}>
+                        <Spinner size="sm" color="white" />
+                        <Text>Sweeping</Text>
+                      </HStack>
+                    ) : (
+                      "Sweep"
+                    )}
+                  </Button>
+                )}
+              </>
             ) : (
               <Button
-                onClick={handlesweep}
-                disabled={isDisabled}
-                width="100%"
-                color="#FDFDFD"
-                fontSize="16px"
-                fontWeight={400}
-                _hover={{
-                  bg: tokensAllowanceStatus
-                    ? `${COLORS.btnGradient}`
-                    : `${COLORS.inputBgcolor}`,
+                onClick={async () => {
+                  setPreviewState(true);
+                  await handlePreviewTokens(); //fetch tokens liquidity status
                 }}
-                bg={
-                  tokensAllowanceStatus
-                    ? `${COLORS.btnGradient}`
-                    : `${COLORS.inputBgcolor}`
-                }
-                height="2.5rem"
-                borderRadius="8px"
               >
-                {isSweeping ? (
-                  <HStack spacing={2}>
-                    <Spinner size="sm" color="white" />
-                    <Text>Sweeping</Text>
-                  </HStack>
-                ) : (
-                  "Sweep"
-                )}
+                Preview
               </Button>
             )}
           </HStack>

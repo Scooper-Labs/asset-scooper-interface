@@ -71,28 +71,6 @@ function SweepWidget() {
     }
   }, [address]);
 
-  const { getTokensWithLiquidity, executeBatchSwap } = useParaSwap();
-  const [tokensWithLiquidity, setTokensWithLiquidity] = React.useState<Token[]>(
-    [],
-  );
-  const [tokensWithoutLiquidity, setTokensWithoutLiquidity] = React.useState<
-    Token[]
-  >([]);
-
-  const handlePreviewTokens = async () => {
-    const { tokensWithLiquidity, tokensWithoutLiquidity } =
-      await getTokensWithLiquidity();
-    setTokensWithLiquidity(tokensWithLiquidity);
-    setTokensWithoutLiquidity(tokensWithoutLiquidity);
-    console.log("tokensWithLiquidity", tokensWithLiquidity, "tokensWithoutLiquidity", tokensWithoutLiquidity)
-  };
-
-  const handleExecuteBatchSwap = async () => {
-    const { tokensWithLiquidity, tokensWithoutLiquidity } =
-      await executeBatchSwap();
-    setTokensWithLiquidity(tokensWithLiquidity);
-    setTokensWithoutLiquidity(tokensWithoutLiquidity);
-  };
 
   return (
     <VStack gap="12px">
@@ -137,9 +115,6 @@ function SweepWidget() {
         borderRadius="12px"
         gap="16px"
       >
-        <Button onClick={handlePreviewTokens} background="red">
-          Test Liquidity
-        </Button>
         <Box>
           <Image
             width={428}
