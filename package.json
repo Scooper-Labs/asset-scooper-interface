@@ -12,6 +12,7 @@
     "@apollo/client": "^3.11.2",
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.2",
+    "@chakra-ui/system": "^2.6.2",
     "@coinbase/onchainkit": "^0.30.0",
     "@covalenthq/client-sdk": "^1.0.2",
     "@emotion/react": "^11.13.0",
@@ -19,7 +20,10 @@
     "@paraswap/core": "^2.4.0",
     "@tanstack/react-query": "^5.52.0",
     "@types/react-copy-to-clipboard": "^5.0.7",
+    "@wagmi/connectors": "^5.1.7",
+    "@wagmi/core": "^2.13.4",
     "@web3modal/wagmi": "^5.1.1",
+    "@xmtp/frames-validator": "^0.6.0",
     "axios": "^1.7.3",
     "crypto-js": "^4.2.0",
     "framer-motion": "^11.3.21",
@@ -41,7 +45,7 @@
     "@types/node": "^22.1.0",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "eslint": "^9.8.0",
+    "eslint": "^9.9.0",
     "eslint-config-next": "14.2.5",
     "typescript": "^5.5.4"
   }
