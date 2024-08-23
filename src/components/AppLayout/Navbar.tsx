@@ -96,7 +96,6 @@ const NavBar = () => {
           <HStack>
             <ConnectButton onOpen={onOpen} />
             {!isConnected && <CustomConnectButton />}
-            <w3m-connect-button />
           </HStack>
         </HStack>
 

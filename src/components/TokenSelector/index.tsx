@@ -133,6 +133,7 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
     </>
   );
 }
+
 function meetsThreshold(
   data: MoralisAssetClass[] | null,
   price: number,
@@ -141,6 +142,7 @@ function meetsThreshold(
   const noETH = data?.filter(
     (token) => token.symbol !== "ETH" && token.symbol !== "WETH"
   );
+
   return noETH?.filter(
     (token) => token.quoteUSD / price < parseFloat(sweepthreshHold)
   );

@@ -50,7 +50,7 @@ const ModalComponent: FC<ModalComponentProps> = ({
           borderRadius="24px"
           py="1%"
           position={{ base: "fixed" }}
-          bottom={{ base: "0" }}
+          bottom={{ base: "0", md: "auto" }}
           mb={{ base: "40px" }}
           {...modalContentStyle}
         >

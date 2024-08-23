@@ -45,7 +45,7 @@ function ApprovalModal({
             ? `${COLORS.inputBgcolor}`
             : `${COLORS.btnGradient}`,
         }}
-        onClick={() => open()}
+        onClick={() => onOpen()}
       >
         Approval
       </Button>
@@ -53,7 +53,7 @@ function ApprovalModal({
       <ModalComponent
         isOpen={isOpen}
         onClose={onClose}
-        // modalContentStyle={{ py: "0" }}
+        modalContentStyle={{ py: "0" }}
       >
         <Flex justify="space-between" alignItems="center">
           <Box flex="1" textAlign="center">

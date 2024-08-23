@@ -4,8 +4,9 @@ import { FC, ReactNode } from "react";
 import ChakraProvider from "./chakra";
 import TokenListProvider from "./tokenListProvider";
 import ApolloClientProvider from "./apolloProvider";
-import AppKitProvider from "./web3Provider";
+import Web3ModalAppKitProvider from "./web3Provider";
 import { State } from "wagmi";
+
 export const RootProvider = ({
   children,
   initialState,
@@ -14,12 +15,12 @@ export const RootProvider = ({
   initialState?: State;
 }) => {
   return (
-    <AppKitProvider initialState={initialState}>
+    <Web3ModalAppKitProvider initialState={initialState}>
       <TokenListProvider>
         <ChakraProvider>
           <ApolloClientProvider>{children}</ApolloClientProvider>
         </ChakraProvider>
       </TokenListProvider>
-    </AppKitProvider>
+    </Web3ModalAppKitProvider>
   );
 };

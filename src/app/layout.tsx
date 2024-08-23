@@ -9,7 +9,7 @@ import localFont from "next/font/local";
 import { RootProvider } from "@/provider";
 
 import { cookieToInitialState } from "wagmi";
-import { config } from "@/constants/config";
+import { WALLETCONNECT_CONFIG } from "@/constants/config";
 import { headers } from "next/headers";
 import "./globals.css";
 
@@ -78,7 +78,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const initialState = cookieToInitialState(config, headers().get("cookie"));
+  const initialState = cookieToInitialState(
+    WALLETCONNECT_CONFIG,
+    headers().get("cookie")
+  );
 
   return (
     <html lang="en">

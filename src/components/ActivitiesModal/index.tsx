@@ -40,6 +40,7 @@ import { MdCheckCircleOutline } from "react-icons/md";
 import { HiOutlineDocumentDuplicate } from "react-icons/hi";
 import Cookies from "js-cookie";
 import CopyToClipboard from "react-copy-to-clipboard";
+import { ClipLoader } from "react-spinners";
 
 interface IModals {
   isOpen: boolean;
@@ -54,7 +55,8 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
   const { data, loading: loadPortfolio } = useWalletsPortfolio();
   const { moralisAssets, isLoading } = useBalances({ address });
   const [userWalletTokens, setWT] = useState<MoralisAssetClass[]>([]);
-  const [addressCopied, setAddressCopied] = useState(false);
+  const [addressCopied, setAddressCopied] = useState<boolean>(false);
+
   const {
     data: txns,
     loading,
@@ -278,7 +280,15 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
             <TabPanels>
               <TabPanel>
                 {isLoading ? (
-                  <div>Loading tokens</div>
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    height="100px"
+                  >
+                    <ClipLoader size={30} color={"#4A90E2"} />
+                    <Text ml={4}>Loading tokens...</Text>
+                  </Box>
                 ) : (
                   <Tokens userWalletTOKENS={userWalletTokens} />
                 )}

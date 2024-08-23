@@ -5,7 +5,6 @@ import { useContext, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { useReadContracts } from "wagmi";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
-// import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { erc20Abi, Address, formatUnits } from "viem";
 import ConfirmationModal from "../modals/confirmation";
 import {
@@ -18,7 +17,6 @@ import { TokenListProvider } from "@/provider/tokenListProvider";
 
 function SweepButton() {
   const { open } = useWeb3Modal();
-  // const { openConnectModal } = useConnectModal();
   const { isSmartWallet } = useSmartWallet();
   const { tokenList: selectedTokens } = useContext(TokenListProvider);
 
@@ -26,7 +24,7 @@ function SweepButton() {
 
   const { isConnected, address } = useAccount();
 
-  //constructing approval call data for both smart wallet and eoa
+  //constructing approval call data for both smart wallet and EOA
   const contracts = selectedTokens.map((token) => ({
     abi: erc20Abi,
     address: token.address as Address,

@@ -31,7 +31,7 @@ const FormatNumber: React.FC<FNProps> = ({ pre, amount, suf }) => {
   return (
     <span>
       {pre ? pre : ""}
-      {formattedValue}
+      {formattedValue}&nbsp;
       {suf ? suf : ""}
     </span>
   );

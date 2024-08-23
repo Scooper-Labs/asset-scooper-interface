@@ -130,9 +130,9 @@ export const useParaSwap = () => {
     const pricesURL = `${PARASWAP_API_URL}/prices/?${queryParams}`;
     try {
       const { data, status } = await axios.get<{ priceRoute: OptimalRate }>(
-        pricesURL,
+        pricesURL
       );
-      console.log(data, status);
+      // console.log(data, status);
       return { priceRoute: data.priceRoute, status: status };
     } catch (e) {
       setError("An error occurred while getting swap rate");
@@ -295,10 +295,10 @@ export const useParaSwap = () => {
                 toast,
                 "Your tokens have been successfully approved proceed to swap.",
                 4000,
-                "top-right",
+                "top-right"
               );
           },
-        },
+        }
       );
     }
 

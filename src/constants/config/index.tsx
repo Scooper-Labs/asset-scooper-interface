@@ -1,26 +1,37 @@
 import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
-
 import { cookieStorage, createStorage } from "wagmi";
-import { base } from "wagmi/chains";
+import { SITE_DESCRIPTION, SITE_INFO, SITE_NAME, SITE_URL } from "@/utils/site";
+import { ETH_CHAINS } from "@/utils/network";
 
-// Get projectId from https://cloud.walletconnect.com
-export const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
+export const WALLETCONNECT_PROJECT_ID =
+  process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "";
 
-if (!projectId) throw new Error("Project ID is not defined");
+if (!WALLETCONNECT_PROJECT_ID) {
+  console.warn(
+    "You need to provide a NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID env variable"
+  );
+}
 
 export const metadata = {
-  name: "AppKit",
-  description: "AppKit Example",
-  url: "https://web3modal.com", // origin must match your domain & subdomain
-  icons: ["https://avatars.githubusercontent.com/u/37784886"],
+  name: SITE_NAME,
+  description: SITE_DESCRIPTION,
+  url: SITE_URL,
+  icons: [
+    "https://github.com/user-attachments/assets/0d8ba3ef-6a20-403b-9279-5e355de173ff",
+  ],
 };
 
-// Create wagmiConfig
-const chains = [base] as const;
-export const config = defaultWagmiConfig({
-  chains,
-  projectId,
-  metadata,
+export const WALLETCONNECT_CONFIG = defaultWagmiConfig({
+  projectId: WALLETCONNECT_PROJECT_ID,
+  chains: ETH_CHAINS,
+  metadata: {
+    name: SITE_NAME,
+    description: SITE_INFO,
+    url: SITE_URL,
+    icons: [
+      "https://github.com/user-attachments/assets/0d8ba3ef-6a20-403b-9279-5e355de173ff",
+    ],
+  },
   ssr: true,
   storage: createStorage({
     storage: cookieStorage,

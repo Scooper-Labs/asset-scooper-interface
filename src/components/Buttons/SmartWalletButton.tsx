@@ -17,22 +17,22 @@ export function CustomConnectButton({
   const { address, chain } = useAccount();
 
   useEffect(() => {
-    console.log(">> switching chain", chain?.id !== base.id);
-    console.log(">> address", address);
+    // console.log(">> switching chain", chain?.id !== base.id);
+    // console.log(">> address", address);
     if (address && chain?.id !== base.id) {
       switchChain({ chainId: base.id });
     }
   }, [address]);
 
   const handleConnect = useCallback(async () => {
-    const connector = connectors.find((c) => c.type == "coinbaseWallet");
+    const connector = connectors.find((c: any) => c.type == "coinbaseWallet");
 
     if (connector) {
       console.log(">> connecting", connector.type);
       try {
         await connectAsync({ connector });
       } catch (e) {
-        console.error(">> error connecting", e);
+        // console.error(">> error connecting", e);
       } finally {
         reloadIfNeeded();
       }

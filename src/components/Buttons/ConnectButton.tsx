@@ -7,6 +7,7 @@ import { useAccount } from "wagmi";
 import { COLORS } from "@/constants/theme";
 import { IoIosArrowDown } from "react-icons/io";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { Basenames } from "./Basename";
 
 export default function ConnectButtonRainbow({
   onOpen,
@@ -40,6 +41,7 @@ interface Props {
   onOpen: () => void;
   address: `0x${string}`;
 }
+
 function CustomConnectButton({ onOpen, address }: Props) {
   return (
     <span onClick={onOpen} className="customConnectSpan">

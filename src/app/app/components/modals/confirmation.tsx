@@ -33,9 +33,8 @@ import ModalComponent from "@/components/ModalComponent/TabViewModal";
 import { COLORS } from "@/constants/theme";
 import OverlappingImage, { getImageArray } from "../sweep-widget/ImageLap";
 import { TokenListProvider } from "@/provider/tokenListProvider";
-import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
-import { Token } from "@/lib/components/types";
 import { MoralisAssetClass } from "@/utils/classes";
+import { ClipLoader } from "react-spinners";
 
 function ConfirmationModal({
   tokensAllowanceStatus,
@@ -60,7 +59,7 @@ function ConfirmationModal({
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const { slippageTolerance } = useSlippageTolerance(
-    SlippageToleranceStorageKey.Sweep,
+    SlippageToleranceStorageKey.Sweep
   );
 
   const { tokenList: selectedTokens, clearList } =
@@ -77,7 +76,7 @@ function ConfirmationModal({
   //min-out put for eoa swap, array of bigint 0s
   const minAmountOut = selectedTokens.map((t) => 0n);
 
-  //eoa swap
+  //EOA swap
   // const args = [selectedTokens.map((token) => token.address), minAmountOut];
   const args = [
     tokensWithLiquidity.map((token) => token.address),
@@ -85,7 +84,6 @@ function ConfirmationModal({
   ];
   const { data, resimulate, isPending } = useSweepTokensSimulation(args);
   const { isLoading, isSuccess, sweepTokens } = useSweepTokens(data);
-  // console.log(isPending);
 
   const handlesweep = async () => {
     const _result = await resimulate();
@@ -100,12 +98,12 @@ function ConfirmationModal({
       await getTokensWithLiquidity();
     setTokensWithLiquidity(tokensWithLiquidity);
     setTokensWithoutLiquidity(tokensWithoutLiquidity);
-    console.log(
-      "tokensWithLiquidity",
-      tokensWithLiquidity,
-      "tokensWithoutLiquidity",
-      tokensWithoutLiquidity,
-    );
+    // console.log(
+    //   "tokensWithLiquidity",
+    //   tokensWithLiquidity,
+    //   "tokensWithoutLiquidity",
+    //   tokensWithoutLiquidity
+    // );
   };
 
   const isSweeping = isPending || isLoading;
@@ -115,7 +113,11 @@ function ConfirmationModal({
     <>
       <Button
         width="100%"
-        bg="#0099FB"
+        bg={COLORS.btnGradient}
+        _hover={{
+          bg: `${COLORS.btnGradient}`,
+        }}
+        boxShadow={COLORS.boxShadowColor}
         color="#fff"
         onClick={() => {
           onOpen();
@@ -193,16 +195,32 @@ function ConfirmationModal({
           {previewState ? (
             <>
               {paraswapDataLoading ? (
-                <Box>
-                  <Text>Please wait, trade data is loading....</Text>
+                <Box
+                  justifyContent="center"
+                  alignItems="center"
+                  display="flex"
+                  flexDirection="column"
+                >
+                  <ClipLoader size={40} color={"#4A90E2"} />
+                  <Text
+                    textAlign="center"
+                    fontSize="13px"
+                    color="#676C87"
+                    mt={4}
+                  >
+                    Please wait, trade data is loading....
+                  </Text>
                 </Box>
               ) : (
                 <VStack>
-                  <Text>The following Tokens are swappable</Text>
-                  {tokensWithLiquidity.length ? (
-                    <VStack>
-                      {tokensWithLiquidity.map((token) => {
-                        return (
+                  {tokensWithLiquidity.length > 0 && (
+                    <>
+                      <Text textAlign="center" fontSize="14px" color="#676C87">
+                        The following tokens are sweepable
+                      </Text>
+
+                      <VStack>
+                        {tokensWithLiquidity.map((token) => (
                           <HStack alignItems="center" key={token.address}>
                             <Avatar
                               size="sm"
@@ -224,53 +242,144 @@ function ConfirmationModal({
                               </Text>
                             </HStack>
                           </HStack>
-                        );
-                      })}
-
-                      {tokensWithoutLiquidity && (
-                        <VStack>
-                          <Text>
-                            The following tokens can't be swapped because they
-                            have inssufficient liquidity or will lead to a high
-                            price impact
-                          </Text>
-                          {tokensWithoutLiquidity.map((token) => {
-                            return (
-                              <HStack key={token.address} alignItems="center">
-                                <Avatar
-                                  size="sm"
-                                  name={token.name}
-                                  src={token.logoURI}
-                                />
-                                <HStack>
-                                  <Text fontWeight="500" color="#281629">
-                                    {token.symbol.length > 6
-                                      ? `${token.symbol.substring(0, 5)}...`
-                                      : token.symbol}
-                                  </Text>
-                                  <Text
-                                    color="#A8BBD6"
-                                    fontSize="13px"
-                                    fontWeight={500}
-                                  >
-                                    {token.name}
-                                  </Text>
-                                </HStack>
-                              </HStack>
-                            );
-                          })}
-                        </VStack>
-                      )}
-                    </VStack>
-                  ) : (
-                    <Box>
-                      <Text>
-                        Insufficient Liquidity for the selected tokens or trade
-                        will lead to a high price impact
-                      </Text>
-                    </Box>
+                        ))}
+                      </VStack>
+                    </>
                   )}
+
+                  {tokensWithoutLiquidity &&
+                    tokensWithoutLiquidity.length > 0 && (
+                      <VStack>
+                        <Text
+                          textAlign="center"
+                          fontSize="14px"
+                          color="#676C87"
+                        >
+                          The following tokens can't be swept because they have
+                          insufficient liquidity
+                        </Text>
+                        {tokensWithoutLiquidity.map((token) => (
+                          <HStack key={token.address} alignItems="center">
+                            <Avatar
+                              size="sm"
+                              name={token.name}
+                              src={token.logoURI}
+                            />
+                            <HStack>
+                              <Text fontWeight="500" color="#281629">
+                                {token.symbol.length > 6
+                                  ? `${token.symbol.substring(0, 5)}...`
+                                  : token.symbol}
+                              </Text>
+                              <Text
+                                color="#A8BBD6"
+                                fontSize="13px"
+                                fontWeight={500}
+                              >
+                                {token.name}
+                              </Text>
+                            </HStack>
+                          </HStack>
+                        ))}
+                      </VStack>
+                    )}
+
+                  {tokensWithLiquidity.length === 0 &&
+                    tokensWithoutLiquidity.length === 0 && (
+                      <Box>
+                        <Text
+                          textAlign="center"
+                          fontSize="14px"
+                          color="#676C87"
+                        >
+                          Insufficient liquidity for the selected tokens or
+                          trade will lead to a high price impact
+                        </Text>
+                      </Box>
+                    )}
                 </VStack>
+                // <VStack>
+                //   {tokensWithLiquidity.length ? (
+                //     <>
+                //       <Text textAlign="center" fontSize="14px" color="#676C87">
+                //         The following tokens are sweepable
+                //       </Text>
+
+                //       <VStack>
+                //         {tokensWithLiquidity.map((token) => {
+                //           return (
+                //             <HStack alignItems="center" key={token.address}>
+                //               <Avatar
+                //                 size="sm"
+                //                 name={token.name}
+                //                 src={token.logoURI}
+                //               />
+                //               <HStack alignItems="center">
+                //                 <Text fontWeight="500" color="#281629">
+                //                   {token.symbol.length > 6
+                //                     ? `${token.symbol.substring(0, 5)}...`
+                //                     : token.symbol}
+                //                 </Text>
+                //                 <Text
+                //                   color="#A8BBD6"
+                //                   fontSize="13px"
+                //                   fontWeight={500}
+                //                 >
+                //                   {token.name}
+                //                 </Text>
+                //               </HStack>
+                //             </HStack>
+                //           );
+                //         })}
+
+                //         {tokensWithoutLiquidity && (
+                //           <VStack>
+                //             <Text
+                //               textAlign="center"
+                //               fontSize="14px"
+                //               color="#676C87"
+                //             >
+                //               The following tokens can't be sweep, because they
+                //               have insufficient liquidity
+                //             </Text>
+                //             {tokensWithoutLiquidity.map((token) => {
+                //               return (
+                //                 <HStack key={token.address} alignItems="center">
+                //                   <Avatar
+                //                     size="sm"
+                //                     name={token.name}
+                //                     src={token.logoURI}
+                //                   />
+                //                   <HStack>
+                //                     <Text fontWeight="500" color="#281629">
+                //                       {token.symbol.length > 6
+                //                         ? `${token.symbol.substring(0, 5)}...`
+                //                         : token.symbol}
+                //                     </Text>
+                //                     <Text
+                //                       color="#A8BBD6"
+                //                       fontSize="13px"
+                //                       fontWeight={500}
+                //                     >
+                //                       {token.name}
+                //                     </Text>
+                //                   </HStack>
+                //                 </HStack>
+                //               );
+                //             })}
+                //           </VStack>
+                //         )}
+                //       </VStack>
+                //     </>
+                //   ) : (
+                //     <Box>
+                //       <Text fontSize="14px" color="#676C87">
+                //         Insufficient Liquidity for the selected tokens or trade
+                //         will lead to a high price impact
+                //       </Text>
+                //     </Box>
+                //   )}
+                // </VStack>
               )}
             </>
           ) : (
@@ -422,6 +531,15 @@ function ConfirmationModal({
               </>
             ) : (
               <Button
+                borderRadius="8px"
+                width="100%"
+                color="#FDFDFD"
+                fontSize="16px"
+                fontWeight={500}
+                _hover={{
+                  bg: `${COLORS.inputBgcolor}`,
+                }}
+                bg={COLORS.inputBgcolor}
                 onClick={async () => {
                   setPreviewState(true);
                   await handlePreviewTokens(); //fetch tokens liquidity status
