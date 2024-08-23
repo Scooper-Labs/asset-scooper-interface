@@ -12,7 +12,8 @@ import TokenSelectListRow from "./token-select-row";
 import { useAccount } from "wagmi";
 import { MoralisAssetClass } from "@/utils/classes";
 import { Skeleton, SkeletonCircle } from "@chakra-ui/react";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
+// import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 interface TokenSelectListProps {
   userWalletTokens: MoralisAssetClass[] | undefined;
@@ -69,7 +70,7 @@ const ListContent: React.FC<ListContentProps> = ({
   error,
   walletBalance,
 }) => {
-  const { openConnectModal } = useConnectModal();
+  const { open } = useWeb3Modal();
 
   if (!address) {
     return (
@@ -85,7 +86,7 @@ const ListContent: React.FC<ListContentProps> = ({
             <chakra.span
               color="#006DED"
               cursor="pointer"
-              onClick={openConnectModal}
+              onClick={() => open({ view: "Connect" })}
             >
               connect wallet
             </chakra.span>{" "}

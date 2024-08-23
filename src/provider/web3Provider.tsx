@@ -1,10 +1,7 @@
 "use client";
 
 import React, { ReactNode } from "react";
-import {
-  WALLETCONNECT_CONFIG,
-  WALLETCONNECT_PROJECT_ID,
-} from "@/constants/config";
+import { config, projectId, metadata } from "@/constants/config";
 
 import { createWeb3Modal } from "@web3modal/wagmi/react";
 
@@ -15,26 +12,17 @@ import { State, WagmiProvider } from "wagmi";
 // Setup queryClient
 const queryClient = new QueryClient();
 
-if (!WALLETCONNECT_PROJECT_ID) {
-  console.warn(
-    "You need to provide a NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID env variable"
-  );
-}
+if (!projectId) throw new Error("Project ID is not defined");
 
+// Create modal
 createWeb3Modal({
-  //@ts-ignore
-  wagmiConfig: WALLETCONNECT_CONFIG,
-  //@ts-ignore
-  projectId: WALLETCONNECT_PROJECT_ID,
-  themeMode: "light",
-  themeVariables: {
-    "--w3m-z-index": 50000,
-    "--w3m-accent": "black",
-    "--w3m-border-radius-master": "8px",
-  },
+  metadata,
+  wagmiConfig: config,
+  projectId,
+  enableAnalytics: true, // Optional - defaults to your Cloud configuration
 });
 
-export function Web3Modal({
+export default function AppKitProvider({
   children,
   initialState,
 }: {
@@ -42,9 +30,7 @@ export function Web3Modal({
   initialState?: State;
 }) {
   return (
-    /* tslint:disable */
-    /* @ts-ignore */
-    <WagmiProvider config={WALLETCONNECT_CONFIG} initialState={initialState}>
+    <WagmiProvider config={config} initialState={initialState}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </WagmiProvider>
   );

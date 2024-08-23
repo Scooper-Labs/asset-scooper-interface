@@ -30,6 +30,7 @@ import { useEthPrice } from "@/hooks/useGetETHPrice2";
 import { ETH_ADDRESS } from "@/utils";
 import CustomTooltip from "@/components/CustomTooltip";
 import useSelectToken from "@/hooks/useSelectToken";
+import { useParaSwap } from "@/hooks/swap/useParaswapSwap";
 
 export function ETHToReceive({ selectedTokens }: { selectedTokens: Token[] }) {
   const { ethPrice } = useEthPrice({
@@ -37,7 +38,7 @@ export function ETHToReceive({ selectedTokens }: { selectedTokens: Token[] }) {
   });
   const quoteAllTokens = selectedTokens.reduce(
     (total, selectedToken) => total + selectedToken.quoteUSD,
-    0
+    0,
   );
 
   return (
@@ -69,6 +70,7 @@ function SweepWidget() {
       clearList();
     }
   }, [address]);
+
 
   return (
     <VStack gap="12px">

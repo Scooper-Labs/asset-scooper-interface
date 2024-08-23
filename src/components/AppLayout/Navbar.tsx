@@ -38,7 +38,7 @@ const NavBar = () => {
       pos={"fixed"}
       w="100%"
       py="10px"
-      zIndex={1000}
+      zIndex={10}
       top={0}
       borderBottom={{
         base: `1px solid ${COLORS.appNavBarBorderColorM}`,
@@ -96,6 +96,7 @@ const NavBar = () => {
           <HStack>
             <ConnectButton onOpen={onOpen} />
             {!isConnected && <CustomConnectButton />}
+            <w3m-connect-button />
           </HStack>
         </HStack>
 

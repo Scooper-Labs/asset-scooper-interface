@@ -4,15 +4,22 @@ import { FC, ReactNode } from "react";
 import ChakraProvider from "./chakra";
 import TokenListProvider from "./tokenListProvider";
 import ApolloClientProvider from "./apolloProvider";
-
-export const RootProvider = ({ children }: { children: ReactNode }) => {
+import AppKitProvider from "./web3Provider";
+import { State } from "wagmi";
+export const RootProvider = ({
+  children,
+  initialState,
+}: {
+  children: ReactNode;
+  initialState?: State;
+}) => {
   return (
-    <TokenListProvider>
-      <ChakraProvider>
-        <ApolloClientProvider>
-          {children}
-        </ApolloClientProvider>
-      </ChakraProvider>
-    </TokenListProvider>
+    <AppKitProvider initialState={initialState}>
+      <TokenListProvider>
+        <ChakraProvider>
+          <ApolloClientProvider>{children}</ApolloClientProvider>
+        </ChakraProvider>
+      </TokenListProvider>
+    </AppKitProvider>
   );
 };

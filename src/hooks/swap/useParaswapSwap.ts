@@ -11,6 +11,7 @@ import { Address } from "viem";
 import { useWalletsPortfolio } from "../useMobula";
 import CustomToast from "@/components/Toast";
 import useSelectToken from "../useSelectToken";
+import { MoralisAssetClass } from "@/utils/classes";
 
 const PARTNER = "chucknorrisv6";
 const SLIPPAGE = 1;
@@ -25,14 +26,83 @@ interface TransactionParams {
   chainId: number;
 }
 
+export const testTokens: Token[] = [
+  {
+    address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    chainId: 8453,
+    decimals: 6,
+    logoURI:
+      "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/network/base/0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913.jpg",
+    name: "USD Coin",
+    symbol: "USDC",
+    quoteUSD: 10.5,
+    userBalance: 123.45,
+    price: 10.0,
+    price_change_24h: 2.5,
+  },
+  {
+    address: "0x6985884C4392D348587B19cb9eAAf157F13271cd",
+    chainId: 8453,
+    decimals: 18,
+    logoURI:
+      "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/network/base/0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913.jpg",
+    name: "LayerZero",
+    symbol: "ZRO",
+    quoteUSD: 10.5,
+    userBalance: 123.45,
+    price: 10.0,
+    price_change_24h: 2.5,
+  },
+  {
+    address: "0x83764F62B9Fd5ae2dE43904dE7E45Ff47476e2B5",
+    chainId: 8453,
+    decimals: 9,
+    logoURI: "",
+    name: "BaseDoodleCat",
+    symbol: "$DOCAT",
+    quoteUSD: 10.5,
+    userBalance: 123.45,
+    price: 10.0,
+    price_change_24h: 2.5,
+  },
+  {
+    address: "0x0cBD6fAdcF8096cC9A43d90B45F65826102e3eCE",
+    chainId: 8453,
+    decimals: 18,
+    logoURI: "",
+    name: "CheckDot",
+    symbol: "CDT",
+    quoteUSD: 5.75,
+    userBalance: 78.9,
+    price: 5.0,
+    price_change_24h: -1.2,
+  },
+  {
+    address: "0x80B3455e1Db60b4Cba46Aba12E8b1E256dD64979",
+    chainId: 8453,
+    decimals: 18,
+    logoURI: "",
+    name: "Blue-Footed Booby",
+    symbol: "BOOBY",
+    quoteUSD: 15.25,
+    userBalance: 45.6,
+    price: 15.0,
+    price_change_24h: 3.8,
+  },
+];
+
 export const useParaSwap = () => {
-  const [, setLoading] = useState(false);
-  const [, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { address, chainId } = useAccount();
   const { tokenList: selectedTokens } = useSelectToken();
   const { refetch: refetchTokenBalance } = useWalletsPortfolio();
   const toast = useToast();
   const { sendCalls } = useSendCalls();
+  const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+  // const selectedTokens = testTokens;
+  // const chainId = "8453";
+  // const address: string = "0xE3c347cEa95B7BfdB921074bdb39b8571F905f6D";
 
   const getRate = async ({
     srcToken,
@@ -44,7 +114,7 @@ export const useParaSwap = () => {
     destToken: Token;
     srcAmount: string;
     networkID: number;
-  }): Promise<OptimalRate> => {
+  }) => {
     const queryParams = new URLSearchParams({
       srcToken: srcToken.address,
       destToken: destToken.address,
@@ -58,10 +128,71 @@ export const useParaSwap = () => {
     });
 
     const pricesURL = `${PARASWAP_API_URL}/prices/?${queryParams}`;
-    const { data } = await axios.get<{ priceRoute: OptimalRate }>(pricesURL);
+    try {
+      const { data, status } = await axios.get<{ priceRoute: OptimalRate }>(
+        pricesURL,
+      );
+      console.log(data, status);
+      return { priceRoute: data.priceRoute, status: status };
+    } catch (e) {
+      setError("An error occurred while getting swap rate");
+      return null;
+    }
+  };
 
-    // console.log(data, "this is data");
-    return data.priceRoute;
+  const getTokensWithLiquidity = async () => {
+    if (!chainId || !address) {
+      setError("Please connect wallet");
+      return {
+        tokensWithLiquidity: [],
+        tokensWithoutLiquidity: selectedTokens,
+      };
+    }
+
+    setLoading(true);
+    setError(null);
+
+    const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+    const tokensWithLiquidity: MoralisAssetClass[] = [];
+    const tokensWithoutLiquidity: MoralisAssetClass[] = [];
+
+    try {
+      for (const token of selectedTokens) {
+        const srcAmount = token.userBalance;
+        const srcAmountBN = new BigNumber(srcAmount)
+          .times(10 ** token.decimals)
+          .toFixed(0);
+
+        const _priceRoute = await getRate({
+          srcToken: token,
+          destToken: { address: ETH_ADDRESS, decimals: 18 } as Token,
+          srcAmount: srcAmountBN,
+          networkID: Number(chainId),
+        });
+
+        if (!_priceRoute) {
+          tokensWithoutLiquidity.push(token);
+          // return;
+        } else if (_priceRoute.status === 200) {
+          console.log("yess");
+          const { priceRoute, status } = _priceRoute;
+          tokensWithLiquidity.push(token);
+        } else {
+          tokensWithoutLiquidity.push(token);
+        }
+      }
+
+      return { tokensWithLiquidity, tokensWithoutLiquidity };
+    } catch (e) {
+      console.error(e);
+      setError("An error occurred while getting swap transactions");
+      return {
+        tokensWithLiquidity: [],
+        tokensWithoutLiquidity: selectedTokens,
+      };
+    } finally {
+      setLoading(false);
+    }
   };
 
   const buildSwap = async ({
@@ -88,14 +219,6 @@ export const useParaSwap = () => {
 
     const txURL = `${PARASWAP_API_URL}/transactions/${networkID}`;
 
-    try {
-    } catch (e) {
-      console.log(e);
-      setError("An error occurred while getting swap transaction");
-    } finally {
-      setLoading(false);
-    }
-
     const txConfig = {
       priceRoute,
       srcToken: srcToken.address,
@@ -110,37 +233,37 @@ export const useParaSwap = () => {
     };
 
     const { data } = await axios.post<TransactionParams>(txURL, txConfig);
-
-    // console.log(data, "this is data2");
+    setLoading(false);
     return data;
   };
 
-  const swapsTrxData = async () => {
-    if (!chainId || !address) {
+  const executeBatchSwap = async () => {
+    const { tokensWithLiquidity, tokensWithoutLiquidity } =
+      await getTokensWithLiquidity();
+    const swapTxnData: TransactionParams[] = [];
+    if (!address || !chainId) {
       setError("Please connect wallet");
-      return null;
+      return { tokensWithLiquidity, tokensWithoutLiquidity };
     }
 
-    setLoading(true);
-    setError(null);
+    for (const token of tokensWithLiquidity) {
+      const srcAmount = token.userBalance;
+      const srcAmountBN = new BigNumber(srcAmount)
+        .times(10 ** token.decimals)
+        .toFixed(0);
 
-    const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
-    const swapData: TransactionParams[] = [];
+      const _priceRoute = await getRate({
+        srcToken: token,
+        destToken: { address: ETH_ADDRESS, decimals: 18 } as Token,
+        srcAmount: srcAmountBN,
+        networkID: Number(chainId),
+      });
 
-    try {
-      for (const token of selectedTokens) {
-        const srcAmount = token.userBalance;
-        const srcAmountBN = new BigNumber(srcAmount)
-          .times(10 ** token.decimals)
-          .toFixed(0);
-
-        const priceRoute = await getRate({
-          srcToken: token,
-          destToken: { address: ETH_ADDRESS, decimals: 18 } as Token,
-          srcAmount: srcAmountBN,
-          networkID: chainId,
-        });
-
+      if (_priceRoute) {
+        const { priceRoute, status } = _priceRoute;
+        if (status !== 200) {
+          return;
+        }
         const minAmount = new BigNumber(priceRoute.destAmount)
           .times(1 - SLIPPAGE / 100)
           .toFixed(0);
@@ -151,26 +274,15 @@ export const useParaSwap = () => {
           srcAmount: srcAmountBN,
           minAmount,
           priceRoute,
-          userAddress: address,
-          networkID: chainId,
+          userAddress: address as Address,
+          networkID: Number(chainId),
         });
 
-        swapData.push(txParams);
+        swapTxnData.push(txParams);
       }
-
-      return swapData;
-    } catch (e) {
-      console.error(e);
-      setError("An error occurred while getting swap transactions");
-      return null;
-    } finally {
-      setLoading(false);
     }
-  };
 
-  const executeBatchSwap = async () => {
-    const swapTxnData = await swapsTrxData();
-    if (swapTxnData) {
+    if (swapTxnData.length > 0) {
       sendCalls(
         {
           calls: swapTxnData,
@@ -183,17 +295,20 @@ export const useParaSwap = () => {
                 toast,
                 "Your tokens have been successfully approved proceed to swap.",
                 4000,
-                "top-right"
+                "top-right",
               );
           },
-        }
+        },
       );
     }
+
+    return { tokensWithLiquidity, tokensWithoutLiquidity };
   };
   return {
     getRate,
-    buildSwap,
-    swapsTrxData,
+    loading,
+    error,
+    getTokensWithLiquidity,
     executeBatchSwap,
   };
 };

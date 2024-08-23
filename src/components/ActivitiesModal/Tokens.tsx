@@ -1,6 +1,6 @@
 import React from "react";
 import { Text, HStack, Avatar, Flex, Heading, Stack } from "@chakra-ui/react";
-import { nanoid } from "@reduxjs/toolkit";
+
 import { Token } from "@/lib/components/types";
 import FormatNumber from "@/components/FormatNumber";
 
@@ -8,7 +8,7 @@ const Tokens = ({ userWalletTOKENS }: { userWalletTOKENS: Token[] }) => {
   return (
     <Stack>
       {userWalletTOKENS.map((token) => (
-        <Flex justify="space-between" py="10px" key={nanoid()}>
+        <Flex justify="space-between" py="10px" key={token.address}>
           <HStack>
             <Avatar boxSize="32px" name={token.name} src={token.logoURI} />
             <Flex flexDir="column">
