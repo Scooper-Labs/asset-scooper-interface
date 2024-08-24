@@ -8,6 +8,8 @@ import { COLORS } from "@/constants/theme";
 import { IoIosArrowDown } from "react-icons/io";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { Basenames } from "./Basename";
+import { ETH_CHAINS } from "@/utils/network";
+import { Name } from "@coinbase/onchainkit/identity";
 
 export default function ConnectButtonRainbow({
   onOpen,
