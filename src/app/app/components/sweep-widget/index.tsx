@@ -13,6 +13,7 @@ import {
   Tag,
   TagLabel,
   Spinner,
+  chakra,
 } from "@chakra-ui/react";
 import Image from "next/image";
 import React, { useEffect } from "react";
@@ -123,7 +124,7 @@ function SweepWidget() {
           />
         </Box>
 
-        <VStack width="100%" gap="2px">
+        <VStack as={"div"} width="100%" gap="2px">
           <Flex width="100%" justify="space-between">
             <Flex gap="6px" alignItems="center">
               <SweepIcon />
@@ -135,15 +136,13 @@ function SweepWidget() {
                 Sweep
               </Text>
             </Flex>
-            <Text fontSize="12px" color={COLORS.tabTextColor}>
-              <Text fontSize="12px" color={COLORS.tabTextColor}>
-                {isLoading ? (
-                  <Spinner size="sm" color="#E7BFE7" />
-                ) : (
-                  `Update in 5 min 1-ETH(WETH) ≈ ${ethPrice} USDC`
-                )}
-              </Text>
-            </Text>
+            <chakra.span fontSize="12px" color={COLORS.tabTextColor}>
+              {isLoading ? (
+                <Spinner size="sm" color="#E7BFE7" />
+              ) : (
+                `Update in 5 min 1-ETH(WETH) ≈ ${ethPrice} USDC`
+              )}
+            </chakra.span>
           </Flex>
           <TokenSelector>
             <Flex
@@ -180,6 +179,7 @@ function SweepWidget() {
         </VStack>
 
         <VStack
+          as={"div"}
           fontSize="small"
           width="100%"
           borderTop="1px solid #F7E5F7"

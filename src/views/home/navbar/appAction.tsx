@@ -11,7 +11,6 @@ const Action = () => {
   return (
     <Link href="/app" passHref>
       <MotionButton
-        as="a"
         h="32px"
         whileHover={{ scale: 1.04 }}
         whileTap={{ scale: 0.9 }}

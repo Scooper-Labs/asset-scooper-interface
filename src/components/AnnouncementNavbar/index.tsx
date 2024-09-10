@@ -76,11 +76,11 @@ const AnnouncementNavbar = () => {
               Assetscooper Integrates coinbase smart wallet{" "}
             </Text>
 
-            <LinkComponent href="/app">
-              <Box as="a" pointerEvents="auto">
+            <Box pointerEvents="auto">
+              <LinkComponent href="/app">
                 <IoArrowForwardCircleSharp color="white" size="16px" />
-              </Box>
-            </LinkComponent>
+              </LinkComponent>
+            </Box>
           </HStack>
 
           {/* ----- Arrow Right Icon ------ */}
