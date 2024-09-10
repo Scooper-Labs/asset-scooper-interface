@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useAccount } from "wagmi";
 
 export const useSmartWallet = () => {
@@ -12,6 +12,6 @@ export const useSmartWallet = () => {
   }, [isConnected, connector?.id]);
   return {
     isSmartWallet,
-    connectorId: connector?.id
+    connectorId: connector?.id,
   };
 };

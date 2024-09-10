@@ -32,7 +32,7 @@ export default function ConnectButtonRainbow({
       color="white"
       fontWeight={400}
       borderRadius="8px"
-      onClick={() => open({ view: "Connect" })}
+      onClick={() => open()}
     >
       Connect
     </Button>

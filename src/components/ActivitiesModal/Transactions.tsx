@@ -1,8 +1,9 @@
+"use client";
+
 import React from "react";
 import {
   Text,
   HStack,
-  Avatar,
   Image,
   Button,
   Flex,

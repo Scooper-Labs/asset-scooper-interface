@@ -54,7 +54,7 @@ export function TokenSelectFooter({
       alignItems="center"
     >
       <Text color="#0099FB" fontSize="larger">
-        ~ ${totalUSDValue.toFixed(3)}{" "}
+        ~ ${totalUSDValue?.toFixed(3)}{" "}
         <chakra.span fontSize="12px" color="#9E829F">
           (<ETHToReceive selectedTokens={selectedTokens} />)
         </chakra.span>
@@ -67,13 +67,13 @@ export function TokenSelectFooter({
           w="102px"
           h="38px"
           border={`1px solid ${
-            selectedTokens.length > 0 ? "#0099FB" : "#E7BFE7"
+            selectedTokens?.length > 0 ? "#0099FB" : "#E7BFE7"
           }`}
           _hover={{
             bgColor: "#E5F2FA",
           }}
           borderRadius={10}
-          color={selectedTokens.length > 0 ? "#006DED" : "#A8BBD6"}
+          color={selectedTokens?.length > 0 ? "#006DED" : "#A8BBD6"}
           fontWeight="500"
           onClick={
             isAllSelected

@@ -1,8 +1,6 @@
-import { useState, useEffect, useMemo } from "react";
-import useSessionStorage from "./useSessionStorage";
+import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { WalletPortfolioClass } from "@/utils/classes";
-import { gen_key } from "@/utils/walletUtils";
 
 interface HistoryDataInterface {
   valueChange: number;
@@ -46,6 +44,7 @@ export const useWalletsPortfolio = () => {
     setError(null);
     await fetchWalletsPortfolio();
   }
+
   useEffect(() => {
     const handleEffect = async () => {
       if (address === undefined) {
