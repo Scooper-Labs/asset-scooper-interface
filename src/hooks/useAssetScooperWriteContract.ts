@@ -10,9 +10,7 @@ import {
   useWaitForTransactionReceipt,
   useSimulateContract,
 } from "wagmi";
-import { useToast } from "@chakra-ui/react";
-import { useContext, useEffect, useState } from "react";
-import CustomToast from "@/components/Toast";
+import { useContext, useEffect } from "react";
 import { BaseError } from "@wagmi/core";
 
 import abi from "@/constants/abi/assetscooper.json";
@@ -33,6 +31,7 @@ export function useSweepTokensSimulation(args: any[] = []) {
     args,
     query: { enabled: false },
   });
+
   const { data, refetch, isLoading } = simulateRes;
 
   const setError = (error: BaseError) => {
@@ -85,6 +84,7 @@ export function useSweepTokens(request?: SimulateContractReturnType) {
     reset,
     isPending,
   } = useWriteContract();
+
   const { isLoading, isSuccess, error, refetch } = useWaitForTransactionReceipt(
     {
       hash,

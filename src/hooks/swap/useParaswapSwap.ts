@@ -92,7 +92,8 @@ export const testTokens: Token[] = [
 ];
 
 export const useParaSwap = () => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [isExecuteLoading, setIsExecuteLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const { address, chainId } = useAccount();
   const { tokenList: selectedTokens } = useSelectToken();
@@ -293,10 +294,22 @@ export const useParaSwap = () => {
             () =>
               CustomToast(
                 toast,
-                "Your tokens have been successfully approved proceed to swap.",
+                "Success! Your tokens have been approved. You're all set to sweep!",
                 4000,
-                "top-right"
+                "top"
               );
+          },
+          onError(error) {
+            console.error("Approval failed:", error);
+            CustomToast(
+              toast,
+              "Oops! There was an issue approving your tokens. Please try again.",
+              4000,
+              "top"
+            );
+          },
+          onSettled() {
+            setIsExecuteLoading(false);
           },
         }
       );
@@ -304,9 +317,11 @@ export const useParaSwap = () => {
 
     return { tokensWithLiquidity, tokensWithoutLiquidity };
   };
+
   return {
     getRate,
     loading,
+    isExecuteLoading,
     error,
     getTokensWithLiquidity,
     executeBatchSwap,

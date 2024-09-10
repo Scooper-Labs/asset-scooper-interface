@@ -47,7 +47,9 @@ function ConfirmationModal({
     getTokensWithLiquidity,
     executeBatchSwap,
     loading: paraswapDataLoading,
+    isExecuteLoading,
   } = useParaSwap();
+
   const [tokensWithLiquidity, setTokensWithLiquidity] = React.useState<
     MoralisAssetClass[]
   >([]);
@@ -67,13 +69,13 @@ function ConfirmationModal({
   const { isSmartWallet } = useSmartWallet();
 
   //Batch approvals
-  const { approveTTokens } = useBatchApprovals({
+  const { approveTTokens, isBatchApprovalLoading } = useBatchApprovals({
     tokens: selectedTokens,
     amounts: selectedTokens.map((item) => item.userBalance.toString()),
     spender: PARASWAP_TRANSFER_PROXY as Address,
   });
 
-  //min-out put for eoa swap, array of bigint 0s
+  //min-out put for EOA swap, array of bigint 0s
   const minAmountOut = selectedTokens.map((t) => 0n);
 
   //EOA swap
@@ -461,8 +463,10 @@ function ConfirmationModal({
                     : `${COLORS.btnGradient}`
                 }
                 onClick={() => approveTTokens()}
-                disabled
+                disabled={isBatchApprovalLoading}
                 border="1px solid #F6EEFC"
+                isLoading={isBatchApprovalLoading}
+                loadingText="Approving..."
               >
                 Approve All
               </Button>
@@ -476,8 +480,6 @@ function ConfirmationModal({
               <>
                 {isSmartWallet ? (
                   <Button
-                    onClick={() => executeBatchSwap()}
-                    disabled={isDisabled}
                     width="100%"
                     color="#FDFDFD"
                     fontSize="16px"
@@ -494,13 +496,15 @@ function ConfirmationModal({
                     }
                     height="2.5rem"
                     borderRadius="8px"
+                    onClick={() => executeBatchSwap()}
+                    disabled={isDisabled}
+                    isLoading={isExecuteLoading}
+                    loadingText="Sweeping..."
                   >
                     Sweep
                   </Button>
                 ) : (
                   <Button
-                    onClick={handlesweep}
-                    disabled={isDisabled}
                     width="100%"
                     color="#FDFDFD"
                     fontSize="16px"
@@ -517,15 +521,12 @@ function ConfirmationModal({
                     }
                     height="2.5rem"
                     borderRadius="8px"
+                    onClick={handlesweep}
+                    disabled={isDisabled}
+                    isLoading={isSweeping}
+                    loadingText="Sweeping..."
                   >
-                    {isSweeping ? (
-                      <HStack spacing={2}>
-                        <Spinner size="sm" color="white" />
-                        <Text>Sweeping</Text>
-                      </HStack>
-                    ) : (
-                      "Sweep"
-                    )}
+                    Sweep
                   </Button>
                 )}
               </>

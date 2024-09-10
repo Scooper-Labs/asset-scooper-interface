@@ -1,10 +1,11 @@
+"use client";
+
 import React from "react";
 import { Flex, Box, Text, HStack } from "@chakra-ui/react";
 import { IoArrowForwardCircleSharp } from "react-icons/io5";
 import ArrowLeftIcon from "./ArrowIcons/LeftArrow";
 import ArrowRightIcon from "./ArrowIcons/RightArrow";
 import { motion } from "framer-motion";
-import Link from "next/link";
 import { LinkComponent } from "../LinkComponent";
 
 const slideLeft = {
@@ -75,7 +76,7 @@ const AnnouncementNavbar = () => {
               Assetscooper Integrates coinbase smart wallet{" "}
             </Text>
 
-            <LinkComponent href="https://mirror.xyz/0x41aDd734d7f63e01FCc336a4030817fdF643D754">
+            <LinkComponent href="/app">
               <Box as="a" pointerEvents="auto">
                 <IoArrowForwardCircleSharp color="white" size="16px" />
               </Box>

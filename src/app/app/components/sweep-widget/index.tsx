@@ -35,8 +35,9 @@ export function ETHToReceive({ selectedTokens }: { selectedTokens: Token[] }) {
   const { ethPrice } = useEthPrice({
     address: ETH_ADDRESS,
   });
+
   const quoteAllTokens = selectedTokens.reduce(
-    (total, selectedToken) => total + selectedToken.quoteUSD,
+    (total, selectedToken) => total + selectedToken?.quoteUSD,
     0
   );
 
@@ -139,7 +140,7 @@ function SweepWidget() {
                 {isLoading ? (
                   <Spinner size="sm" color="#E7BFE7" />
                 ) : (
-                  `Update in 5 min 1ETH(WETH) ≈ ${ethPrice} USDC`
+                  `Update in 5 min 1-ETH(WETH) ≈ ${ethPrice} USDC`
                 )}
               </Text>
             </Text>
@@ -210,7 +211,7 @@ function SweepWidget() {
               >
                 Max fee per gas
               </Text>
-              <CustomTooltip label="Estimated Transaction fee to process this transaction.">
+              <CustomTooltip label="Estimated transaction fee to process this transaction.">
                 <AiOutlineQuestionCircle color="#C9BCCA" />
               </CustomTooltip>
             </Flex>
@@ -227,7 +228,7 @@ function SweepWidget() {
               >
                 Estimated transaction time
               </Text>
-              <CustomTooltip label="Estimated Time taken for this transaction to be completed.">
+              <CustomTooltip label="Estimated time taken for this transaction to be completed.">
                 <AiOutlineQuestionCircle color="#C9BCCA" />
               </CustomTooltip>
             </Flex>
