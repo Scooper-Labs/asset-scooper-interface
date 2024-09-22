@@ -1,5 +1,5 @@
 export function stripPrice(_price: number) {
-  let price = _price.toString();
+  let price = _price?.toString();
   if (Math.floor(Number(price)) > 0) {
     return { subscript: null, value: formatVolume(price) };
   }
@@ -7,7 +7,7 @@ export function stripPrice(_price: number) {
     return { subscript: null, value: "0" };
   }
   // Split on decimal
-  const [, decimal] = price.split(".");
+  const [, decimal] = String(price)?.split(".");
 
   // Remove trailing zeros
   const value = decimal?.replace(/^0+/, "");
