@@ -10,12 +10,14 @@ import {
   useWaitForTransactionReceipt,
   useSimulateContract,
 } from "wagmi";
-import { useCallback, useContext, useEffect } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { BaseError } from "@wagmi/core";
 
 import abi from "@/constants/abi/assetscooper.json";
 import { assetscooper_contract as assetscooper } from "@/constants/contractAddress";
 import { Types, StateContext } from "@/provider/AppProvider";
+import { waitForTransactionReceipt } from '@wagmi/core'
+import { WALLETCONNECT_CONFIG } from "@/constants/config";
 
 type ExtendedErrorType = SimulateContractErrorType & {
   shortMessage?: string;
@@ -78,9 +80,9 @@ export function useApprove(
 
 export function useSweepTokens(request?: SimulateContractReturnType) {
   const { setMessage, setType } = useContext(StateContext);
+  const [txhash, setTxhash] = useState<`0x${string}`>("0x");
   const {
     writeContractAsync,
-    data: hash,
     failureReason,
     reset,
     isPending,
@@ -95,8 +97,11 @@ export function useSweepTokens(request?: SimulateContractReturnType) {
 
   const { isLoading, isSuccess, error, refetch } = useWaitForTransactionReceipt(
     {
-      hash: hash || undefined,
-    }
+      hash: txhash,
+      query: {
+        enabled: txhash !== "0x",
+      }
+    },
   );
 
   useEffect(() => {
@@ -107,10 +112,11 @@ export function useSweepTokens(request?: SimulateContractReturnType) {
       setError(error as ExtendedErrorType);
     }
     if (isSuccess) {
-      setMessage(hash as string);
+      setMessage(txhash as string);
       setType(Types.SUCCESS);
     }
   }, [failureReason, error, isSuccess]);
+  
 
   const sweepTokens = useCallback(
     async (customRequest?: SimulateContractReturnType) => {
@@ -118,8 +124,9 @@ export function useSweepTokens(request?: SimulateContractReturnType) {
       if (!finalRequest) return;
 
       const transactionHash = await writeContractAsync(finalRequest.request);
+      setTxhash(transactionHash);
 
-      console.log(hash, error, "this is error");
+      console.log(txhash, transactionHash, "this is error");
 
       if (transactionHash) {
         refetch();
