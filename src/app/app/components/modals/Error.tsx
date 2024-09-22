@@ -10,21 +10,23 @@ import {
   Button,
   ModalCloseButton,
 } from "@chakra-ui/react";
-import ModalComponent from "@/components/ModalComponent/MobileViewModal";
+import ModalComponent from "@/components/ModalComponent/TabViewModal";
 
 type ErrMsg = {
   title?: string;
   message: string;
 };
 
-const ErrorOccured = ({
-  isOpen,
-  onClose,
-  error,
-}: {
+interface ErrorOccuredProps {
   isOpen: boolean;
   onClose: () => void;
   error: ErrMsg | null;
+}
+
+const ErrorOccured: React.FC<ErrorOccuredProps> = ({
+  isOpen,
+  onClose,
+  error,
 }) => {
   return (
     <ModalComponent

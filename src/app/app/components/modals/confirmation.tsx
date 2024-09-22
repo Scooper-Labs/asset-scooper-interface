@@ -12,7 +12,6 @@ import {
   Text,
   HStack,
   IconButton,
-  Spinner,
   Avatar,
 } from "@chakra-ui/react";
 import ApprovalModal from "./approval";
@@ -22,7 +21,7 @@ import {
   useSweepTokensSimulation,
 } from "@/hooks/useAssetScooperWriteContract";
 import { Address } from "viem";
-import { ETHToReceive } from "../sweep-widget";
+import { ETHToReceive } from "@/components/ETHToReceive";
 import { useSlippageTolerance } from "@/hooks/settings/slippage/useSlippage";
 import { SlippageToleranceStorageKey } from "@/hooks/settings/slippage/utils";
 import { useBatchApprovals } from "@/hooks/approvals/useBatchApprovals";
@@ -36,13 +35,15 @@ import { TokenListProvider } from "@/provider/tokenListProvider";
 import { MoralisAssetClass } from "@/utils/classes";
 import { ClipLoader } from "react-spinners";
 
-function ConfirmationModal({
-  tokensAllowanceStatus,
-  refetch,
-}: {
+interface ConfirmationModalProps {
   tokensAllowanceStatus: boolean;
   refetch: () => void;
-}) {
+}
+
+const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
+  tokensAllowanceStatus,
+  refetch,
+}) => {
   const {
     getTokensWithLiquidity,
     executeBatchSwap,
@@ -57,7 +58,7 @@ function ConfirmationModal({
     MoralisAssetClass[]
   >([]);
 
-  const [previewState, setPreviewState] = useState(false);
+  const [previewState, setPreviewState] = useState<boolean>(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const { slippageTolerance } = useSlippageTolerance(
@@ -68,7 +69,7 @@ function ConfirmationModal({
     useContext(TokenListProvider);
   const { isSmartWallet } = useSmartWallet();
 
-  //Batch approvals
+  //Batch approvals for Smart Wallet
   const { approveTTokens, isBatchApprovalLoading } = useBatchApprovals({
     tokens: selectedTokens,
     amounts: selectedTokens.map((item) => item.userBalance.toString()),
@@ -84,6 +85,7 @@ function ConfirmationModal({
     tokensWithLiquidity.map((token) => token.address),
     minAmountOut,
   ];
+
   const { data, resimulate, isPending } = useSweepTokensSimulation(args);
   const { isLoading, isSuccess, sweepTokens } = useSweepTokens(data);
 
@@ -113,6 +115,7 @@ function ConfirmationModal({
 
   return (
     <>
+      {/* -------------------- Sweep Button ------------------- */}
       <Button
         width="100%"
         bg={COLORS.btnGradient}
@@ -210,14 +213,14 @@ function ConfirmationModal({
                     color="#676C87"
                     mt={4}
                   >
-                    Please wait, trade data is loading....
+                    Please wait, trade data is fetching...
                   </Text>
                 </Box>
               ) : (
                 <VStack>
                   {tokensWithLiquidity.length > 0 && (
                     <>
-                      <Text textAlign="center" fontSize="14px" color="#676C87">
+                      <Text textAlign="center" fontSize="12px" color="#676C87">
                         The following tokens are sweepable
                       </Text>
 
@@ -254,7 +257,7 @@ function ConfirmationModal({
                       <VStack>
                         <Text
                           textAlign="center"
-                          fontSize="14px"
+                          fontSize="12px"
                           color="#676C87"
                         >
                           The following tokens can't be swept because they have
@@ -268,14 +271,18 @@ function ConfirmationModal({
                               src={token.logoURI}
                             />
                             <HStack>
-                              <Text fontWeight="500" color="#281629">
+                              <Text
+                                fontSize="13px"
+                                fontWeight="500"
+                                color="#281629"
+                              >
                                 {token.symbol.length > 6
                                   ? `${token.symbol.substring(0, 5)}...`
                                   : token.symbol}
                               </Text>
                               <Text
                                 color="#A8BBD6"
-                                fontSize="13px"
+                                fontSize="12px"
                                 fontWeight={500}
                               >
                                 {token.name}
@@ -294,8 +301,8 @@ function ConfirmationModal({
                           fontSize="14px"
                           color="#676C87"
                         >
-                          Insufficient liquidity for the selected tokens or
-                          trade will lead to a high price impact
+                          Insufficient liquidity for the selected tokens and
+                          can't be sweep
                         </Text>
                       </Box>
                     )}
@@ -445,6 +452,7 @@ function ConfirmationModal({
 
           {/* ----------------- Button section ---------------- */}
           <HStack width="100%" mt="10px" mb="20px">
+            {/*  // --------------- Smart wallet Batch Approval --------------- */}
             {isSmartWallet ? (
               <Button
                 borderRadius="8px"
@@ -462,15 +470,16 @@ function ConfirmationModal({
                     ? `${COLORS.inputBgcolor}`
                     : `${COLORS.btnGradient}`
                 }
-                onClick={() => approveTTokens()}
-                disabled={isBatchApprovalLoading}
                 border="1px solid #F6EEFC"
+                onClick={() => approveTTokens()}
+                isDisabled={isDisabled}
                 isLoading={isBatchApprovalLoading}
                 loadingText="Approving..."
               >
                 Approve All
               </Button>
             ) : (
+              // --------------- EOA Approval Modal ---------------
               <ApprovalModal
                 tokensAllowanceStatus={tokensAllowanceStatus}
                 refetch={refetch}
@@ -497,7 +506,7 @@ function ConfirmationModal({
                     height="2.5rem"
                     borderRadius="8px"
                     onClick={() => executeBatchSwap()}
-                    disabled={isDisabled}
+                    isDisabled={isDisabled}
                     isLoading={isExecuteLoading}
                     loadingText="Sweeping..."
                   >
@@ -522,7 +531,7 @@ function ConfirmationModal({
                     height="2.5rem"
                     borderRadius="8px"
                     onClick={handlesweep}
-                    disabled={isDisabled}
+                    isDisabled={isDisabled}
                     isLoading={isSweeping}
                     loadingText="Sweeping..."
                   >
@@ -538,12 +547,18 @@ function ConfirmationModal({
                 fontSize="16px"
                 fontWeight={500}
                 _hover={{
-                  bg: `${COLORS.inputBgcolor}`,
+                  bg: tokensAllowanceStatus
+                    ? `${COLORS.btnGradient}`
+                    : `${COLORS.inputBgcolor}`,
                 }}
-                bg={COLORS.inputBgcolor}
+                bg={
+                  tokensAllowanceStatus
+                    ? `${COLORS.btnGradient}`
+                    : `${COLORS.inputBgcolor}`
+                }
                 onClick={async () => {
                   setPreviewState(true);
-                  await handlePreviewTokens(); //fetch tokens liquidity status
+                  await handlePreviewTokens(); //******fetch tokens liquidity status
                 }}
               >
                 Preview
@@ -554,6 +569,6 @@ function ConfirmationModal({
       </ModalComponent>
     </>
   );
-}
+};
 
 export default ConfirmationModal;

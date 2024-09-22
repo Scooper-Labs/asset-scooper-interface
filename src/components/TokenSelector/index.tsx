@@ -134,6 +134,8 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
   );
 }
 
+export default TokenSelector;
+
 function meetsThreshold(
   data: MoralisAssetClass[] | null,
   price: number,

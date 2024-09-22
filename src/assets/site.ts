@@ -5,10 +5,10 @@ export const tabs: TabsProps[] = [
     name: "Sweep",
     link: "/app",
   },
-  {
-    name: "Wrap",
-    link: "#",
-  },
+  // {
+  //   name: "Wrap",
+  //   link: "#",
+  // },
   {
     name: "Docs",
     link: "#",

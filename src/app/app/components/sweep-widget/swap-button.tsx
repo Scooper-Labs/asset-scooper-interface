@@ -15,6 +15,20 @@ import { COLORS } from "@/constants/theme";
 import { useSmartWallet } from "@/hooks/useSmartWallet";
 import { TokenListProvider } from "@/provider/tokenListProvider";
 
+interface AllowanceResultTrue {
+  error?: undefined;
+  result: string | number | bigint;
+  status: "success";
+}
+
+interface AllowanceResultFalse {
+  error: Error;
+  result?: undefined;
+  status: "failure";
+}
+
+type AllowanceRes = AllowanceResultTrue | AllowanceResultFalse;
+
 function SweepButton() {
   const { open } = useWeb3Modal();
   const { isSmartWallet } = useSmartWallet();
@@ -115,17 +129,3 @@ function SweepButton() {
 }
 // InfoOutlineIcon
 export default SweepButton;
-
-interface AllowanceResultTrue {
-  error?: undefined;
-  result: string | number | bigint;
-  status: "success";
-}
-
-interface AllowanceResultFalse {
-  error: Error;
-  result?: undefined;
-  status: "failure";
-}
-
-type AllowanceRes = AllowanceResultTrue | AllowanceResultFalse;

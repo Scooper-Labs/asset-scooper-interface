@@ -13,6 +13,7 @@ import {
   Tag,
   TagLabel,
   Spinner,
+  Skeleton,
   chakra,
 } from "@chakra-ui/react";
 import Image from "next/image";
@@ -23,40 +24,20 @@ import SweepButton from "./swap-button";
 import { useRouter } from "next/navigation";
 import { SweepIcon } from "@/assets/svg";
 import OverlappingImage, { getImageArray } from "./ImageLap";
-import FormatNumber from "@/components/FormatNumber";
-import { Token } from "@/lib/components/types";
 import { useAccount, useEstimateFeesPerGas } from "wagmi";
 import { useWalletsPortfolio } from "@/hooks/useMobula";
 import { useEthPrice } from "@/hooks/useGetETHPrice2";
 import { ETH_ADDRESS } from "@/utils";
 import CustomTooltip from "@/components/CustomTooltip";
 import useSelectToken from "@/hooks/useSelectToken";
-
-export function ETHToReceive({ selectedTokens }: { selectedTokens: Token[] }) {
-  const { ethPrice } = useEthPrice({
-    address: ETH_ADDRESS,
-  });
-
-  const quoteAllTokens = selectedTokens.reduce(
-    (total, selectedToken) => total + selectedToken?.quoteUSD,
-    0
-  );
-
-  return (
-    <>
-      {ethPrice === 0 ? (
-        "__"
-      ) : (
-        <FormatNumber amount={quoteAllTokens / ethPrice} suf="ETH" />
-      )}
-    </>
-  );
-}
+import { ETHToReceive } from "@/components/ETHToReceive";
+import FormatNumber from "@/components/FormatNumber";
 
 function SweepWidget() {
   const { address } = useAccount();
   const { tokenList: selectedTokens, clearList } = useSelectToken();
-  const { data } = useEstimateFeesPerGas();
+  const { data: estimateData, isLoading: isLoadingEstimateFee } =
+    useEstimateFeesPerGas();
 
   const router = useRouter();
 
@@ -136,14 +117,22 @@ function SweepWidget() {
                 Sweep
               </Text>
             </Flex>
-            <chakra.span fontSize="12px" color={COLORS.tabTextColor}>
+            <chakra.span fontSize="12px" color="#9E829F">
               {isLoading ? (
-                <Spinner size="sm" color="#E7BFE7" />
+                <Skeleton
+                  height="3em"
+                  width="200px"
+                  startColor="#E7BFE7"
+                  endColor="#9E829F"
+                  speed={1.2}
+                  fadeDuration={0.5}
+                />
               ) : (
-                `Update in 5 min 1-ETH(WETH) ≈ ${ethPrice} USDC`
+                `Update in 5min 1 ETH(WETH) ≈ ${ethPrice} USDC`
               )}
             </chakra.span>
           </Flex>
+          {/* -------------------- Token Selector is here ------------------- */}
           <TokenSelector>
             <Flex
               width="100%"
@@ -211,12 +200,29 @@ function SweepWidget() {
               >
                 Max fee per gas
               </Text>
-              <CustomTooltip label="Estimated transaction fee to process this transaction.">
+              <CustomTooltip label="Maximum amount you're willing to pay per unit of gas for this transaction.">
                 <AiOutlineQuestionCircle color="#C9BCCA" />
               </CustomTooltip>
             </Flex>
 
-            <Text>{data ? data.formatted.maxFeePerGas : "__"} ETH</Text>
+            {isLoadingEstimateFee ? (
+              <Skeleton
+                height="2em"
+                width="100px"
+                startColor="#E7BFE7"
+                endColor="#9E829F"
+                speed={1.2}
+                fadeDuration={0.5}
+              />
+            ) : (
+              <Text>
+                <FormatNumber
+                  //@ts-ignore
+                  amount={estimateData ? estimateData.maxFeePerGas : "__"}
+                  suf="ETH"
+                />
+              </Text>
+            )}
           </Flex>
 
           <Flex width="100%" justifyContent="space-between">
@@ -235,11 +241,11 @@ function SweepWidget() {
 
             <Text>3 seconds</Text>
           </Flex>
+          {/* -------------------- Connect Button & Sweep Button is here ------------------- */}
           <SweepButton />
         </VStack>
       </VStack>
     </VStack>
   );
 }
-// InfoOutlineIcon
 export default SweepWidget;
