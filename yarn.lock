@@ -931,10 +931,10 @@
   resolved "https://registry.yarnpkg.com/@chakra-ui/visually-hidden/-/visually-hidden-2.2.0.tgz#9b0ecef8f01263ab808ba3bda7b36a0d91b4d5c1"
   integrity sha512-KmKDg01SrQ7VbTD3+cPWf/UfpF5MSwm3v7MWi0n5t8HnnadT13MF0MJCDSXbBWnzLv1ZKJ6zlyAOeARWX+DpjQ==
 
-"@coinbase/onchainkit@^0.30.0":
-  version "0.30.0"
-  resolved "https://registry.yarnpkg.com/@coinbase/onchainkit/-/onchainkit-0.30.0.tgz#ac3981de88df8e681d3201c19388dbe2bd06b194"
-  integrity sha512-enunWqC0JU7PTEI/t516VsteNMXl6yeMxmcksNy6o9ZHG2c8JsvnpaXpVo6ROnMl0rEKcpv1pMnk8WudyEIfWA==
+"@coinbase/onchainkit@^0.31.6":
+  version "0.31.6"
+  resolved "https://registry.yarnpkg.com/@coinbase/onchainkit/-/onchainkit-0.31.6.tgz#9ec756acfffd13ee38de17af8fa546e180b81596"
+  integrity sha512-tcqhf8N/3Wvlq0KfA+KaMbx2WtQfJOlTEZRJ3McZhZiTMS1OA1rct5GvwBKiZgg7SRnNl6XPLMRtYAOSX50JdQ==
   dependencies:
     "@rainbow-me/rainbowkit" "^2.1.3"
     "@tanstack/react-query" "^5"

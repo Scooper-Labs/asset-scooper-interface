@@ -5,7 +5,7 @@ import React, { useContext, useMemo } from "react";
 import { Token } from "@/lib/components/types";
 import { MoralisAssetClass } from "@/utils/classes";
 import { TokenListProvider } from "@/provider/tokenListProvider";
-import { ETHToReceive } from "@/app/app/components/sweep-widget";
+import { ETHToReceive } from "../ETHToReceive";
 
 export function TokenSelectFooter({
   userWalletTokens,

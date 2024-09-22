@@ -2,7 +2,7 @@
 
 import ErrorOccured from "@/app/app/components/modals/Error";
 import TransactionComplete from "@/app/app/components/modals/Success";
-import { ETHToReceive } from "@/app/app/components/sweep-widget";
+import { ETHToReceive } from "@/components/ETHToReceive";
 import useSelectToken from "@/hooks/useSelectToken";
 import { useDisclosure } from "@chakra-ui/react";
 import { createContext, useEffect, useState } from "react";

@@ -12,8 +12,6 @@ import { ETH_CHAINS } from "@/utils/network";
 // export const WALLETCONNECT_PROJECT_ID =
 //   process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "";
 
-// export const WALLETCONNECT_PROJECT_ID = "9e27a596a8ddb5b83b60dba6505d1265";
-
 export const WALLETCONNECT_PROJECT_ID = "b10ff2f14f1c8a4efecf95865ebb1ac2";
 
 if (!WALLETCONNECT_PROJECT_ID) {

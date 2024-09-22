@@ -41,6 +41,13 @@ import { HiOutlineDocumentDuplicate } from "react-icons/hi";
 import Cookies from "js-cookie";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { ClipLoader } from "react-spinners";
+import { useSmartWallet } from "@/hooks/useSmartWallet";
+import {
+  WalletDropdown,
+  WalletDropdownLink,
+  WalletDropdownDisconnect,
+} from "@coinbase/onchainkit/wallet";
+import Link from "next/link";
 
 interface IModals {
   isOpen: boolean;
@@ -56,6 +63,8 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
   const { moralisAssets, isLoading } = useBalances({ address });
   const [userWalletTokens, setWT] = useState<MoralisAssetClass[]>([]);
   const [addressCopied, setAddressCopied] = useState<boolean>(false);
+
+  const { isSmartWallet } = useSmartWallet();
 
   const {
     data: txns,
@@ -128,82 +137,107 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
           bgPos={["", "inherit", "inherit"]}
         >
           {/* ----- Heading Account detail ----- */}
-          <Flex justify="space-between">
-            <HStack>
-              <Avatar width={32} height={32} />
-              <CopyToClipboard
-                text={address ?? ""}
-                onCopy={() => {
-                  setAddressCopied(true);
-                  setTimeout(() => {
-                    setAddressCopied(false);
-                  }, 800);
-                }}
-              >
-                <HStack>
-                  <Text
-                    fontSize="16px"
-                    lineHeight="19.2px"
-                    fontWeight={502}
-                    color="#151829"
-                    cursor="pointer"
-                    _hover={{
-                      cursor: "pointer",
-                      color: "#9E829F",
-                    }}
-                  >
-                    {truncateAddress(address || "")}
-                  </Text>
+          <Flex flexDir="column">
+            <Flex justify="space-between">
+              <HStack>
+                {/* -------------------- This is for EOA users --------------------- */}
+                <Avatar width={32} height={32} />
+                <CopyToClipboard
+                  text={address ?? ""}
+                  onCopy={() => {
+                    setAddressCopied(true);
+                    setTimeout(() => {
+                      setAddressCopied(false);
+                    }, 800);
+                  }}
+                >
+                  <HStack>
+                    <Text
+                      fontSize="16px"
+                      lineHeight="19.2px"
+                      fontWeight={502}
+                      color="#151829"
+                      cursor="pointer"
+                      _hover={{
+                        cursor: "pointer",
+                        color: "#9E829F",
+                      }}
+                    >
+                      {truncateAddress(address || "")}
+                    </Text>
 
-                  {addressCopied ? (
-                    <MdCheckCircleOutline
-                      size={16}
-                      aria-hidden="true"
-                      color={COLORS.balTextColor}
-                    />
-                  ) : (
-                    <HiOutlineDocumentDuplicate
-                      size={16}
-                      style={{ cursor: "pointer" }}
-                    />
-                  )}
-                </HStack>
-              </CopyToClipboard>
-            </HStack>
+                    {addressCopied ? (
+                      <MdCheckCircleOutline
+                        size={16}
+                        aria-hidden="true"
+                        color={COLORS.balTextColor}
+                      />
+                    ) : (
+                      <HiOutlineDocumentDuplicate
+                        size={16}
+                        style={{ cursor: "pointer" }}
+                      />
+                    )}
+                  </HStack>
+                </CopyToClipboard>
+              </HStack>
 
-            <HStack>
-              <Center
-                display={{ base: "flex", md: "none" }}
-                as={Button}
-                width="95px"
-                bgColor="#FFDFE3"
+              <HStack>
+                <Center
+                  display={{ base: "flex", md: "none" }}
+                  as={Button}
+                  width="95px"
+                  bgColor="#FFDFE3"
+                  py="10px"
+                  px="10px"
+                  color="#E2001B"
+                  fontWeight={400}
+                  borderRadius="104px"
+                  h="29px"
+                  onClick={disconnectAndCloseModal}
+                  _hover={{
+                    bgColor: "#FFDFE3",
+                    color: "#E2001B",
+                  }}
+                >
+                  Disconnect
+                </Center>
+
+                <Circle
+                  onClick={onClose}
+                  background="#018FE91A"
+                  borderRadius="50px"
+                  //@ts-ignore
+                  width="32px"
+                  height="32px"
+                  cursor="pointer"
+                >
+                  <IoMdClose color="black" />
+                </Circle>
+              </HStack>
+            </Flex>
+
+            {/* ---------------------- This is for coinbase smart wallet users --------------------- */}
+            {isSmartWallet ? (
+              <Box
+                mt="10px"
+                as={Link}
+                href="https://keys.coinbase.com"
+                rel="noopener noreferrer"
+                target="_blank"
+                w="100%"
+                borderRadius={"10px"}
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                bg="#00BA8233"
+                color="#00976A"
                 py="10px"
                 px="10px"
-                color="#E2001B"
-                fontWeight={400}
-                borderRadius="104px"
-                h="29px"
-                onClick={disconnectAndCloseModal}
-                _hover={{
-                  bgColor: "#FFDFE3",
-                  color: "#E2001B",
-                }}
               >
-                Disconnect
-              </Center>
-
-              <Circle
-                onClick={onClose}
-                background="#018FE91A"
-                borderRadius="50px"
-                //@ts-ignore
-                width="32px"
-                height="32px"
-                cursor="pointer"
-              >
-                <IoMdClose color="black" />
-              </Circle>
-            </HStack>
+                <Text fontSize="12px">View your wallet</Text>
+              </Box>
+            ) : null}
           </Flex>
 
           <HStack mt="40px">

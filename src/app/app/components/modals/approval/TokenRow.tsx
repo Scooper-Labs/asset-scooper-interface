@@ -18,7 +18,13 @@ import { RxReload } from "react-icons/rx";
 import { assetscooper_contract } from "@/constants/contractAddress";
 import { useApprove } from "@/hooks/useAssetScooperWriteContract";
 
-function TokenRow({ token, refetch }: { token: Token; refetch: () => void }) {
+interface TokenRowProps {
+  token: Token;
+  refetch: () => void;
+  onClose: () => void;
+}
+
+const TokenRow: React.FC<TokenRowProps> = ({ token, refetch, onClose }) => {
   const {
     name,
     logoURI,
@@ -52,6 +58,11 @@ function TokenRow({ token, refetch }: { token: Token; refetch: () => void }) {
 
   const handleApprove = async () => {
     await approve();
+
+    //***Close the modal only if the approval is successful
+    if (isSuccess) {
+      onClose();
+    }
   };
 
   const isApproved =
@@ -62,8 +73,10 @@ function TokenRow({ token, refetch }: { token: Token; refetch: () => void }) {
     if (isSuccess) {
       refetchAllowance();
       refetch();
+      // Close the modal when the approval is successful
+      onClose();
     }
-  }, [isSuccess]);
+  }, [isSuccess, onClose, refetchAllowance, refetch]);
 
   return (
     <HStack
@@ -92,13 +105,14 @@ function TokenRow({ token, refetch }: { token: Token; refetch: () => void }) {
         <Button
           onClick={handleApprove}
           isLoading={isLoading}
-          borderRadius="8px"
+          loadingText={isApproved ? "Approved" : "Approving..."}
           isDisabled={isApproved}
           width="100%"
           color="#FDFDFD"
           fontSize="16px"
           fontWeight={500}
           bg={COLORS.btnGradient}
+          borderRadius="8px"
           _hover={{
             bg: COLORS.btnGradient,
           }}
@@ -106,12 +120,12 @@ function TokenRow({ token, refetch }: { token: Token; refetch: () => void }) {
           {isApproved ? "Approved" : "Approve"}
         </Button>
 
-        <Button onClick={() => refetchAllowance()}>
+        <Button onClick={() => refetchAllowance()} isDisabled={isLoading}>
           {isLoading ? <ClipLoader size={20} /> : <RxReload size={20} />}
         </Button>
       </HStack>
     </HStack>
   );
-}
+};
 
 export default TokenRow;

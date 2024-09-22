@@ -10,7 +10,7 @@ import {
   useWaitForTransactionReceipt,
   useSimulateContract,
 } from "wagmi";
-import { useContext, useEffect } from "react";
+import { useCallback, useContext, useEffect } from "react";
 import { BaseError } from "@wagmi/core";
 
 import abi from "@/constants/abi/assetscooper.json";
@@ -59,16 +59,17 @@ export function useApprove(
   const { data: hash, isPending, writeContractAsync } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash,
-    confirmations: 2,
+    confirmations: 1,
   });
 
   const approve = async () => {
-    writeContractAsync({
+    const result = await writeContractAsync({
       address,
       abi: erc20Abi,
       functionName: "approve",
       args,
     });
+    return result;
   };
 
   const isLoading = isPending ?? isConfirming;
@@ -85,20 +86,18 @@ export function useSweepTokens(request?: SimulateContractReturnType) {
     isPending,
   } = useWriteContract();
 
-  const { isLoading, isSuccess, error, refetch } = useWaitForTransactionReceipt(
-    {
-      hash,
-      confirmations: 2,
-      query: { enabled: false },
-    }
-  );
-
   const setError = (error: ExtendedErrorType) => {
     const message = error.shortMessage ? error.shortMessage : error.message;
     const title = error.name as string;
     setMessage({ title, message: message ?? "An unknown error occurred" });
     setType(Types.ERROR);
   };
+
+  const { isLoading, isSuccess, error, refetch } = useWaitForTransactionReceipt(
+    {
+      hash: hash || undefined,
+    }
+  );
 
   useEffect(() => {
     if (failureReason) {
@@ -113,24 +112,26 @@ export function useSweepTokens(request?: SimulateContractReturnType) {
     }
   }, [failureReason, error, isSuccess]);
 
-  async function sweepTokens(customRequest?: SimulateContractReturnType) {
-    const finalRequest = customRequest ?? request;
-    if (!finalRequest) return;
-    await writeContractAsync(finalRequest.request);
-    refetch();
-    reset();
-  }
+  const sweepTokens = useCallback(
+    async (customRequest?: SimulateContractReturnType) => {
+      const finalRequest = customRequest ?? request;
+      if (!finalRequest) return;
+
+      const transactionHash = await writeContractAsync(finalRequest.request);
+
+      console.log(hash, error, "this is error");
+
+      if (transactionHash) {
+        refetch();
+        reset();
+      } else {
+        console.error("Transaction hash is undefined");
+      }
+    },
+    []
+  );
 
   const waitSubmitAndConfirm = isPending || isLoading;
 
   return { sweepTokens, isLoading: waitSubmitAndConfirm, isSuccess };
-}
-
-function parseSimulationResults(simulationResults: any) {
-  return JSON.parse(
-    JSON.stringify(
-      simulationResults,
-      (key, value) => (typeof value === "bigint" ? value.toString() : value) // return everything else unchanged
-    )
-  );
 }

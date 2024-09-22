@@ -29,7 +29,7 @@ function ApprovalModal({
   return (
     <>
       <Button
-        disabled={tokensAllowanceStatus}
+        isDisabled={tokensAllowanceStatus}
         borderRadius="8px"
         width="100%"
         color="#FDFDFD"
@@ -77,7 +77,7 @@ function ApprovalModal({
           <VStack width="100%" gap="4px" position="relative">
             {selectedTokens.map((token) => (
               <Box width="100%" key={token.address}>
-                <TokenRow token={token} refetch={refetch} />
+                <TokenRow token={token} refetch={refetch} onClose={onClose} />
               </Box>
             ))}
           </VStack>
