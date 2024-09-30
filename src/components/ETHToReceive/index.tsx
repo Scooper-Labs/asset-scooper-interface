@@ -15,7 +15,7 @@ export function ETHToReceive({ selectedTokens }: { selectedTokens: Token[] }) {
   );
 
   return (
-    <Flex fontSize="11px">
+    <Flex fontSize="14px">
       <Skeleton
         isLoaded={!isLoading}
         fadeDuration={0.5}

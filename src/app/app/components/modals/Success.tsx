@@ -10,7 +10,7 @@ import {
   Button,
   ModalCloseButton,
 } from "@chakra-ui/react";
-import ModalComponent from "@/components/ModalComponent/MobileViewModal";
+import ModalComponent from "@/components/ModalComponent/TabViewModal";
 import Link from "next/link";
 
 const TransactionComplete = ({

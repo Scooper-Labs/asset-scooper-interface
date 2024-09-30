@@ -16,7 +16,7 @@ import { BaseError } from "@wagmi/core";
 import abi from "@/constants/abi/assetscooper.json";
 import { assetscooper_contract as assetscooper } from "@/constants/contractAddress";
 import { Types, StateContext } from "@/provider/AppProvider";
-import { waitForTransactionReceipt } from '@wagmi/core'
+import { waitForTransactionReceipt } from "@wagmi/core";
 import { WALLETCONNECT_CONFIG } from "@/constants/config";
 
 type ExtendedErrorType = SimulateContractErrorType & {
@@ -81,12 +81,8 @@ export function useApprove(
 export function useSweepTokens(request?: SimulateContractReturnType) {
   const { setMessage, setType } = useContext(StateContext);
   const [txhash, setTxhash] = useState<`0x${string}`>("0x");
-  const {
-    writeContractAsync,
-    failureReason,
-    reset,
-    isPending,
-  } = useWriteContract();
+  const { writeContractAsync, failureReason, reset, isPending } =
+    useWriteContract();
 
   const setError = (error: ExtendedErrorType) => {
     const message = error.shortMessage ? error.shortMessage : error.message;
@@ -100,8 +96,8 @@ export function useSweepTokens(request?: SimulateContractReturnType) {
       hash: txhash,
       query: {
         enabled: txhash !== "0x",
-      }
-    },
+      },
+    }
   );
 
   useEffect(() => {
@@ -116,7 +112,6 @@ export function useSweepTokens(request?: SimulateContractReturnType) {
       setType(Types.SUCCESS);
     }
   }, [failureReason, error, isSuccess]);
-  
 
   const sweepTokens = useCallback(
     async (customRequest?: SimulateContractReturnType) => {
@@ -126,7 +121,7 @@ export function useSweepTokens(request?: SimulateContractReturnType) {
       const transactionHash = await writeContractAsync(finalRequest.request);
       setTxhash(transactionHash);
 
-      console.log(txhash, transactionHash, "this is error");
+      // console.log(txhash, transactionHash, "this is error");
 
       if (transactionHash) {
         refetch();

@@ -1,23 +1,31 @@
-@import url("https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&display=swap");
+@font-face {
+  font-family: "Dellamor";
+  src: url("/public/fonts/Dellamor/Dellamor.otf");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Moderat";
+  src: url("/public/fonts/Moderat/Moderat-Light.ttf");
+  font-weight: 400;
+  font-style: normal;
+}
 
 * {
   margin: 0;
   padding: 0;
-  box-shadow: none;
+  box-sizing: border-box;
 }
 
 body {
   color: #0000;
   background: #ffff;
-  scroll-behavior: smooth;
+  font-family: "Moderat", sans-serif;
 }
 
-@font-face {
-  font-family: "Dellamor";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("/public/fonts/Dellamor.otf");
+html {
+  scroll-behavior: smooth;
 }
 
 .fontBalance {

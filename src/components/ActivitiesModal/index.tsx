@@ -27,7 +27,7 @@ import { IoMdClose } from "react-icons/io";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import Tokens from "./Tokens";
 import Transactions from "./Transactions";
-import { useAccount, useDisconnect } from "wagmi";
+import { useAccount, useBalance, useDisconnect } from "wagmi";
 import { truncateAddress } from "@/utils/walletUtils";
 import { useBalances } from "@/hooks/balances/useBalances";
 import Avatar from "@/assets/svg";
@@ -48,6 +48,7 @@ import {
   WalletDropdownDisconnect,
 } from "@coinbase/onchainkit/wallet";
 import Link from "next/link";
+import { useWalletsPortfolioMoralis } from "@/hooks/useMoralis";
 
 interface IModals {
   isOpen: boolean;
@@ -58,8 +59,13 @@ interface IModals {
 const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
   const [isBalanceVisible, setIsBalanceVisible] = useState<boolean>(true);
   const { address } = useAccount();
+
+  const { data: portfolioBalance, isLoading: loadPortfolio } = useBalance({
+    address,
+  });
+
   const { disconnect } = useDisconnect();
-  const { data, loading: loadPortfolio } = useWalletsPortfolio();
+  // const { data, loading: loadPortfolio } = useWalletsPortfolio();
   const { moralisAssets, isLoading } = useBalances({ address });
   const [userWalletTokens, setWT] = useState<MoralisAssetClass[]>([]);
   const [addressCopied, setAddressCopied] = useState<boolean>(false);
@@ -268,12 +274,16 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
                 lineHeight="43.2px"
               >
                 {isBalanceVisible ? (
-                  <FormatNumber pre="$" amount={data ? data.balance : 0} />
+                  <FormatNumber
+                    pre="$"
+                    amount={portfolioBalance ? Number(portfolioBalance) : 0}
+                  />
                 ) : (
                   "****"
                 )}
               </Text>
-              <Box
+
+              {/* <Box
                 background="#00BA8233"
                 color="#00976A"
                 py="10px"
@@ -287,7 +297,7 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
                     suf="%"
                   />
                 </Text>
-              </Box>
+              </Box> */}
             </HStack>
           )}
         </Box>

@@ -34,6 +34,8 @@ import OverlappingImage, { getImageArray } from "../sweep-widget/ImageLap";
 import { TokenListProvider } from "@/provider/tokenListProvider";
 import { MoralisAssetClass } from "@/utils/classes";
 import { ClipLoader } from "react-spinners";
+import { SOCIAL_TELEGRAM } from "@/utils/site";
+import { TbMessage2Heart } from "react-icons/tb";
 
 interface ConfirmationModalProps {
   tokensAllowanceStatus: boolean;
@@ -141,21 +143,41 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       >
         {/* ------------------------ Header section ---------------------- */}
         <Flex justify="space-between" alignItems="center">
-          <Box flex="1" textAlign="center">
+          <Box flex="1" textAlign="left">
             <Text fontWeight={700} fontSize="14px" color="#0D0D0D">
               Review Transaction
             </Text>
           </Box>
 
-          <IconButton
-            aria-label="close-btn"
-            icon={<IoMdClose size="24px" color="#0D0D0D" />}
-            onClick={onClose}
-            bg="none"
-            _hover={{
-              bg: "none",
-            }}
-          />
+          {/* ------------------- Get help button ---------------- */}
+          <HStack>
+            <Button
+              fontSize="13px"
+              fontWeight={400}
+              as="a"
+              h="40px"
+              borderRadius="18px"
+              leftIcon={<TbMessage2Heart />}
+              _hover={{
+                bg: `${COLORS.sweepBGColor}`,
+              }}
+              href={SOCIAL_TELEGRAM}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Get Help
+            </Button>
+
+            <IconButton
+              aria-label="close-btn"
+              icon={<IoMdClose size="24px" color="#0D0D0D" />}
+              onClick={onClose}
+              bg="none"
+              _hover={{
+                bg: "none",
+              }}
+            />
+          </HStack>
         </Flex>
 
         <Stack w="100%">
@@ -171,7 +193,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               Sweep
             </Text>
 
-            <HStack mt="8px">
+            <HStack mt="15px">
               <OverlappingImage imageArray={getImageArray(selectedTokens)} />
               <Text fontWeight="500" fontSize="14px" color="#2C333B">
                 {selectedTokens.length} selected Tokens
@@ -221,33 +243,40 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                   {tokensWithLiquidity.length > 0 && (
                     <>
                       <Text textAlign="center" fontSize="12px" color="#676C87">
-                        The following tokens are sweepable
+                        The following{" "}
+                        <>
+                          {tokensWithLiquidity.length === 1
+                            ? "token"
+                            : `tokens`}
+                        </>{" "}
+                        are sweepable
                       </Text>
 
                       <VStack>
-                        {tokensWithLiquidity.map((token) => (
-                          <HStack alignItems="center" key={token.address}>
-                            <Avatar
-                              size="sm"
-                              name={token.name}
-                              src={token.logoURI}
-                            />
-                            <HStack alignItems="center">
-                              <Text fontWeight="500" color="#281629">
-                                {token.symbol.length > 6
-                                  ? `${token.symbol.substring(0, 5)}...`
-                                  : token.symbol}
-                              </Text>
-                              <Text
-                                color="#A8BBD6"
-                                fontSize="13px"
-                                fontWeight={500}
-                              >
-                                {token.name}
-                              </Text>
+                        {tokensWithLiquidity.length > 0 && (
+                          <>
+                            <HStack spacing={-2} alignItems="center">
+                              {tokensWithLiquidity.slice(0, 5).map((token) => (
+                                <Avatar
+                                  key={token.address}
+                                  size="sm"
+                                  name={token.name}
+                                  src={token.logoURI}
+                                  border="2px solid white"
+                                />
+                              ))}
+                              {tokensWithLiquidity.length > 5 && (
+                                <Text
+                                  color="#A8BBD6"
+                                  fontSize="13px"
+                                  fontWeight={500}
+                                >
+                                  +{tokensWithLiquidity.length - 5}
+                                </Text>
+                              )}
                             </HStack>
-                          </HStack>
-                        ))}
+                          </>
+                        )}
                       </VStack>
                     </>
                   )}
@@ -263,33 +292,35 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                           The following tokens can't be swept because they have
                           insufficient liquidity
                         </Text>
-                        {tokensWithoutLiquidity.map((token) => (
-                          <HStack key={token.address} alignItems="center">
-                            <Avatar
-                              size="sm"
-                              name={token.name}
-                              src={token.logoURI}
-                            />
-                            <HStack>
-                              <Text
-                                fontSize="13px"
-                                fontWeight="500"
-                                color="#281629"
-                              >
-                                {token.symbol.length > 6
-                                  ? `${token.symbol.substring(0, 5)}...`
-                                  : token.symbol}
-                              </Text>
-                              <Text
-                                color="#A8BBD6"
-                                fontSize="12px"
-                                fontWeight={500}
-                              >
-                                {token.name}
-                              </Text>
+                        {tokensWithoutLiquidity.length > 0 && (
+                          <>
+                            <HStack spacing={-2} alignItems="center">
+                              {tokensWithoutLiquidity
+                                .slice(0, 5)
+                                .map((token) => (
+                                  <Avatar
+                                    key={token.address}
+                                    size="sm"
+                                    name={token.name}
+                                    src={token.logoURI}
+                                    border="2px solid white"
+                                  />
+                                ))}
+                              {tokensWithoutLiquidity.length > 5 && (
+                                <Text
+                                  fontSize="13px"
+                                  fontWeight="500"
+                                  color="#A8BBD6"
+                                >
+                                  +{tokensWithoutLiquidity.length - 5}{" "}
+                                  {tokensWithoutLiquidity.length - 5 === 1
+                                    ? "token"
+                                    : "tokens"}
+                                </Text>
+                              )}
                             </HStack>
-                          </HStack>
-                        ))}
+                          </>
+                        )}
                       </VStack>
                     )}
 

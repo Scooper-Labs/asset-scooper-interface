@@ -101,7 +101,7 @@ function SweepWidget() {
             width={428}
             height={118}
             alt="Swap tokens Art"
-            src="/images/ConvertArt.svg"
+            src="/image/ConvertArt.svg"
           />
         </Box>
 

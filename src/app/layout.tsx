@@ -1,9 +1,10 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import {
   SITE_DESCRIPTION,
   SITE_NAME,
   SITE_URL,
-  SOCIAL_TWITTER,
+  SITE_NAME_URL,
+  SITE_IMAGE_CLOUDINARY_URL,
 } from "@/utils/site";
 import localFont from "next/font/local";
 import { RootProvider } from "@/provider";
@@ -34,43 +35,61 @@ const myFont = localFont({
 });
 
 export const metadata: Metadata = {
-  applicationName: SITE_NAME,
-  title: {
-    default: `${SITE_NAME}`,
-    // default: `${SITE_NAME} · ${SITE_INFO}`,
-    template: `${SITE_NAME} · %s`,
-  },
-  metadataBase: new URL(SITE_URL),
+  title: SITE_NAME,
   description: SITE_DESCRIPTION,
-  manifest: "/manifest.json",
-  appleWebApp: {
-    title: SITE_NAME,
-    capable: true,
-    statusBarStyle: "black-translucent",
-  },
+  keywords: [
+    "base",
+    "scooper",
+    "scooper labs",
+    "sweep token",
+    "Aggregate low-value assets",
+    "valuable",
+    "labs",
+    "Optimism",
+    "Mode",
+    "Ethereum",
+    "base",
+    "onchain summer",
+    "single transaction",
+    "blockRepo",
+    "assetscooper",
+    "warpcast",
+    "build onchain",
+    "onchain",
+    "superchain",
+    "building the future of onchain",
+    "onchain economy",
+    "base builder rounds",
+    "blockRepo base database",
+  ],
+  applicationName: SITE_NAME,
   openGraph: {
-    type: "website",
     title: SITE_NAME,
-    siteName: SITE_NAME,
     description: SITE_DESCRIPTION,
     url: SITE_URL,
-    images: "/opengraph-image",
+    type: "website",
+    images: [
+      {
+        url: SITE_IMAGE_CLOUDINARY_URL,
+        width: 1200,
+        height: 630,
+      },
+    ],
+    siteName: SITE_NAME_URL,
   },
   twitter: {
     card: "summary_large_image",
-    site: SOCIAL_TWITTER,
+    site: SITE_URL,
     title: SITE_NAME,
     description: SITE_DESCRIPTION,
-    images: "/opengraph-image",
+    images: [
+      {
+        url: SITE_IMAGE_CLOUDINARY_URL,
+        width: 1200,
+        height: 630,
+      },
+    ],
   },
-};
-
-export const viewport: Viewport = {
-  width: "device-width",
-  height: "device-height",
-  initialScale: 1.0,
-  viewportFit: "cover",
-  themeColor: "#000000",
 };
 
 export default function RootLayout({

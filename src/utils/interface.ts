@@ -1,3 +1,18 @@
+interface MoralisWalletPortfolioApiResInterface {
+  token_address: string;
+  name: string;
+  symbol: string;
+  logo: string;
+  thumbnail: string;
+  decimals: number;
+  balance: string;
+  possible_spam: string;
+  verified_collection: string;
+  total_supply: string;
+  total_supply_formatted: string;
+  percentage_relative_to_total_supply: number;
+}
+
 export interface AssetsInterface {
   asset: {
     name: string;
@@ -49,6 +64,21 @@ export interface TXN_Interface {
   transactionHash: string;
   blockTimestamp: string;
   blockNumber: string;
+}
+
+export interface MoralisWalletPortfolioApiResponse {
+  token_address: string;
+  name: string;
+  symbol: string;
+  logo: string;
+  thumbnail: string;
+  decimals: number;
+  balance: string | number;
+  possible_spam: string;
+  verified_collection: string;
+  total_supply: string;
+  total_supply_formatted: string;
+  percentage_relative_to_total_supply: number;
 }
 
 export interface MoralisAssetInterface {
