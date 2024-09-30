@@ -41,30 +41,12 @@ const TokenPercentageDifference = ({
         const lastUpdated = await localforage.getItem(
           `${cacheKey}-lastUpdated`
         );
-        //@ts-ignore
         const timeDifference = currentTime - lastUpdated;
-        console.log(
-          "Cache and lastUpdated exists",
-          currentTime,
-          lastUpdated,
-          //@ts-ignore
-          currentTime - lastUpdated,
-          timeDifference,
-          cacheDuration
-        );
+
         if (timeDifference < cacheDuration) {
-          console.log("Time to update cache");
+          //   console.log("Time to update cache");
         } else {
-          console.log("Not time to update cache");
-          console.log(
-            "Time to Read from cache instead",
-            cachedSum,
-            cachedData,
-            currentSum
-          );
-          //@ts-ignore
           setCachedSum(cachedData);
-          //@ts-ignore
           cachedSumRef.current = cachedData;
         }
         // if (currentTime - lastUpdated < cacheDuration) {
@@ -79,7 +61,6 @@ const TokenPercentageDifference = ({
         //   await localforage.setItem(`${cacheKey}-lastUpdated`, currentTime);
         //   console.log("In else condition");
         // }
-      } else {
       }
     };
 
@@ -93,9 +74,7 @@ const TokenPercentageDifference = ({
     // Calculate percentage change if cached sum is available
     if (cachedSum !== null) {
       const percentage = ((sum - cachedSum) / cachedSum) * 100;
-      //@ts-ignore
       setPercentageChange(percentage);
-      console.log(percentage, typeof percentage);
     }
   }, [data, cacheKey, cacheDuration, cachedSum, sum]);
 
@@ -131,11 +110,8 @@ const TokenPercentageDifference = ({
           : "No comparison yet"}
       </p> */}
       <Text fontSize="12px" lineHeight="14.4px">
-        {percentageChange !== null && percentageChange > 0 ? "+" : "-"}
-
-        {percentageChange !== null &&
-          //@ts-ignore
-          `${percentageChange.toFixed(2)}%`}
+        {percentageChange !== null && percentageChange > 0 ? "+" : ""}
+        {percentageChange !== null && `${percentageChange.toFixed(2)}%`}
       </Text>
     </Box>
   );
