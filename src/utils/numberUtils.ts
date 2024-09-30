@@ -18,7 +18,7 @@ export function stripPrice(_price: number) {
   // Add subscript with zeros count - 1
   const subscript = zeros?.length - 1;
 
-  return { subscript: subscript.toString(), value: value?.slice(0, 2) };
+  return { subscript: !Number.isNaN(subscript) ? subscript.toString() : null, value: value?.slice(0, 2) };
 }
 
 export function formatVolume(volume: string) {
