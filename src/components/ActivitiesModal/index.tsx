@@ -49,6 +49,7 @@ import {
 } from "@coinbase/onchainkit/wallet";
 import Link from "next/link";
 import { useWalletsPortfolioMoralis } from "@/hooks/useMoralis";
+import TokenPercentageDifference from "../TokenPercentageDifference";
 
 interface IModals {
   isOpen: boolean;
@@ -276,7 +277,16 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
                 {isBalanceVisible ? (
                   <FormatNumber
                     pre="$"
-                    amount={portfolioBalance ? Number(portfolioBalance) : 0}
+                    amount={
+                      portfolioBalance?.value
+                        ? Number(
+                            userWalletTokens.reduce(
+                              (sum, item) => sum + item.quoteUSD,
+                              0
+                            )
+                          )
+                        : 0
+                    }
                   />
                 ) : (
                   "****"
@@ -298,6 +308,15 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
                   />
                 </Text>
               </Box> */}
+
+              <TokenPercentageDifference
+                data={userWalletTokens}
+                cacheDuration={300}
+                sum={userWalletTokens.reduce(
+                  (sum, item) => sum + item.quoteUSD,
+                  0
+                )}
+              />
             </HStack>
           )}
         </Box>
