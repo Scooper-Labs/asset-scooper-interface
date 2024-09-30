@@ -1,3 +1,4 @@
+export const SITE_EMOJI = "©";
 export const SITE_NAME = "AssetScooper";
 export const SITE_INFO = "Asset Scooper";
 export const SITE_DESCRIPTION =

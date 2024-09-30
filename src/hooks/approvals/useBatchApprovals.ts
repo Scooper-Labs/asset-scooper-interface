@@ -26,7 +26,7 @@ export const useBatchApprovals = ({
     //   return;
     // }
     const amount = amounts && amounts.length > index ? amounts[index] : "0";
-    const amountBigInt = parseUnits(amount, token.decimals);
+    const amountBigInt = parseUnits(amount, token?.decimals);
 
     const approveCalldata = encodeFunctionData({
       abi: erc20Abi,

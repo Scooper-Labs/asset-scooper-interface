@@ -85,7 +85,7 @@ function SweepWidget() {
           >
             Refresh
           </Button>
-          <SwapSettings />
+          {/* <SwapSettings /> */}
         </HStack>
       </Flex>
 
