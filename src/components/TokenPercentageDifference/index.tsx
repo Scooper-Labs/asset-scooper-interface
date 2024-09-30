@@ -42,24 +42,10 @@ const TokenPercentageDifference = ({
           `${cacheKey}-lastUpdated`
         );
         const timeDifference = currentTime - lastUpdated;
-        console.log(
-          "Cache and lastUpdated exists",
-          currentTime,
-          lastUpdated,
-          currentTime - lastUpdated,
-          timeDifference,
-          cacheDuration
-        );
+
         if (timeDifference < cacheDuration) {
-          console.log("Time to update cache");
+          //   console.log("Time to update cache");
         } else {
-          console.log("Not time to update cache");
-          console.log(
-            "Time to Read from cache instead",
-            cachedSum,
-            cachedData,
-            currentSum
-          );
           setCachedSum(cachedData);
           cachedSumRef.current = cachedData;
         }
@@ -75,7 +61,6 @@ const TokenPercentageDifference = ({
         //   await localforage.setItem(`${cacheKey}-lastUpdated`, currentTime);
         //   console.log("In else condition");
         // }
-      } else {
       }
     };
 
@@ -90,7 +75,6 @@ const TokenPercentageDifference = ({
     if (cachedSum !== null) {
       const percentage = ((sum - cachedSum) / cachedSum) * 100;
       setPercentageChange(percentage);
-      console.log(percentage, typeof percentage);
     }
   }, [data, cacheKey, cacheDuration, cachedSum, sum]);
 
