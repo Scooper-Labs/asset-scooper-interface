@@ -126,7 +126,7 @@ const TokenPercentageDifference = ({
           : "No comparison yet"}
       </p> */}
       <Text fontSize="12px" lineHeight="14.4px">
-        {percentageChange !== null && percentageChange > 0 ? "+" : "-"}
+        {percentageChange !== null && percentageChange > 0 ? "+" : ""}
         {percentageChange !== null && `${percentageChange.toFixed(2)}%`}
       </Text>
     </Box>
