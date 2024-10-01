@@ -32,7 +32,7 @@ const HeroSection = () => {
       bgPosition="center"
       bgRepeat="no-repeat"
       bgAttachment="fixed"
-      pt={{ base: "70px", md: "100px", lg: "100px" }}
+      pt={{ base: "125px", md: "115px", lg: "115px" }}
       color="white"
     >
       <ContainerWrapper px="5%">

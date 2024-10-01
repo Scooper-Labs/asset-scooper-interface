@@ -2,13 +2,6 @@
 
 import { COLORS } from "@/constants/theme";
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
   Button,
   useDisclosure,
   Box,
@@ -18,10 +11,10 @@ import {
   Flex,
   IconButton,
 } from "@chakra-ui/react";
-import { useSelectedTokens } from "@/hooks/useSelectTokens";
-import TokenRow from "./token-row";
+import TokenRow from "./TokenRow";
 import { IoMdClose } from "react-icons/io";
-import ModalComponent from "@/components/ModalComponent";
+import ModalComponent from "@/components/ModalComponent/TabViewModal";
+import useSelectToken from "@/hooks/useSelectToken";
 
 function ApprovalModal({
   tokensAllowanceStatus,
@@ -31,12 +24,12 @@ function ApprovalModal({
   refetch: () => void;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { selectedTokens } = useSelectedTokens();
+  const { tokenList: selectedTokens } = useSelectToken();
 
   return (
     <>
       <Button
-        disabled={tokensAllowanceStatus}
+        isDisabled={tokensAllowanceStatus}
         borderRadius="8px"
         width="100%"
         color="#FDFDFD"
@@ -52,14 +45,16 @@ function ApprovalModal({
             ? `${COLORS.inputBgcolor}`
             : `${COLORS.btnGradient}`,
         }}
-        onClick={() => {
-          onOpen();
-        }}
+        onClick={() => onOpen()}
       >
         Approval
       </Button>
 
-      <ModalComponent isOpen={isOpen} onClose={onClose}>
+      <ModalComponent
+        isOpen={isOpen}
+        onClose={onClose}
+        modalContentStyle={{ py: "0" }}
+      >
         <Flex justify="space-between" alignItems="center">
           <Box flex="1" textAlign="center">
             <Text fontWeight={700} fontSize="14px" color="#0D0D0D">
@@ -79,10 +74,10 @@ function ApprovalModal({
         </Flex>
 
         <Stack w="100%" mt="15px">
-          <VStack width="100%" gap="4px">
+          <VStack width="100%" gap="4px" position="relative">
             {selectedTokens.map((token) => (
               <Box width="100%" key={token.address}>
-                <TokenRow token={token} refetch={refetch} />
+                <TokenRow token={token} refetch={refetch} onClose={onClose} />
               </Box>
             ))}
           </VStack>

@@ -1,7 +1,7 @@
 "use client";
 
 import { TokenSelector } from "@/components/TokenSelector";
-import { ChevronDownIcon, InfoOutlineIcon } from "@chakra-ui/icons";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 import { AiOutlineQuestionCircle } from "react-icons/ai";
 import {
   Box,
@@ -10,114 +10,48 @@ import {
   HStack,
   Text,
   VStack,
-  useDisclosure,
   Tag,
   TagLabel,
+  Spinner,
+  Skeleton,
+  chakra,
 } from "@chakra-ui/react";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect } from "react";
 import { SwapSettings } from "./swap-settings";
 import { COLORS } from "@/constants/theme";
-import { useSelectedTokens } from "@/hooks/useSelectTokens";
 import SweepButton from "./swap-button";
 import { useRouter } from "next/navigation";
 import { SweepIcon } from "@/assets/svg";
 import OverlappingImage, { getImageArray } from "./ImageLap";
-import useGetETHPrice from "@/hooks/useGetETHPrice";
-import FormatNumber from "@/components/FormatNumber";
-import { Token } from "@/lib/components/types";
-import { useParaSwap } from "@/hooks/swap/useParaswapSwap";
-import { base } from "viem/chains";
-import { useAccount } from "wagmi";
-import { useAssetScooperContractWrite } from "@/hooks/useAssetScooperWriteContract";
-import { PARASWAP_TRANSFER_PROXY } from "@/constants/contractAddress";
-import { Address, erc20Abi, parseUnits } from "viem";
-import { useSmartWallet } from "@/hooks/useSmartWallet";
+import { useAccount, useEstimateFeesPerGas } from "wagmi";
 import { useWalletsPortfolio } from "@/hooks/useMobula";
 import { useEthPrice } from "@/hooks/useGetETHPrice2";
 import { ETH_ADDRESS } from "@/utils";
 import CustomTooltip from "@/components/CustomTooltip";
-
-export function ETHToReceive({ selectedTokens }: { selectedTokens: Token[] }) {
-  const { price } = useGetETHPrice();
-  const quoteAllTokens = selectedTokens.reduce(
-    (total, selectedToken) => total + selectedToken.quoteUSD,
-    0
-  );
-
-  return (
-    <>
-      {price === 0 ? (
-        "__"
-      ) : (
-        <FormatNumber amount={quoteAllTokens / price} suf="ETH" />
-      )}
-    </>
-  );
-}
+import useSelectToken from "@/hooks/useSelectToken";
+import { ETHToReceive } from "@/components/ETHToReceive";
+import FormatNumber from "@/components/FormatNumber";
 
 function SweepWidget() {
   const { address } = useAccount();
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const { selectedTokens } = useSelectedTokens();
-  const { price } = useGetETHPrice();
+  const { tokenList: selectedTokens, clearList } = useSelectToken();
+  const { data: estimateData, isLoading: isLoadingEstimateFee } =
+    useEstimateFeesPerGas();
 
-  // console.log("address", address);
   const router = useRouter();
 
-  const { getRate, buildSwap, swapsTrxData } = useParaSwap();
   const { refetch: refetchTokenBalance } = useWalletsPortfolio();
 
-  const { ethPrice } = useEthPrice({
+  const { isLoading, ethPrice } = useEthPrice({
     address: ETH_ADDRESS,
   });
 
-  const handleSwap = async () => {
-    const trade = await getRate({
-      srcToken: selectedTokens[0],
-      destToken: selectedTokens[1],
-      srcAmount: "10000",
-      networkID: base.id,
-    });
-    // console.log("trade test", trade);
-    // console.log("trade price route", trade);
-    const swapBuild = await buildSwap({
-      srcToken: selectedTokens[0],
-      destToken: selectedTokens[1],
-      srcAmount: "10000",
-      minAmount: "10000",
-      priceRoute: trade,
-      userAddress: address ?? "",
-      receiver: address ?? "",
-      networkID: base.id,
-    });
-
-    // console.log("swapBuild swapBuild", swapBuild);
-  };
-
-  const handleBatchSwap = async () => {
-    const swapTransactions = await swapsTrxData();
-    if (swapTransactions) {
-      console.log("this is batch swap data", swapTransactions);
+  useEffect(() => {
+    if (address === undefined) {
+      clearList();
     }
-  };
-
-  const {
-    write: approveToken,
-    isPending: isApprovalPending,
-    isConfirmed: isConfirmed,
-    isConfirming,
-  } = useAssetScooperContractWrite({
-    fn: "approve",
-    args: [PARASWAP_TRANSFER_PROXY as Address, parseUnits("100000000000", 18)],
-    abi: erc20Abi,
-    contractAddress:
-      selectedTokens.length > 0
-        ? (selectedTokens[0].address as Address)
-        : "0xE3c347cEa95B7BfdB921074bdb39b8571F905f6D",
-  });
-
-  const { isSmartWallet } = useSmartWallet();
+  }, [address]);
 
   return (
     <VStack gap="12px">
@@ -143,6 +77,7 @@ function SweepWidget() {
             onClick={() => {
               refetchTokenBalance();
               router.refresh();
+              clearList();
             }}
             _hover={{
               bg: `${COLORS.btnBGGradient}`,
@@ -150,11 +85,11 @@ function SweepWidget() {
           >
             Refresh
           </Button>
-          <SwapSettings />
+          {/* <SwapSettings /> */}
         </HStack>
       </Flex>
 
-      {/* mainbox */}
+      {/* ----------- mainbox ---------- */}
       <VStack
         border="1px solid #E1C9E1"
         padding="16px"
@@ -166,11 +101,11 @@ function SweepWidget() {
             width={428}
             height={118}
             alt="Swap tokens Art"
-            src="/images/ConvertArt.svg"
+            src="/image/ConvertArt.svg"
           />
         </Box>
 
-        <VStack width="100%" gap="2px">
+        <VStack as={"div"} width="100%" gap="2px">
           <Flex width="100%" justify="space-between">
             <Flex gap="6px" alignItems="center">
               <SweepIcon />
@@ -182,16 +117,27 @@ function SweepWidget() {
                 Sweep
               </Text>
             </Flex>
-            <Text fontSize="12px" color={COLORS.tabTextColor}>
-              Update in 30 sec 1ETH ≈ {ethPrice} USDC
-              {/* 1ETH ≈ {price} USDC{" "} */}
-            </Text>
+            <chakra.span fontSize="12px" color="#9E829F">
+              {isLoading ? (
+                <Skeleton
+                  height="3em"
+                  width="200px"
+                  startColor="#E7BFE7"
+                  endColor="#9E829F"
+                  speed={1.2}
+                  fadeDuration={0.5}
+                />
+              ) : (
+                `Update in 5min 1 ETH(WETH) ≈ ${ethPrice} USDC`
+              )}
+            </chakra.span>
           </Flex>
+          {/* -------------------- Token Selector is here ------------------- */}
           <TokenSelector>
             <Flex
               width="100%"
               border={`1px solid ${
-                selectedTokens.length === 0 ? "#E7BFE7" : "#0F04D7"
+                selectedTokens?.length === 0 ? "#E7BFE7" : "#0F04D7"
               }`}
               backgroundColor="#fff"
               justifyContent="space-between"
@@ -201,7 +147,7 @@ function SweepWidget() {
               borderRadius="6px"
               alignItems="center"
             >
-              {selectedTokens.length > 0 ? (
+              {selectedTokens?.length > 0 ? (
                 <Flex alignItems="center" gap="6px">
                   <OverlappingImage
                     imageArray={getImageArray(selectedTokens)}
@@ -222,6 +168,7 @@ function SweepWidget() {
         </VStack>
 
         <VStack
+          as={"div"}
           fontSize="small"
           width="100%"
           borderTop="1px solid #F7E5F7"
@@ -234,7 +181,7 @@ function SweepWidget() {
                 fontWeight={500}
                 color={COLORS.tabTextColor}
               >
-                You will receive..
+                You will receive
               </Text>
               <CustomTooltip label="Estimated Total Value you will receive in ETH(WETH)">
                 <AiOutlineQuestionCircle color="#C9BCCA" />
@@ -251,14 +198,31 @@ function SweepWidget() {
                 fontWeight={500}
                 color={COLORS.tabTextColor}
               >
-                Transaction fee
+                Max fee per gas
               </Text>
-              <CustomTooltip label="Estimated Transaction fee to process this transaction.">
+              <CustomTooltip label="Maximum amount you're willing to pay per unit of gas for this transaction.">
                 <AiOutlineQuestionCircle color="#C9BCCA" />
               </CustomTooltip>
             </Flex>
 
-            <Text>__</Text>
+            {isLoadingEstimateFee ? (
+              <Skeleton
+                height="2em"
+                width="100px"
+                startColor="#E7BFE7"
+                endColor="#9E829F"
+                speed={1.2}
+                fadeDuration={0.5}
+              />
+            ) : (
+              <Text>
+                <FormatNumber
+                  //@ts-ignore
+                  amount={estimateData ? estimateData.maxFeePerGas : "__"}
+                  suf="ETH"
+                />
+              </Text>
+            )}
           </Flex>
 
           <Flex width="100%" justifyContent="space-between">
@@ -270,18 +234,18 @@ function SweepWidget() {
               >
                 Estimated transaction time
               </Text>
-              <CustomTooltip label="Estimated Time taken for this transaction to be completed.">
+              <CustomTooltip label="Estimated time taken for this transaction to be completed.">
                 <AiOutlineQuestionCircle color="#C9BCCA" />
               </CustomTooltip>
             </Flex>
 
             <Text>3 seconds</Text>
           </Flex>
+          {/* -------------------- Connect Button & Sweep Button is here ------------------- */}
           <SweepButton />
         </VStack>
       </VStack>
     </VStack>
   );
 }
-// InfoOutlineIcon
 export default SweepWidget;

@@ -6,8 +6,7 @@ interface UseEthPrice {
 }
 
 export const useEthPrice = ({ address }: UseEthPrice) => {
-  // const [ethPrice, setEthPrice] = useState<number | null>(null);
-  const [ethPrice, setEthPrice] = useState<string | null>(null);
+  const [ethPrice, setEthPrice] = useState<any | null>(null);
 
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["/ethPrice", address],
@@ -28,7 +27,7 @@ export const useEthPrice = ({ address }: UseEthPrice) => {
     },
     refetchOnWindowFocus: false,
     enabled: true,
-    refetchInterval: 30000, // refetch every 30 seconds
+    refetchInterval: 240000, // refetch every 4 minutes
   });
 
   useEffect(() => {
@@ -39,11 +38,8 @@ export const useEthPrice = ({ address }: UseEthPrice) => {
   }, [data]);
 
   return {
-    data,
+    refetch: () => {},
     isLoading,
-    isError,
-    error,
-    refetch,
     ethPrice,
   };
 };

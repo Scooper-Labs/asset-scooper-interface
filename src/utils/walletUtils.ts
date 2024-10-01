@@ -2,8 +2,8 @@ import CryptoJS from "crypto-js";
 
 export function truncateAddress(
   address: string,
-  startLength = 7,
-  endLength = 5
+  startLength = 4,
+  endLength = 6
 ) {
   const truncatedStart = address.slice(0, startLength);
   const truncatedEnd = address.slice(-endLength);
@@ -16,4 +16,8 @@ export function gen_key(key: string) {
   const generatedKey = hash.substring(0, 10);
 
   return generatedKey;
+}
+
+export function compareAddress(addr1: string, addr2: string) {
+  return addr1.toLowerCase() === addr2.toLowerCase();
 }

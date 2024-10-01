@@ -84,6 +84,7 @@ export class BlockTransactions {
     );
   }
 }
+
 export function groupTransactionsByBlock(
   txns: TXN_Interface[]
 ): BlockTransactions[] {

@@ -1,40 +1,56 @@
-@import url("https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&display=swap");
+@font-face {
+  font-family: "Dellamor";
+  src: url("/public/fonts/Dellamor/Dellamor.otf");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Moderat";
+  src: url("/public/fonts/Moderat/Moderat-Light.ttf");
+  font-weight: 400;
+  font-style: normal;
+}
 
 * {
   margin: 0;
   padding: 0;
-  box-shadow: none;
+  box-sizing: border-box;
 }
 
 body {
   color: #0000;
   background: #ffff;
+  font-family: "Moderat", sans-serif;
+}
+
+html {
   scroll-behavior: smooth;
 }
 
-@font-face {
-  font-family: "Dellamor";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("/public/fonts/Dellamor.otf") format("opentype");
+.fontBalance {
+  font-family: "dellamor-regular", sans-serif;
 }
 
 .customConnectSpan {
   display: flex;
   align-items: center;
   gap: 4px;
-  background: radial-gradient(circle, #0099fb 100%, #006ded 100%);
+  background: radial-gradient(50% 50% at 50% 50%, #0099fb 0%, #006ded 100%);
   padding: 6px 8px;
   border-radius: 8px;
   box-shadow: 0px 3px 5.8px -2.5px #e443ca66;
   cursor: pointer;
 }
+
 .customConnectSpan button {
   all: unset;
+  display: flex;
+  align-items: center;
   background: white;
   font-size: 12px;
   color: #018fe9;
   padding: 5px 10px;
   border-radius: 8px;
+  gap: 4px;
 }

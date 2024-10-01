@@ -8,6 +8,7 @@ import {
   Text,
   Box,
   Circle,
+  Spinner,
   HStack,
   DrawerContent,
   Flex,
@@ -24,20 +25,31 @@ import {
 import { COLORS } from "@/constants/theme";
 import { IoMdClose } from "react-icons/io";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
-import Tokens from "./components/Tokens";
-import Transactions from "./components/Transactions";
-import { useAccount, useDisconnect } from "wagmi";
-import { truncate } from "@/utils/address";
+import Tokens from "./Tokens";
+import Transactions from "./Transactions";
+import { useAccount, useBalance, useDisconnect } from "wagmi";
+import { truncateAddress } from "@/utils/walletUtils";
 import { useBalances } from "@/hooks/balances/useBalances";
 import Avatar from "@/assets/svg";
 import FormatNumber from "../FormatNumber";
 import { useWalletsPortfolio } from "@/hooks/useMobula";
-import { AssetClass, MoralisAssetClass } from "@/utils/classes";
+import { MoralisAssetClass } from "@/utils/classes";
 import { useQuery } from "@apollo/client";
 import { GET_ACCOUNT_TX } from "@/utils/queries";
 import { MdCheckCircleOutline } from "react-icons/md";
 import { HiOutlineDocumentDuplicate } from "react-icons/hi";
+import Cookies from "js-cookie";
 import CopyToClipboard from "react-copy-to-clipboard";
+import { ClipLoader } from "react-spinners";
+import { useSmartWallet } from "@/hooks/useSmartWallet";
+import {
+  WalletDropdown,
+  WalletDropdownLink,
+  WalletDropdownDisconnect,
+} from "@coinbase/onchainkit/wallet";
+import Link from "next/link";
+import { useWalletsPortfolioMoralis } from "@/hooks/useMoralis";
+import TokenPercentageDifference from "../TokenPercentageDifference";
 
 interface IModals {
   isOpen: boolean;
@@ -48,11 +60,19 @@ interface IModals {
 const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
   const [isBalanceVisible, setIsBalanceVisible] = useState<boolean>(true);
   const { address } = useAccount();
+
+  const { data: portfolioBalance, isLoading: loadPortfolio } = useBalance({
+    address,
+  });
+
   const { disconnect } = useDisconnect();
-  const { data, loading: loadPortfolio } = useWalletsPortfolio();
+  // const { data, loading: loadPortfolio } = useWalletsPortfolio();
   const { moralisAssets, isLoading } = useBalances({ address });
   const [userWalletTokens, setWT] = useState<MoralisAssetClass[]>([]);
-  const [addressCopied, setAddressCopied] = useState(false);
+  const [addressCopied, setAddressCopied] = useState<boolean>(false);
+
+  const { isSmartWallet } = useSmartWallet();
+
   const {
     data: txns,
     loading,
@@ -67,8 +87,21 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
     }
   }, [moralisAssets]);
 
+  useEffect(() => {
+    // Load the state from cookies on component mount
+    const savedVisibility = Cookies.get("balanceVisibility");
+    if (savedVisibility !== undefined) {
+      setIsBalanceVisible(savedVisibility === "true");
+    }
+  }, []);
+
   const balanceVisibility = () => {
-    setIsBalanceVisible(!isBalanceVisible);
+    setIsBalanceVisible((prev) => {
+      const newState = !prev;
+      // storing the newstate in cookies
+      Cookies.set("balanceVisibility", newState.toString(), { expires: 7 }); // Expires in 7 days
+      return newState;
+    });
   };
 
   function disconnectAndCloseModal() {
@@ -111,90 +144,111 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
           bgPos={["", "inherit", "inherit"]}
         >
           {/* ----- Heading Account detail ----- */}
-          <Flex justify="space-between">
-            <HStack>
-              <Avatar width={32} height={32} />
-              <CopyToClipboard
-                text={address ?? ""}
-                onCopy={() => {
-                  setAddressCopied(true);
-                  setTimeout(() => {
-                    setAddressCopied(false);
-                  }, 800);
-                }}
-              >
-                <HStack>
-                  <Text
-                    fontSize="16px"
-                    lineHeight="19.2px"
-                    fontWeight={502}
-                    color="#151829"
-                    cursor="pointer"
-                    _hover={{
-                      cursor: "pointer",
-                      color: "#9E829F",
-                    }}
-                  >
-                    {truncate(address || "")}
-                  </Text>
+          <Flex flexDir="column">
+            <Flex justify="space-between">
+              <HStack>
+                {/* -------------------- This is for EOA users --------------------- */}
+                <Avatar width={32} height={32} />
+                <CopyToClipboard
+                  text={address ?? ""}
+                  onCopy={() => {
+                    setAddressCopied(true);
+                    setTimeout(() => {
+                      setAddressCopied(false);
+                    }, 800);
+                  }}
+                >
+                  <HStack>
+                    <Text
+                      fontSize="16px"
+                      lineHeight="19.2px"
+                      fontWeight={502}
+                      color="#151829"
+                      cursor="pointer"
+                      _hover={{
+                        cursor: "pointer",
+                        color: "#9E829F",
+                      }}
+                    >
+                      {truncateAddress(address || "")}
+                    </Text>
 
-                  {addressCopied ? (
-                    <MdCheckCircleOutline
-                      size={16}
-                      aria-hidden="true"
-                      color={COLORS.balTextColor}
-                    />
-                  ) : (
-                    <HiOutlineDocumentDuplicate
-                      size={16}
-                      style={{ cursor: "pointer" }}
-                    />
-                  )}
-                </HStack>
-              </CopyToClipboard>
-            </HStack>
+                    {addressCopied ? (
+                      <MdCheckCircleOutline
+                        size={16}
+                        aria-hidden="true"
+                        color={COLORS.balTextColor}
+                      />
+                    ) : (
+                      <HiOutlineDocumentDuplicate
+                        size={16}
+                        style={{ cursor: "pointer" }}
+                      />
+                    )}
+                  </HStack>
+                </CopyToClipboard>
+              </HStack>
 
-            <HStack>
-              <Center
-                display={{ base: "flex", md: "none" }}
-                as={Button}
-                width="95px"
-                bgColor="#FFDFE3"
+              <HStack>
+                <Center
+                  display={{ base: "flex", md: "none" }}
+                  as={Button}
+                  width="95px"
+                  bgColor="#FFDFE3"
+                  py="10px"
+                  px="10px"
+                  color="#E2001B"
+                  fontWeight={400}
+                  borderRadius="104px"
+                  h="29px"
+                  onClick={disconnectAndCloseModal}
+                  _hover={{
+                    bgColor: "#FFDFE3",
+                    color: "#E2001B",
+                  }}
+                >
+                  Disconnect
+                </Center>
+
+                <Circle
+                  onClick={onClose}
+                  background="#018FE91A"
+                  borderRadius="50px"
+                  //@ts-ignore
+                  width="32px"
+                  height="32px"
+                  cursor="pointer"
+                >
+                  <IoMdClose color="black" />
+                </Circle>
+              </HStack>
+            </Flex>
+
+            {/* ---------------------- This is for coinbase smart wallet users --------------------- */}
+            {isSmartWallet ? (
+              <Box
+                mt="10px"
+                as={Link}
+                href="https://keys.coinbase.com"
+                rel="noopener noreferrer"
+                target="_blank"
+                w="100%"
+                borderRadius={"10px"}
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                bg="#00BA8233"
+                color="#00976A"
                 py="10px"
                 px="10px"
-                color="#E2001B"
-                fontWeight={400}
-                borderRadius="104px"
-                h="29px"
-                onClick={disconnectAndCloseModal}
-                _hover={{
-                  bgColor: "#FFDFE3",
-                  color: "#E2001B",
-                }}
               >
-                Disconnect
-              </Center>
-
-              <Circle
-                onClick={onClose}
-                background="#018FE91A"
-                borderRadius="50px"
-                //@ts-ignore
-                width="32px"
-                height="32px"
-                cursor="pointer"
-              >
-                <IoMdClose color="black" />
-              </Circle>
-            </HStack>
+                <Text fontSize="12px">View your wallet</Text>
+              </Box>
+            ) : null}
           </Flex>
 
           <HStack mt="40px">
-            <Text
-              fontWeight={400}
-              fontSize="24px"
-              style={{ fontFamily: "Dellamor, sans-serif" }}
-            >
+            <Text fontWeight={400} fontSize="24px" className="fontBalance">
               Balance
             </Text>
 
@@ -208,7 +262,10 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
           </HStack>
 
           {loadPortfolio ? (
-            <div>Loading Balances</div>
+            <HStack spacing={2}>
+              <Spinner size="sm" color="teal.500" />
+              <Text fontSize="14px">Loading Balances</Text>
+            </HStack>
           ) : (
             <HStack>
               <Text
@@ -218,12 +275,25 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
                 lineHeight="43.2px"
               >
                 {isBalanceVisible ? (
-                  <FormatNumber pre="$" amount={data ? data.balance : 0} />
+                  <FormatNumber
+                    pre="$"
+                    amount={
+                      portfolioBalance?.value
+                        ? Number(
+                            userWalletTokens.reduce(
+                              (sum, item) => sum + item.quoteUSD,
+                              0
+                            )
+                          )
+                        : 0
+                    }
+                  />
                 ) : (
                   "****"
                 )}
               </Text>
-              <Box
+
+              {/* <Box
                 background="#00BA8233"
                 color="#00976A"
                 py="10px"
@@ -237,7 +307,16 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
                     suf="%"
                   />
                 </Text>
-              </Box>
+              </Box> */}
+
+              <TokenPercentageDifference
+                data={userWalletTokens}
+                cacheDuration={300}
+                sum={userWalletTokens.reduce(
+                  (sum, item) => sum + item.quoteUSD,
+                  0
+                )}
+              />
             </HStack>
           )}
         </Box>
@@ -264,7 +343,15 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
             <TabPanels>
               <TabPanel>
                 {isLoading ? (
-                  <div>Loading tokens</div>
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    height="100px"
+                  >
+                    <ClipLoader size={30} color={"#4A90E2"} />
+                    <Text ml={4}>Loading tokens...</Text>
+                  </Box>
                 ) : (
                   <Tokens userWalletTOKENS={userWalletTokens} />
                 )}

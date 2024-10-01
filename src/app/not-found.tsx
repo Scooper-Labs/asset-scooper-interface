@@ -2,7 +2,6 @@
 
 import { Flex, Text, Link, Box, HStack } from "@chakra-ui/react";
 import Image from "next/image";
-import { nanoid } from "@reduxjs/toolkit";
 
 import { FaXTwitter } from "react-icons/fa6";
 import { RiGithubLine } from "react-icons/ri";
@@ -98,7 +97,7 @@ export const NotFound = () => {
             {socialLinks.map((link) => (
               <Box
                 as="a"
-                key={nanoid()}
+                key={link.label}
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"

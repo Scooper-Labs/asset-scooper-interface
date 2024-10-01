@@ -1,13 +1,22 @@
 import React from "react";
-import { Box, VStack, Text, HStack } from "@chakra-ui/react";
+import {
+  Box,
+  VStack,
+  Text,
+  HStack,
+  Image,
+  Flex,
+  chakra,
+} from "@chakra-ui/react";
 import TokenSelectListRow from "./token-select-row";
-// import { useBalances } from "@/hooks/balances/useBalances";
 import { useAccount } from "wagmi";
-import { AssetClass } from "@/utils/classes";
+import { MoralisAssetClass } from "@/utils/classes";
 import { Skeleton, SkeletonCircle } from "@chakra-ui/react";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
+// import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 interface TokenSelectListProps {
-  userWalletTokens: AssetClass[] | undefined;
+  userWalletTokens: MoralisAssetClass[] | undefined;
   loading: boolean;
   error: boolean;
 }
@@ -16,7 +25,7 @@ interface ListContentProps {
   address: string | undefined;
   loading: boolean;
   error: boolean;
-  walletBalance: AssetClass[] | undefined;
+  walletBalance: MoralisAssetClass[] | undefined;
 }
 
 function TokenSelectList({
@@ -25,9 +34,6 @@ function TokenSelectList({
   loading,
 }: TokenSelectListProps) {
   const { address } = useAccount();
-  // const { walletBalance, isError, isLoading } = useBalances({
-  //   account: address,
-  // });
 
   return (
     <VStack
@@ -64,11 +70,29 @@ const ListContent: React.FC<ListContentProps> = ({
   error,
   walletBalance,
 }) => {
+  const { open } = useWeb3Modal();
+
   if (!address) {
     return (
-      <Box>
-        <Text>No tokens to see here, Kindly Connect Wallet</Text>
-      </Box>
+      <Flex justify="center" alignItems="center" flexDir="column">
+        <Image
+          src="/image/connect_wallet_tokens_svg.png"
+          w={"200px"}
+          alt="an image"
+        />
+        <Box mt="30px">
+          <Text color="#9E829F" fontSize="14px">
+            No Tokens available, Please{" "}
+            <chakra.span
+              color="#006DED"
+              cursor="pointer"
+              onClick={() => open({ view: "Connect" })}
+            >
+              connect wallet
+            </chakra.span>{" "}
+          </Text>
+        </Box>
+      </Flex>
     );
   }
 
@@ -82,17 +106,35 @@ const ListContent: React.FC<ListContentProps> = ({
     );
   }
 
-  if (!walletBalance && error) {
+  if (error) {
     return (
-      <Box>
-        <Text>An error occurred while fetching balance</Text>
-      </Box>
+      <Flex justify="center" alignItems="center" flexDir="column">
+        <Image src="/image/error_info_icon.png" w={"100px"} alt="an image" />
+        <Box mt="30px">
+          <Text color="#9E829F" fontSize="14px">
+            An error occurred while fetching balance
+          </Text>
+        </Box>
+      </Flex>
+    );
+  }
+
+  if (!walletBalance) {
+    return (
+      <Flex justify="center" alignItems="center" flexDir="column">
+        <Image src="/image/error_info_icon.png" w={"100px"} alt="an image" />
+        <Box mt="30px">
+          <Text color="#9E829F" fontSize="14px">
+            An error occurred while fetching balance
+          </Text>
+        </Box>
+      </Flex>
     );
   }
 
   return (
     <>
-      {walletBalance?.map((token, i) => (
+      {walletBalance.map((token, i) => (
         <Box key={i} width="100%">
           <TokenSelectListRow token={token} />
         </Box>

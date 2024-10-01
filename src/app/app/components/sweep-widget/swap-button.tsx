@@ -1,8 +1,7 @@
 "use client";
 
 import { Button } from "@chakra-ui/react";
-import { useSelectedTokens } from "@/hooks/useSelectTokens";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { useReadContracts } from "wagmi";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
@@ -14,17 +13,32 @@ import {
 } from "@/constants/contractAddress";
 import { COLORS } from "@/constants/theme";
 import { useSmartWallet } from "@/hooks/useSmartWallet";
+import { TokenListProvider } from "@/provider/tokenListProvider";
+
+interface AllowanceResultTrue {
+  error?: undefined;
+  result: string | number | bigint;
+  status: "success";
+}
+
+interface AllowanceResultFalse {
+  error: Error;
+  result?: undefined;
+  status: "failure";
+}
+
+type AllowanceRes = AllowanceResultTrue | AllowanceResultFalse;
 
 function SweepButton() {
   const { open } = useWeb3Modal();
   const { isSmartWallet } = useSmartWallet();
-  const { selectedTokens } = useSelectedTokens();
+  const { tokenList: selectedTokens } = useContext(TokenListProvider);
 
-  const [tokensAllowance, setTokensAllowance] = useState(false);
+  const [tokensAllowance, setTokensAllowance] = useState<boolean>(false);
 
   const { isConnected, address } = useAccount();
 
-  //constructing approval call data for both smart wallet and eoa
+  //constructing approval call data for both smart wallet and EOA
   const contracts = selectedTokens.map((token) => ({
     abi: erc20Abi,
     address: token.address as Address,
@@ -115,17 +129,3 @@ function SweepButton() {
 }
 // InfoOutlineIcon
 export default SweepButton;
-
-interface AllowanceResultTrue {
-  error?: undefined;
-  result: string | number | bigint;
-  status: "success";
-}
-
-interface AllowanceResultFalse {
-  error: Error;
-  result?: undefined;
-  status: "failure";
-}
-
-type AllowanceRes = AllowanceResultTrue | AllowanceResultFalse;

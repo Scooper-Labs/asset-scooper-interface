@@ -1,99 +1,139 @@
 "use client";
 
-import { Address } from "viem";
-import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { useToast } from "@chakra-ui/react";
-import { useEffect } from "react";
-import CustomToast from "@/components/CustomToast";
+import {
+  type SimulateContractReturnType,
+  type SimulateContractErrorType,
+  erc20Abi,
+} from "viem";
+import {
+  useWriteContract,
+  useWaitForTransactionReceipt,
+  useSimulateContract,
+} from "wagmi";
+import { useCallback, useContext, useEffect, useState } from "react";
+import { BaseError } from "@wagmi/core";
 
-export const useAssetScooperContractWrite = ({
-  fn,
-  args,
-  abi,
-  contractAddress,
-}: {
-  fn: string;
-  args: any[];
-  abi: any;
-  contractAddress: Address;
-}) => {
-  const toast = useToast();
-  const {
-    data: hash,
-    isPending,
-    isSuccess: isTrxSubmitted,
-    isError: isWriteContractError,
-    writeContractAsync,
-    error: WriteContractError,
-    reset,
-  } = useWriteContract();
+import abi from "@/constants/abi/assetscooper.json";
+import { assetscooper_contract as assetscooper } from "@/constants/contractAddress";
+import { Types, StateContext } from "@/provider/AppProvider";
+import { waitForTransactionReceipt } from "@wagmi/core";
+import { WALLETCONNECT_CONFIG } from "@/constants/config";
 
-  const {
-    isLoading: isConfirming,
-    isSuccess: isConfirmed,
-    isError: isWaitTrxError,
-    error: WaitForTransactionReceiptError,
-  } = useWaitForTransactionReceipt({
-    hash,
-    confirmations: 2,
+type ExtendedErrorType = SimulateContractErrorType & {
+  shortMessage?: string;
+};
+
+export function useSweepTokensSimulation(args: any[] = []) {
+  const { setMessage, setType } = useContext(StateContext);
+
+  const simulateRes = useSimulateContract({
+    address: assetscooper,
+    abi: abi,
+    functionName: "sweepTokens",
+    args,
+    query: { enabled: false },
   });
 
-  const write = () =>
-    writeContractAsync({
-      address: contractAddress,
-      abi,
-      functionName: fn,
+  const { data, refetch, isLoading } = simulateRes;
+
+  const setError = (error: BaseError) => {
+    const message = error.shortMessage ? error.shortMessage : error.message;
+    const title = error.name as string;
+    setMessage({ title, message: message ?? "An unknown error occurred" });
+    setType(Types.ERROR);
+  };
+
+  async function resimulate() {
+    const { data: newRes, failureReason: newFail } = await refetch();
+    if (newFail) {
+      setError(newFail as BaseError);
+    }
+    return newRes;
+  }
+
+  return { data, resimulate, isPending: isLoading };
+}
+
+export function useApprove(
+  address: `0x${string}`,
+  args: [`0x${string}`, bigint]
+) {
+  const { data: hash, isPending, writeContractAsync } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+    hash,
+    confirmations: 1,
+  });
+
+  const approve = async () => {
+    const result = await writeContractAsync({
+      address,
+      abi: erc20Abi,
+      functionName: "approve",
       args,
     });
+    return result;
+  };
+
+  const isLoading = isPending ?? isConfirming;
+  return { approve, isLoading, isSuccess };
+}
+
+export function useSweepTokens(request?: SimulateContractReturnType) {
+  const { setMessage, setType } = useContext(StateContext);
+  const [txhash, setTxhash] = useState<`0x${string}`>("0x");
+  const { writeContractAsync, failureReason, reset, isPending } =
+    useWriteContract();
+
+  const setError = (error: ExtendedErrorType) => {
+    const message = error.shortMessage ? error.shortMessage : error.message;
+    const title = error.name as string;
+    setMessage({ title, message: message ?? "An unknown error occurred" });
+    setType(Types.ERROR);
+  };
+
+  const { isLoading, isSuccess, error, refetch } = useWaitForTransactionReceipt(
+    {
+      hash: txhash,
+      query: {
+        enabled: txhash !== "0x",
+      },
+    }
+  );
 
   useEffect(() => {
-    if (isPending) {
-      CustomToast(
-        toast,
-        "Transaction Pending, Please confirm in wallet",
-        2000,
-        "bottom-right"
-      );
+    if (failureReason) {
+      setError(failureReason as ExtendedErrorType);
     }
-    if (isTrxSubmitted) {
-      CustomToast(
-        toast,
-        "Transaction has been submitted to the network",
-        2000,
-        "bottom-right"
-      );
+    if (error) {
+      setError(error as ExtendedErrorType);
     }
-    // if (isWriteContractError || isWaitTrxError) {
-    //   toast({
-    //     title: "Transaction Error",
-    //     description:
-    //       WriteContractError?.message ||
-    //       ?.message ||
-    //       "An error occurred",
-    //     status: "error",
-    //     duration: 2000,
-    //     isClosable: true,
-    //   });
-    // }
-  }, [
-    isPending,
-    isTrxSubmitted,
-    isConfirmed,
-    isWriteContractError,
-    isWaitTrxError,
-  ]);
+    if (isSuccess) {
+      setMessage(txhash as string);
+      setType(Types.SUCCESS);
+    }
+  }, [failureReason, error, isSuccess]);
 
-  return {
-    write,
-    isPending,
-    isConfirming,
-    isTrxSubmitted,
-    isConfirmed,
-    isWriteContractError,
-    isWaitTrxError,
-    reset,
-    hash,
-    WriteContractError,
-    WaitForTransactionReceiptError,
-  };
-};
+  const sweepTokens = useCallback(
+    async (customRequest?: SimulateContractReturnType) => {
+      const finalRequest = customRequest ?? request;
+      if (!finalRequest) return;
+
+      const transactionHash = await writeContractAsync(finalRequest.request);
+      setTxhash(transactionHash);
+
+      // console.log(txhash, transactionHash, "this is error");
+
+      if (transactionHash) {
+        refetch();
+        reset();
+      } else {
+        console.error("Transaction hash is undefined");
+      }
+    },
+    []
+  );
+
+  const waitSubmitAndConfirm = isPending || isLoading;
+
+  return { sweepTokens, isLoading: waitSubmitAndConfirm, isSuccess };
+}

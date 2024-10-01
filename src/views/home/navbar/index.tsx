@@ -15,7 +15,7 @@ import Action from "./appAction";
 import { NavLink } from "./type";
 import Menu from "./menu";
 import useScreenSize from "@/hooks/useScreenSize";
-import Hamburger from "@/components/hamburger";
+import Hamburger from "@/assets/svg/hamburger";
 import { SCOOPER_SVG } from "@/assets/svg";
 import { COLORS } from "@/constants/theme";
 import { useRouter } from "next/router";
@@ -34,7 +34,7 @@ const LandingHeader = () => {
     { name: "Home", href: "#" },
     {
       name: "Features",
-      href: "#",
+      href: "#features",
     },
     { name: "Docs", href: "#" },
   ];
@@ -71,7 +71,7 @@ const LandingHeader = () => {
       display="flex"
       justifyContent="center"
       alignItems="center"
-      pt={3}
+      pt={10}
       px={4}
     >
       <Flex
