@@ -71,7 +71,7 @@ const LandingHeader = () => {
       display="flex"
       justifyContent="center"
       alignItems="center"
-      pt={10}
+      pt={{ base: 14, md: 10 }}
       px={4}
     >
       <Flex

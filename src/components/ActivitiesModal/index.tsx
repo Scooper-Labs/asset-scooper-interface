@@ -48,7 +48,6 @@ import {
   WalletDropdownDisconnect,
 } from "@coinbase/onchainkit/wallet";
 import Link from "next/link";
-import { useWalletsPortfolioMoralis } from "@/hooks/useMoralis";
 import TokenPercentageDifference from "../TokenPercentageDifference";
 
 interface IModals {
@@ -66,7 +65,6 @@ const ActivitiesModal: React.FC<IModals> = ({ isOpen, onClose, btnRef }) => {
   });
 
   const { disconnect } = useDisconnect();
-  // const { data, loading: loadPortfolio } = useWalletsPortfolio();
   const { moralisAssets, isLoading } = useBalances({ address });
   const [userWalletTokens, setWT] = useState<MoralisAssetClass[]>([]);
   const [addressCopied, setAddressCopied] = useState<boolean>(false);

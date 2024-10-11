@@ -84,6 +84,9 @@ const TransactionComplete = ({
             </Text>
 
             <Button
+              as={Link}
+              href={`https://basescan.org/tx/${hash}`}
+              target="_blank"
               mt="25px"
               w="100%"
               color="white"
@@ -94,11 +97,9 @@ const TransactionComplete = ({
               fontWeight={400}
               fontSize="16px"
               h="48px"
-              onClick={onClose}
+              // onClick={onClose}
             >
-              <Link href={`https://basescan.org/tx/${hash}`} target="_blank">
-                See Details
-              </Link>
+              See Details
             </Button>
           </Box>
         </Flex>

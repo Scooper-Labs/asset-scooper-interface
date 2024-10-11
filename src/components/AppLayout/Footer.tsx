@@ -101,7 +101,7 @@ export function AppFooter() {
               <Text color="#0E111B" fontSize="14px">
                 About Us
               </Text>
-              <LinkComponent href={`/`}>
+              <LinkComponent href={`https://scooperlabs.com/`}>
                 <RiExternalLinkLine />
               </LinkComponent>
             </HStack>

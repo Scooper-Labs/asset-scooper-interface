@@ -37,7 +37,14 @@ const MainAppLayout: React.FC<MainAppLayoutProps> = ({ children }) => {
 
   return (
     <StateContextProvider>
-      <Flex as="div" direction="column" minH="100vh">
+      <Flex
+        as="div"
+        direction="column"
+        minH="100vh"
+        bgImage={["/image/Perspective-Background-lines.png"]}
+        bgSize={"cover"}
+        bgPos={["inherit"]}
+      >
         <AppNavbar />
         <Box flex="1" overflow="auto">
           <DialogModal isOpen={isModalOpen} onClose={closeModal} />
