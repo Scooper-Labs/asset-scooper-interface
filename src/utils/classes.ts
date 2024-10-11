@@ -70,6 +70,7 @@ export class BlockTransactions {
   transactionHash: string;
   tokensIn: string[];
   amountsIn: string[];
+  amountsOut: string[];
 
   constructor(txns: TXN_Interface[]) {
     const { blockNumber, blockTimestamp, transactionHash } = txns[0];
@@ -78,6 +79,7 @@ export class BlockTransactions {
     this.transactionHash = transactionHash;
     this.tokensIn = txns.map((txn) => txn.tokenIn);
     this.amountsIn = txns.map((txn) => txn.amountIn);
+    this.amountsOut = txns.map((txn) => formatEther(BigInt(txn.amountOut)));
     this.wethIn = txns.reduce(
       (acc, txn) => acc + parseInt(formatEther(BigInt(txn.amountOut))),
       0
