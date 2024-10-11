@@ -1,17 +1,20 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useContext } from "react";
 import axios from "axios";
 import BigNumber from "bignumber.js";
 import { OptimalRate, SwapSide, ParaSwapVersion } from "@paraswap/core";
 import { PARASWAP_API_URL } from "@/constants/paraswap";
 import { Token } from "@/lib/components/types";
-import { useAccount } from "wagmi";
-import { useSendCalls } from "wagmi/experimental";
+import { useAccount, useWaitForTransactionReceipt } from "wagmi";
+import { useSendCalls, useCallsStatus } from "wagmi/experimental";
 import { useToast } from "@chakra-ui/react";
 import { Address } from "viem";
 import { useWalletsPortfolio } from "../useMobula";
 import CustomToast from "@/components/Toast";
 import useSelectToken from "../useSelectToken";
 import { MoralisAssetClass } from "@/utils/classes";
+import { ExtendedErrorType } from "../useAssetScooperWriteContract";
+import { StateContext, Types } from "@/provider/AppProvider";
+import { TransactionStatus } from "../approvals/useBatchApprovals";
 
 const PARTNER = "chucknorrisv6";
 const SLIPPAGE = 1;
@@ -92,6 +95,7 @@ export const testTokens: Token[] = [
 ];
 
 export const useParaSwap = () => {
+  const { setMessage, setType } = useContext(StateContext);
   const [loading, setLoading] = useState<boolean>(false);
   const [isExecuteLoading, setIsExecuteLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -100,6 +104,16 @@ export const useParaSwap = () => {
   const { refetch: refetchTokenBalance } = useWalletsPortfolio();
   const toast = useToast();
   const { sendCalls } = useSendCalls();
+  const [batchCallId, setBatchCallId] = useState<string | null>(null);
+
+  const [txHash, setTxHash] = useState<any>(null);
+  const [transactionStatus, setTransactionStatus] =
+    useState<TransactionStatus | null>(null);
+
+  const { data: callStatus, isLoading: statusLoading } = useCallsStatus({
+    id: batchCallId ?? "", // Pass the batch call ID data in the state
+  });
+
   const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
   // const selectedTokens = testTokens;
   // const chainId = "8453";
@@ -239,9 +253,14 @@ export const useParaSwap = () => {
   };
 
   const executeBatchSwap = async () => {
+    setIsExecuteLoading(true);
+    setTransactionStatus(TransactionStatus.PENDING);
+
     const { tokensWithLiquidity, tokensWithoutLiquidity } =
       await getTokensWithLiquidity();
+
     const swapTxnData: TransactionParams[] = [];
+
     if (!address || !chainId) {
       setError("Please connect wallet");
       return { tokensWithLiquidity, tokensWithoutLiquidity };
@@ -265,6 +284,7 @@ export const useParaSwap = () => {
         if (status !== 200) {
           return;
         }
+
         const minAmount = new BigNumber(priceRoute.destAmount)
           .times(1 - SLIPPAGE / 100)
           .toFixed(0);
@@ -289,21 +309,16 @@ export const useParaSwap = () => {
           calls: swapTxnData,
         },
         {
-          onSuccess(data, variables, context) {
+          onSuccess(data) {
+            const batchId = data;
+            setBatchCallId(batchId);
             refetchTokenBalance();
-            () =>
-              CustomToast(
-                toast,
-                "Success! Your tokens have been approved. You're all set to sweep!",
-                4000,
-                "top"
-              );
           },
           onError(error) {
-            console.error("Approval failed:", error);
+            console.error("Transaction failed:", error);
             CustomToast(
               toast,
-              "Oops! There was an issue approving your tokens. Please try again.",
+              "Oops! There was an issue sweeping your tokens. Please try again.",
               4000,
               "top"
             );
@@ -314,9 +329,107 @@ export const useParaSwap = () => {
         }
       );
     }
-
-    return { tokensWithLiquidity, tokensWithoutLiquidity };
   };
+
+  // Monitor batch call status and fetch receipt if available
+  useEffect(() => {
+    if (
+      callStatus &&
+      callStatus.status &&
+      callStatus.receipts &&
+      callStatus.receipts.length > 0
+    ) {
+      const transactionStatusCall = callStatus.status as TransactionStatus;
+
+      const transactionHash = callStatus.receipts[0].transactionHash;
+
+      if (
+        transactionStatusCall === TransactionStatus.CONFIRMED &&
+        transactionHash
+      ) {
+        setTransactionStatus(TransactionStatus.CONFIRMED);
+
+        setTxHash(transactionHash);
+
+        setIsExecuteLoading(false);
+      } else if (
+        transactionStatusCall === TransactionStatus.PENDING &&
+        transactionHash
+      ) {
+        console.log("Approval is still pending...");
+        setIsExecuteLoading(true);
+      } else {
+        console.log("Unexpected status:", transactionStatusCall);
+
+        setTransactionStatus(TransactionStatus.FAILED);
+
+        setIsExecuteLoading(false);
+      }
+    } else {
+      console.log("Call status or receipts are undefined or empty.");
+    }
+  }, [callStatus]);
+
+  const setErrorBatch = (error: ExtendedErrorType) => {
+    const message = error.shortMessage ? error.shortMessage : error.message;
+    const title = error.name as string;
+    setMessage({ title, message: message ?? "An unknown error occurred" });
+    setType(Types.ERROR);
+  };
+
+  const {
+    data: receipt,
+    isError,
+    isLoading: receiptLoading,
+    failureReason,
+    isSuccess,
+    error: receiptError,
+  } = useWaitForTransactionReceipt({
+    hash: txHash,
+    query: {
+      enabled: txHash !== "0x",
+    },
+  });
+
+  useEffect(() => {
+    if (failureReason) {
+      setErrorBatch(failureReason as ExtendedErrorType);
+      setTransactionStatus(TransactionStatus.FAILED);
+    }
+    if (error) {
+      setErrorBatch(receiptError as ExtendedErrorType);
+      setTransactionStatus(TransactionStatus.FAILED);
+      setIsExecuteLoading(false);
+    }
+    if (isSuccess) {
+      setMessage(txHash as string);
+      setType(Types.SUCCESS);
+      setTransactionStatus(TransactionStatus.CONFIRMED);
+      setIsExecuteLoading(false);
+    }
+  }, [failureReason, receiptError, error, isSuccess]);
+
+  useEffect(() => {
+    if (receipt) {
+      console.log("Transaction is confirmed:", receipt);
+      // CustomToast(
+      //   toast,
+      //   "Transaction confirmed! Your swap was successful.",
+      //   4000,
+      //   "top"
+      // );
+    }
+
+    if (isError) {
+      console.log("error while making transaction:", isError);
+      // CustomToast(
+      //   toast,
+      //   "Transaction failed. Please check the details or try again.",
+      //   4000,
+      //   "top"
+      // );
+    }
+  }, [receipt, isError]);
 
   return {
     getRate,
@@ -325,5 +438,7 @@ export const useParaSwap = () => {
     error,
     getTokensWithLiquidity,
     executeBatchSwap,
+    transactionStatus,
+    TransactionStatus,
   };
 };

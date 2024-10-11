@@ -19,7 +19,7 @@ import { Types, StateContext } from "@/provider/AppProvider";
 import { waitForTransactionReceipt } from "@wagmi/core";
 import { WALLETCONNECT_CONFIG } from "@/constants/config";
 
-type ExtendedErrorType = SimulateContractErrorType & {
+export type ExtendedErrorType = SimulateContractErrorType & {
   shortMessage?: string;
 };
 

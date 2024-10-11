@@ -16,6 +16,7 @@ import { HiExternalLink } from "react-icons/hi";
 import { TXN_Interface } from "@/utils/interface";
 import { ApolloError } from "@apollo/client";
 import { groupTransactionsByBlock } from "@/utils/classes";
+import { formatEther } from "viem";
 
 interface ITransactions {
   txns: TXN_Interface[] | undefined;
@@ -64,7 +65,8 @@ function Transactions({ txns, loading, error }: ITransactions) {
             </Circle>
             <Flex flexDir="column">
               <Heading fontSize="15px" fontWeight={500}>
-                Swept {txn.tokensIn.length} token(s) into {txn.wethIn} WETH
+                Swept {txn.tokensIn.length} token(s) into{" "}
+                {(parseFloat(txn.amountsOut[0]) || 0).toFixed(6)} WETH
               </Heading>
               <Text fontSize="13px" color="#9E829F">
                 {txn.time}
@@ -75,6 +77,7 @@ function Transactions({ txns, loading, error }: ITransactions) {
           <Button
             as={Link}
             href={`https://basescan.org/tx/${txn.transactionHash}`}
+            target="_blank"
             bg="none"
             _hover={{
               bg: "none",

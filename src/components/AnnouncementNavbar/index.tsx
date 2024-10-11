@@ -43,7 +43,7 @@ const AnnouncementNavbar = () => {
       <Flex
         as="div"
         width="100%"
-        height="31px"
+        height={{ base: "40px", md: "31px" }}
         p="10px 12px"
         backgroundColor="#006DED"
         justify="center"
@@ -51,7 +51,7 @@ const AnnouncementNavbar = () => {
       >
         <HStack>
           {/* ----- Arrow Left Icon ------ */}
-          <HStack>
+          <HStack display={{ base: "none", md: "flex" }}>
             {arrowsLeft.map((arrow, index) => (
               <motion.div
                 key={index}
@@ -71,9 +71,14 @@ const AnnouncementNavbar = () => {
             </Text>
           </Box>
 
-          <HStack>
-            <Text color="white" fontSize="12px" fontWeight={400}>
-              Assetscooper Integrates coinbase smart wallet{" "}
+          <HStack spacing={{ base: 2, md: 4 }}>
+            <Text
+              color="white"
+              fontSize="12px"
+              fontWeight={400}
+              textAlign="center"
+            >
+              AssetScooper integrates Coinbase smart wallet{" "}
             </Text>
 
             <Box pointerEvents="auto">
@@ -84,7 +89,7 @@ const AnnouncementNavbar = () => {
           </HStack>
 
           {/* ----- Arrow Right Icon ------ */}
-          <HStack>
+          <HStack display={{ base: "none", md: "flex" }}>
             {arrowsRight.map((arrow, index) => (
               <motion.div
                 key={index}

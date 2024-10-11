@@ -51,6 +51,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     executeBatchSwap,
     loading: paraswapDataLoading,
     isExecuteLoading,
+    TransactionStatus,
+    transactionStatus,
   } = useParaSwap();
 
   const [tokensWithLiquidity, setTokensWithLiquidity] = React.useState<
@@ -96,7 +98,13 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     await sweepTokens(_result);
     if (isSuccess) {
       clearList();
+      // onClose(); //close the modal
     }
+  };
+
+  const handleExecuteBatchSweep = () => {
+    executeBatchSwap();
+    // onClose(); // close the modal when done sweeping
   };
 
   const handlePreviewTokens = async () => {
@@ -112,8 +120,15 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     // );
   };
 
+  //for EOA
   const isSweeping = isPending || isLoading;
   const isDisabled = !tokensAllowanceStatus || isSweeping;
+
+  //for smart wallet
+  const isSweepingPatch = isBatchApprovalLoading || isExecuteLoading;
+  const isSweepingBatch =
+    isExecuteLoading || transactionStatus === TransactionStatus.PENDING;
+  const isDisabledBatch = !tokensAllowanceStatus || isSweepingBatch;
 
   return (
     <>
@@ -246,10 +261,10 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                         The following{" "}
                         <>
                           {tokensWithLiquidity.length === 1
-                            ? "token"
-                            : `tokens`}
+                            ? "token is"
+                            : `tokens are`}
                         </>{" "}
-                        are sweepable
+                        sweepable
                       </Text>
 
                       <VStack>
@@ -503,11 +518,11 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                 }
                 border="1px solid #F6EEFC"
                 onClick={() => approveTTokens()}
-                isDisabled={isDisabled}
+                // isDisabled={isDisabledPatch}
                 isLoading={isBatchApprovalLoading}
                 loadingText="Approving..."
               >
-                Approve All
+                {selectedTokens.length === 1 ? "Approve" : "Approve All"}
               </Button>
             ) : (
               // --------------- EOA Approval Modal ---------------
@@ -536,9 +551,9 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                     }
                     height="2.5rem"
                     borderRadius="8px"
-                    onClick={() => executeBatchSwap()}
-                    isDisabled={isDisabled}
-                    isLoading={isExecuteLoading}
+                    onClick={handleExecuteBatchSweep}
+                    isDisabled={isDisabledBatch}
+                    isLoading={isSweepingBatch}
                     loadingText="Sweeping..."
                   >
                     Sweep
