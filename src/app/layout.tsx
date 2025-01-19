@@ -11,8 +11,29 @@ import { RootProvider } from "@/provider";
 
 import { cookieToInitialState } from "wagmi";
 import { WALLETCONNECT_CONFIG } from "@/constants/config";
+import { wagmiConfig } from "@/config/switchchain/reownkit";
 import { headers } from "next/headers";
 import "./globals.css";
+
+const myFont = localFont({
+  src: [
+    {
+      path: "../assets/fonts/Moderat-Light.ttf",
+      weight: "200",
+      style: "normal",
+    },
+    {
+      path: "../assets/fonts/Moderat-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../assets/fonts/Moderat-Bold.ttf",
+      weight: "600",
+      style: "normal",
+    },
+  ],
+});
 
 export const metadata: Metadata = {
   title: SITE_NAME,
@@ -72,40 +93,21 @@ export const metadata: Metadata = {
   },
 };
 
-const myFont = localFont({
-  src: [
-    {
-      path: "../assets/fonts/Moderat-Light.ttf",
-      weight: "200",
-      style: "normal",
-    },
-    {
-      path: "../assets/fonts/Moderat-Regular.ttf",
-      weight: "400",
-      style: "normal",
-    },
-    {
-      path: "../assets/fonts/Moderat-Bold.ttf",
-      weight: "600",
-      style: "normal",
-    },
-  ],
-});
-
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const initialState = cookieToInitialState(
-    WALLETCONNECT_CONFIG,
-    headers().get("cookie")
-  );
+  const cookieHeader = (await headers()).get("cookie");
+  const initialState = cookieToInitialState(wagmiConfig, cookieHeader);
 
   return (
     <html lang="en">
-      <head />
-      <body className={myFont.className}>
+      <body
+        className={myFont.className}
+        id={"root"}
+        suppressHydrationWarning={true}
+      >
         <RootProvider initialState={initialState}>
           <main>{children}</main>
         </RootProvider>

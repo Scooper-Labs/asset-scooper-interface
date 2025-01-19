@@ -5,11 +5,12 @@ import {
   linea,
   polygon,
   optimism,
+  lisk,
   scroll,
 } from "viem/chains";
 import { Chain } from "viem/chains";
 
-let chains = [base] as [Chain, ...Chain[]];
+let chains = [base, optimism, lisk] as [Chain, ...Chain[]];
 
 // if (process.env.NODE_ENV !== "production") chains.push(sepolia, hardhat);
 
@@ -44,6 +45,10 @@ export const NETWORK_COLORS = {
     color: "amber",
     bgVariant: "rgb(217 119 6)",
   },
+  lisk: {
+    color: "black",
+    bgVariant: "#000000",
+  },
   other: {
     color: "scooper-red",
     bgVariant: "#940012",
@@ -61,10 +66,10 @@ export function GetNetworkColor(
   // if (chain?.includes("arbitrum")) return NETWORK_COLORS.arbitrum[type];
   // if (chain?.includes("base")) return NETWORK_COLORS.base[type];
   // if (chain?.includes("linea")) return NETWORK_COLORS.linea[type];
-  // if (chain?.includes("polygon") || chain?.includes("matic"))
-  //   return NETWORK_COLORS.polygon[type];
-  // if (chain?.includes("optimism") || chain?.startsWith("op"))
-  //   return NETWORK_COLORS.optimism[type];
+  if (chain?.includes("optimism") || chain?.startsWith("op"))
+    return NETWORK_COLORS.optimism[type];
+  if (chain?.includes("lisk") || chain?.includes("lisk"))
+    return NETWORK_COLORS.lisk[type];
   // if (chain?.includes("scroll")) return NETWORK_COLORS.scroll[type];
 
   return NETWORK_COLORS.other[type];

@@ -20,7 +20,7 @@ import {
   useSweepTokens,
   useSweepTokensSimulation,
 } from "@/hooks/useAssetScooperWriteContract";
-import { Address } from "viem";
+import { Address, parseUnits } from "viem";
 import { ETHToReceive } from "@/components/ETHToReceive";
 import { useSlippageTolerance } from "@/hooks/settings/slippage/useSlippage";
 import { SlippageToleranceStorageKey } from "@/hooks/settings/slippage/utils";
@@ -36,24 +36,32 @@ import { MoralisAssetClass } from "@/utils/classes";
 import { ClipLoader } from "react-spinners";
 import { SOCIAL_TELEGRAM } from "@/utils/site";
 import { TbMessage2Heart } from "react-icons/tb";
+import { TokenListDisplay } from "../TokenListDisplay";
+import { useBatchTransactions } from "@/hooks/swap/useBatchApprovalandSwap";
+
+import { useSweepAssetsPermit2 } from "@/hooks/swap/useSweepAssetsPermit2";
+import { usePermit2Sweep } from "@/hooks/swap/usePermit2Sweep";
+// import { ETH_ADDRESS } from "@/utils";
 
 interface ConfirmationModalProps {
   tokensAllowanceStatus: boolean;
   refetch: () => void;
 }
 
+const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   tokensAllowanceStatus,
   refetch,
 }) => {
-  const {
-    getTokensWithLiquidity,
-    executeBatchSwap,
-    loading: paraswapDataLoading,
-    isExecuteLoading,
-    TransactionStatus,
-    transactionStatus,
-  } = useParaSwap();
+  // const {
+  //   getTokensWithLiquidity,
+  //   executeBatchSwap,
+  //   loading: paraswapDataLoading,
+  //   isExecuteLoading,
+  //   TransactionStatus,
+  //   transactionStatus,
+  // } = useParaSwap();
 
   const [tokensWithLiquidity, setTokensWithLiquidity] = React.useState<
     MoralisAssetClass[]
@@ -71,39 +79,103 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
   const { tokenList: selectedTokens, clearList } =
     useContext(TokenListProvider);
+
   const { isSmartWallet } = useSmartWallet();
 
+  const { sweep } = usePermit2Sweep();
+
+  const { sweepAssets, checkAndApproveTokens, isApproving } =
+    useSweepAssetsPermit2();
+
   //Batch approvals for Smart Wallet
-  const { approveTTokens, isBatchApprovalLoading } = useBatchApprovals({
+  // const { approveTTokens, isBatchApprovalLoading } = useBatchApprovals({
+  //   tokens: selectedTokens,
+  //   amounts: selectedTokens.map((item) => item.userBalance.toString()),
+  //   spender: PARASWAP_TRANSFER_PROXY as Address,
+  // });
+
+  const {
+    executeApproveAndSwap,
+    isExecuteLoading,
+    transactionStatus,
+    TransactionStatus,
+    paraswapDataLoading,
+    getTokensWithLiquidity,
+  } = useBatchTransactions({
     tokens: selectedTokens,
     amounts: selectedTokens.map((item) => item.userBalance.toString()),
     spender: PARASWAP_TRANSFER_PROXY as Address,
   });
 
   //min-out put for EOA swap, array of bigint 0s
-  const minAmountOut = selectedTokens.map((t) => 0n);
+  // const minAmountOut = selectedTokens.map((t) => 0n);
+
+  // const minAmountOut = selectedTokens.map((item) =>
+  //   item.userBalance.toString()
+  // );
+
+  const minAmountOut = selectedTokens.map((item) => {
+    // Convert user balance to a string with 18 decimals
+    return parseUnits(item.userBalance.toString(), item.decimals).toString();
+  });
 
   //EOA swap
   // const args = [selectedTokens.map((token) => token.address), minAmountOut];
-  const args = [
-    tokensWithLiquidity.map((token) => token.address),
-    minAmountOut,
-  ];
+  // const args = [
+  //   tokensWithLiquidity.map((token) => token.address),
+  //   minAmountOut,
+  // ];
 
-  const { data, resimulate, isPending } = useSweepTokensSimulation(args);
-  const { isLoading, isSuccess, sweepTokens } = useSweepTokens(data);
+  // const handleSweep = async () => {
+  //   try {
+  //     await sweepAssets({
+  //       tokens: selectedTokens,
+  //       minOutputAmounts: minAmountOut,
+  //       tokenOut: ETH_ADDRESS,
+  //     });
 
-  const handlesweep = async () => {
-    const _result = await resimulate();
-    await sweepTokens(_result);
-    if (isSuccess) {
-      clearList();
-      // onClose(); //close the modal
+  //     // Wait for the transaction
+  //     console.log("Sweep successful! and going true");
+  //   } catch (error) {
+  //     console.error("Error sweeping assets:", error);
+  //     console.log("Error occurs");
+  //   }
+  // };
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  // const { data, resimulate, isPending } = useSweepTokensSimulation(args);
+  // const { isLoading, isSuccess, sweepTokens } = useSweepTokens(data);
+
+  // const handlesweep = async () => {
+  //   const _result = await resimulate();
+  //   await sweepTokens(_result);
+  //   if (isSuccess) {
+  //     clearList();
+  //     // onClose(); //close the modal
+  //   }
+  // };
+
+  const handleSweep = async () => {
+    try {
+      setIsLoading(true);
+
+      // Call the sweep function with the converted amounts
+      const receipt = await sweep({
+        tokens: selectedTokens,
+        amounts: minAmountOut,
+      });
+      console.log("Sweep successful:", receipt);
+    } catch (error) {
+      console.error("Sweep failed:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleExecuteBatchSweep = () => {
-    executeBatchSwap();
+    // executeBatchSwap();
+    executeApproveAndSwap();
     // onClose(); // close the modal when done sweeping
   };
 
@@ -121,14 +193,14 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   };
 
   //for EOA
-  const isSweeping = isPending || isLoading;
-  const isDisabled = !tokensAllowanceStatus || isSweeping;
+  // const isSweeping = isPending || isLoading;
+  // const isDisabled = !tokensAllowanceStatus || isSweeping;
 
   //for smart wallet
-  const isSweepingPatch = isBatchApprovalLoading || isExecuteLoading;
+  // const isSweepingPatch = isBatchApprovalLoading || isExecuteLoading;
   const isSweepingBatch =
     isExecuteLoading || transactionStatus === TransactionStatus.PENDING;
-  const isDisabledBatch = !tokensAllowanceStatus || isSweepingBatch;
+  const isDisabledBatch = isSweepingBatch;
 
   return (
     <>
@@ -254,187 +326,21 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                   </Text>
                 </Box>
               ) : (
-                <VStack>
+                <>
                   {tokensWithLiquidity.length > 0 && (
-                    <>
-                      <Text textAlign="center" fontSize="12px" color="#676C87">
-                        The following{" "}
-                        <>
-                          {tokensWithLiquidity.length === 1
-                            ? "token is"
-                            : `tokens are`}
-                        </>{" "}
-                        sweepable
-                      </Text>
-
-                      <VStack>
-                        {tokensWithLiquidity.length > 0 && (
-                          <>
-                            <HStack spacing={-2} alignItems="center">
-                              {tokensWithLiquidity.slice(0, 5).map((token) => (
-                                <Avatar
-                                  key={token.address}
-                                  size="sm"
-                                  name={token.name}
-                                  src={token.logoURI}
-                                  border="2px solid white"
-                                />
-                              ))}
-                              {tokensWithLiquidity.length > 5 && (
-                                <Text
-                                  color="#A8BBD6"
-                                  fontSize="13px"
-                                  fontWeight={500}
-                                >
-                                  +{tokensWithLiquidity.length - 5}
-                                </Text>
-                              )}
-                            </HStack>
-                          </>
-                        )}
-                      </VStack>
-                    </>
+                    <TokenListDisplay
+                      tokens={tokensWithLiquidity}
+                      title="The following tokens are sweepable"
+                    />
                   )}
 
-                  {tokensWithoutLiquidity &&
-                    tokensWithoutLiquidity.length > 0 && (
-                      <VStack>
-                        <Text
-                          textAlign="center"
-                          fontSize="12px"
-                          color="#676C87"
-                        >
-                          The following tokens can't be swept because they have
-                          insufficient liquidity
-                        </Text>
-                        {tokensWithoutLiquidity.length > 0 && (
-                          <>
-                            <HStack spacing={-2} alignItems="center">
-                              {tokensWithoutLiquidity
-                                .slice(0, 5)
-                                .map((token) => (
-                                  <Avatar
-                                    key={token.address}
-                                    size="sm"
-                                    name={token.name}
-                                    src={token.logoURI}
-                                    border="2px solid white"
-                                  />
-                                ))}
-                              {tokensWithoutLiquidity.length > 5 && (
-                                <Text
-                                  fontSize="13px"
-                                  fontWeight="500"
-                                  color="#A8BBD6"
-                                >
-                                  +{tokensWithoutLiquidity.length - 5}{" "}
-                                  {tokensWithoutLiquidity.length - 5 === 1
-                                    ? "token"
-                                    : "tokens"}
-                                </Text>
-                              )}
-                            </HStack>
-                          </>
-                        )}
-                      </VStack>
-                    )}
-
-                  {tokensWithLiquidity.length === 0 &&
-                    tokensWithoutLiquidity.length === 0 && (
-                      <Box>
-                        <Text
-                          textAlign="center"
-                          fontSize="14px"
-                          color="#676C87"
-                        >
-                          Insufficient liquidity for the selected tokens and
-                          can't be sweep
-                        </Text>
-                      </Box>
-                    )}
-                </VStack>
-                // <VStack>
-                //   {tokensWithLiquidity.length ? (
-                //     <>
-                //       <Text textAlign="center" fontSize="14px" color="#676C87">
-                //         The following tokens are sweepable
-                //       </Text>
-
-                //       <VStack>
-                //         {tokensWithLiquidity.map((token) => {
-                //           return (
-                //             <HStack alignItems="center" key={token.address}>
-                //               <Avatar
-                //                 size="sm"
-                //                 name={token.name}
-                //                 src={token.logoURI}
-                //               />
-                //               <HStack alignItems="center">
-                //                 <Text fontWeight="500" color="#281629">
-                //                   {token.symbol.length > 6
-                //                     ? `${token.symbol.substring(0, 5)}...`
-                //                     : token.symbol}
-                //                 </Text>
-                //                 <Text
-                //                   color="#A8BBD6"
-                //                   fontSize="13px"
-                //                   fontWeight={500}
-                //                 >
-                //                   {token.name}
-                //                 </Text>
-                //               </HStack>
-                //             </HStack>
-                //           );
-                //         })}
-
-                //         {tokensWithoutLiquidity && (
-                //           <VStack>
-                //             <Text
-                //               textAlign="center"
-                //               fontSize="14px"
-                //               color="#676C87"
-                //             >
-                //               The following tokens can't be sweep, because they
-                //               have insufficient liquidity
-                //             </Text>
-                //             {tokensWithoutLiquidity.map((token) => {
-                //               return (
-                //                 <HStack key={token.address} alignItems="center">
-                //                   <Avatar
-                //                     size="sm"
-                //                     name={token.name}
-                //                     src={token.logoURI}
-                //                   />
-                //                   <HStack>
-                //                     <Text fontWeight="500" color="#281629">
-                //                       {token.symbol.length > 6
-                //                         ? `${token.symbol.substring(0, 5)}...`
-                //                         : token.symbol}
-                //                     </Text>
-                //                     <Text
-                //                       color="#A8BBD6"
-                //                       fontSize="13px"
-                //                       fontWeight={500}
-                //                     >
-                //                       {token.name}
-                //                     </Text>
-                //                   </HStack>
-                //                 </HStack>
-                //               );
-                //             })}
-                //           </VStack>
-                //         )}
-                //       </VStack>
-                //     </>
-                //   ) : (
-                //     <Box>
-                //       <Text fontSize="14px" color="#676C87">
-                //         Insufficient Liquidity for the selected tokens or trade
-                //         will lead to a high price impact
-                //       </Text>
-                //     </Box>
-                //   )}
-                // </VStack>
+                  {tokensWithoutLiquidity.length > 0 && (
+                    <TokenListDisplay
+                      tokens={tokensWithoutLiquidity}
+                      title="The following tokens can't be swept because they have insufficient liquidity"
+                    />
+                  )}
+                </>
               )}
             </>
           ) : (
@@ -487,10 +393,15 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                 textAlign="center"
               >
                 Your transaction is on way to be been processed and{" "}
-                <chakra.span color="#151515" fontWeight={600} fontSize="14px">
+                <Flex
+                  as="span"
+                  color="#151515"
+                  fontWeight={600}
+                  fontSize="14px"
+                >
                   {" "}
                   <ETHToReceive selectedTokens={selectedTokens} />
-                </chakra.span>{" "}
+                </Flex>{" "}
                 will be deposited to your Wallet.
               </Text>
             </>
@@ -500,36 +411,38 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           <HStack width="100%" mt="10px" mb="20px">
             {/*  // --------------- Smart wallet Batch Approval --------------- */}
             {isSmartWallet ? (
-              <Button
-                borderRadius="8px"
-                width="100%"
-                color="#FDFDFD"
-                fontSize="16px"
-                fontWeight={500}
-                _hover={{
-                  bg: tokensAllowanceStatus
-                    ? `${COLORS.inputBgcolor}`
-                    : `${COLORS.btnGradient}`,
-                }}
-                bg={
-                  tokensAllowanceStatus
-                    ? `${COLORS.inputBgcolor}`
-                    : `${COLORS.btnGradient}`
-                }
-                border="1px solid #F6EEFC"
-                onClick={() => approveTTokens()}
-                // isDisabled={isDisabledPatch}
-                isLoading={isBatchApprovalLoading}
-                loadingText="Approving..."
-              >
-                {selectedTokens.length === 1 ? "Approve" : "Approve All"}
-              </Button>
+              // <Button
+              //   borderRadius="8px"
+              //   width="100%"
+              //   color="#FDFDFD"
+              //   fontSize="16px"
+              //   fontWeight={500}
+              //   _hover={{
+              //     bg: tokensAllowanceStatus
+              //       ? `${COLORS.inputBgcolor}`
+              //       : `${COLORS.btnGradient}`,
+              //   }}
+              //   bg={
+              //     tokensAllowanceStatus
+              //       ? `${COLORS.inputBgcolor}`
+              //       : `${COLORS.btnGradient}`
+              //   }
+              //   border="1px solid #F6EEFC"
+              //   onClick={() => approveTTokens()}
+              //   // isDisabled={isDisabledPatch}
+              //   isLoading={isBatchApprovalLoading}
+              //   loadingText="Approving..."
+              // >
+              //   {selectedTokens.length === 1 ? "Approve" : "Approve All"}
+              // </Button>
+              <></>
             ) : (
               // --------------- EOA Approval Modal ---------------
-              <ApprovalModal
-                tokensAllowanceStatus={tokensAllowanceStatus}
-                refetch={refetch}
-              />
+              // <ApprovalModal
+              //   tokensAllowanceStatus={tokensAllowanceStatus}
+              //   refetch={refetch}
+              // />
+              <></>
             )}
             {previewState === true ? (
               <>
@@ -540,21 +453,15 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                     fontSize="16px"
                     fontWeight={500}
                     _hover={{
-                      bg: tokensAllowanceStatus
-                        ? `${COLORS.btnGradient}`
-                        : `${COLORS.inputBgcolor}`,
+                      bg: COLORS.btnGradient,
                     }}
-                    bg={
-                      tokensAllowanceStatus
-                        ? `${COLORS.btnGradient}`
-                        : `${COLORS.inputBgcolor}`
-                    }
+                    bg={COLORS.btnGradient}
                     height="2.5rem"
                     borderRadius="8px"
                     onClick={handleExecuteBatchSweep}
                     isDisabled={isDisabledBatch}
                     isLoading={isSweepingBatch}
-                    loadingText="Sweeping..."
+                    loadingText="Confirm in wallet"
                   >
                     Sweep
                   </Button>
@@ -576,9 +483,9 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                     }
                     height="2.5rem"
                     borderRadius="8px"
-                    onClick={handlesweep}
-                    isDisabled={isDisabled}
-                    isLoading={isSweeping}
+                    onClick={handleSweep}
+                    // isDisabled={isDisabled}
+                    // isLoading={isSweeping}
                     loadingText="Sweeping..."
                   >
                     Sweep
@@ -607,7 +514,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                   await handlePreviewTokens(); //******fetch tokens liquidity status
                 }}
               >
-                Preview
+                Review
               </Button>
             )}
           </HStack>

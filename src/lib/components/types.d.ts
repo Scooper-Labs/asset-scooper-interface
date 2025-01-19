@@ -48,3 +48,5 @@ export interface Token {
   price: number;
   price_change_24h: number;
 }
+
+export type ModalType = "account" | "wallet" | "network";

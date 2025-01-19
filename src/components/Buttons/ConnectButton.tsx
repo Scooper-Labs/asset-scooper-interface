@@ -11,11 +11,7 @@ import { Basenames } from "./Basename";
 import { ETH_CHAINS } from "@/utils/network";
 import { Name } from "@coinbase/onchainkit/identity";
 
-export default function ConnectButtonRainbow({
-  onOpen,
-}: {
-  onOpen: () => void;
-}) {
+export default function ConnectButton({ onOpen }: { onOpen: () => void }) {
   const { address } = useAccount();
   const { open } = useWeb3Modal();
 

@@ -1,4 +1,12 @@
-import { Button, Flex, Text, HStack, Checkbox, chakra } from "@chakra-ui/react";
+import {
+  Button,
+  Flex,
+  Text,
+  HStack,
+  Checkbox,
+  chakra,
+  Box,
+} from "@chakra-ui/react";
 import { COLORS } from "@/constants/theme";
 import { FaArrowRight } from "react-icons/fa";
 import React, { useContext, useMemo } from "react";
@@ -53,12 +61,19 @@ export function TokenSelectFooter({
       padding="1rem"
       alignItems="center"
     >
-      <Text color="#0099FB" fontSize="larger">
-        ~ ${totalUSDValue?.toFixed(3)}{" "}
-        <chakra.span fontSize="12px" color="#9E829F">
-          (<ETHToReceive selectedTokens={selectedTokens} />)
-        </chakra.span>
-      </Text>
+      <Box>
+        <Text
+          color="#0099FB"
+          fontSize="lg"
+          fontWeight="bold"
+          display="inline-block"
+        >
+          ~ ${totalUSDValue?.toFixed(3)}{" "}
+          <Text as="span" fontSize="sm" color="#9E829F">
+            (<ETHToReceive selectedTokens={selectedTokens} />)
+          </Text>
+        </Text>
+      </Box>
 
       <HStack>
         <Button

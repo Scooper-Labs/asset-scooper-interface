@@ -18,7 +18,10 @@ export function stripPrice(_price: number) {
   // Add subscript with zeros count - 1
   const subscript = zeros?.length - 1;
 
-  return { subscript: !Number.isNaN(subscript) ? subscript.toString() : null, value: value?.slice(0, 2) };
+  return {
+    subscript: !Number.isNaN(subscript) ? subscript.toString() : null,
+    value: value?.slice(0, 2),
+  };
 }
 
 export function formatVolume(volume: string) {
@@ -42,6 +45,7 @@ export function formatVolume(volume: string) {
     return num.toFixed(2);
   }
 }
+
 function getOrdinalSuffix(day: number) {
   if (day > 3 && day < 21) return "th"; // 11th to 20th
   switch (day % 10) {
@@ -55,6 +59,7 @@ function getOrdinalSuffix(day: number) {
       return "th";
   }
 }
+
 export function getTime(timestamp: number) {
   const date = new Date(timestamp * 1000);
 
@@ -69,4 +74,8 @@ export function getTime(timestamp: number) {
   )} ${month}, ${year} (${hours}:${minutes})`;
 
   return formattedDate;
+}
+
+export function toDeadline(expiration: number): number {
+  return Math.floor((Date.now() + expiration) / 1000);
 }

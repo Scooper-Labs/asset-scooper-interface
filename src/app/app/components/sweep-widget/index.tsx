@@ -32,12 +32,16 @@ import CustomTooltip from "@/components/CustomTooltip";
 import useSelectToken from "@/hooks/useSelectToken";
 import { ETHToReceive } from "@/components/ETHToReceive";
 import FormatNumber from "@/components/FormatNumber";
+import useEstimatedTransactionTime from "@/hooks/useEstimatedTransactionTime";
+import { ClockIcon } from "../../../../../public/icons";
 
 function SweepWidget() {
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
   const { tokenList: selectedTokens, clearList } = useSelectToken();
-  const { data: estimateData, isLoading: isLoadingEstimateFee } =
-    useEstimateFeesPerGas();
+  // const { data: estimateData, isLoading: isLoadingEstimateFee } =
+  //   useEstimateFeesPerGas();
+
+  const estimatedTime = useEstimatedTransactionTime();
 
   const router = useRouter();
 
@@ -117,7 +121,8 @@ function SweepWidget() {
                 Sweep
               </Text>
             </Flex>
-            <chakra.span fontSize="12px" color="#9E829F">
+
+            <Flex as="span" fontSize="12px" color="#9E829F">
               {isLoading ? (
                 <Skeleton
                   height="3em"
@@ -128,9 +133,17 @@ function SweepWidget() {
                   fadeDuration={0.5}
                 />
               ) : (
-                `Update in 5min 1 ETH(WETH) ≈ ${ethPrice} USDC`
+                <>
+                  <Flex as="div" alignItems="center">
+                    Update in 5 min
+                    <Box mx="1">
+                      <ClockIcon />
+                    </Box>
+                    1 ETH ≈ ${ethPrice} USDC
+                  </Flex>
+                </>
               )}
-            </chakra.span>
+            </Flex>
           </Flex>
           {/* -------------------- Token Selector is here ------------------- */}
           <TokenSelector>
@@ -188,10 +201,16 @@ function SweepWidget() {
               </CustomTooltip>
             </Flex>
 
-            <ETHToReceive selectedTokens={selectedTokens} />
+            {isConnected ? (
+              <ETHToReceive selectedTokens={selectedTokens} />
+            ) : (
+              <Text color="#2C333B" fontSize="14px" fontWeight="600">
+                --
+              </Text>
+            )}
           </Flex>
 
-          <Flex width="100%" justifyContent="space-between">
+          {/* <Flex width="100%" justifyContent="space-between">
             <Flex alignItems="center" gap="4px">
               <Text
                 fontSize="14px"
@@ -223,7 +242,7 @@ function SweepWidget() {
                 />
               </Text>
             )}
-          </Flex>
+          </Flex> */}
 
           <Flex width="100%" justifyContent="space-between">
             <Flex alignItems="center" gap="4px">
@@ -239,7 +258,13 @@ function SweepWidget() {
               </CustomTooltip>
             </Flex>
 
-            <Text>3 seconds</Text>
+            {isConnected ? (
+              <Text>{estimatedTime}</Text>
+            ) : (
+              <Text color="#2C333B" fontSize="14px" fontWeight="600">
+                --
+              </Text>
+            )}
           </Flex>
           {/* -------------------- Connect Button & Sweep Button is here ------------------- */}
           <SweepButton />

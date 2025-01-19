@@ -1,0 +1,38 @@
+  <Box
+        maxW={{ base: "200px", md: "240px" }}
+        borderColor="red"
+        borderRadius="base"
+        borderWidth="1px"
+        // borderColor="primary.250"
+        boxShadow="nav-select-shadow"
+        py={1}
+        pl={1}
+        pr={2}
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        gap="6px"
+        position="relative"
+      >
+        <Flex align="center" justify="center">
+          {icon}
+        </Flex>
+
+        {variant === "network" && address && (
+          <Flex
+            position="absolute"
+            right="3px"
+            bottom="5px"
+            align="center"
+            justify="center"
+            bg="green"
+            borderRadius="full"
+            borderWidth="0.171px"
+            borderColor="primary.1000"
+          >
+            <SelectSecondaryIcon />
+          </Flex>
+        )}
+
+        {/* {variant !== "network" && <SelectIcon />} */}
+      </Box>

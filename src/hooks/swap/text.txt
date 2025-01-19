@@ -1,0 +1,301 @@
+import { 
+  useAccount, 
+  useContractRead, 
+  useContractWrite, 
+  useNetwork,
+  useContractReads,
+  usePrepareContractWrite,
+  erc20ABI
+} from 'wagmi'
+import { useState, useEffect } from 'react'
+import { SignatureTransfer } from '@uniswap/permit2-sdk'
+import { parseEther, parseUnits } from 'viem'
+
+// Import your contract ABI
+import { AssetScooperABI } from './abi/AssetScooper'
+import { PERMIT2_ABI } from './abi/Permit2'
+
+// Contract addresses should be environment variables
+const ASSET_SCOOPER_ADDRESS = '0x...' // Your deployed contract
+const PERMIT2_ADDRESS = '0x000000000022D473030F116dDEE9F6B43aC78BA3' // Permit2 contract
+
+export function useAssetScooper() {
+  const { address } = useAccount()
+  const { chain } = useNetwork()
+  const [tokenList, setTokenList] = useState([])
+  const [isApproving, setIsApproving] = useState(false)
+
+  // Get token balances and allowances
+  const { data: tokenData } = useContractReads({
+    contracts: tokenList.flatMap(token => ([
+      {
+        address: token.address,
+        abi: erc20ABI,
+        functionName: 'balanceOf',
+        args: [address],
+      },
+      {
+        address: token.address,
+        abi: erc20ABI,
+        functionName: 'allowance',
+        args: [address, PERMIT2_ADDRESS],
+      }
+    ])),
+    enabled: Boolean(address && tokenList.length),
+  })
+
+  // Prepare permit2 approval
+  const { config: approvalConfig } = usePrepareContractWrite({
+    address: tokenList[0]?.address,
+    abi: erc20ABI,
+    functionName: 'approve',
+    args: [PERMIT2_ADDRESS, parseEther('1000000')], // Adjust amount as needed
+  })
+
+  // Handle permit2 approval
+  const { write: approvePermit2 } = useContractWrite(approvalConfig)
+
+  // Prepare asset sweep
+  const { config: sweepConfig } = usePrepareContractWrite({
+    address: ASSET_SCOOPER_ADDRESS,
+    abi: AssetScooperABI,
+    functionName: 'sweepAsset',
+  })
+
+  // Handle asset sweep
+  const { write: executeSweep } = useContractWrite(sweepConfig)
+
+  // Check if tokens need approval
+  const checkAndApproveTokens = async (tokens) => {
+    setIsApproving(true)
+    try {
+      for (const token of tokens) {
+        const allowance = await token.allowance
+        if (allowance.eq(0)) {
+          await approvePermit2?.()
+        }
+      }
+    } finally {
+      setIsApproving(false)
+    }
+  }
+
+  // Generate permit signature
+  const generatePermitSignature = async (tokens, amounts, deadline) => {
+    if (!address || !chain?.id) return null
+
+    const permitted = tokens.map((token, index) => ({
+      token: token.address,
+      amount: amounts[index].toString()
+    }))
+
+    const permitData = {
+      permitted,
+      nonce: Date.now(), // You might want to get this from the contract
+      deadline
+    }
+
+    const { domain, types } = SignatureTransfer.getPermitData(
+      permitData,
+      PERMIT2_ADDRESS,
+      chain.id
+    )
+
+    // Use wagmi's signTypedData
+    const signature = await window.ethereum.request({
+      method: 'eth_signTypedData_v4',
+      params: [address, JSON.stringify({
+        domain,
+        types,
+        message: permitData
+      })]
+    })
+
+    return { permitData, signature }
+  }
+
+  // Main sweep function
+  const sweepAssets = async ({
+    tokens,
+    minOutputAmounts,
+    tokenOut,
+    deadline = Math.floor(Date.now() / 1000) + 1200 // 20 minutes from now
+  }) => {
+    if (!address) throw new Error('Wallet not connected')
+
+    // 1. Check and approve tokens if needed
+    await checkAndApproveTokens(tokens)
+
+    // 2. Generate permit signature
+    const { permitData, signature } = await generatePermitSignature(
+      tokens,
+      minOutputAmounts,
+      deadline
+    )
+
+    // 3. Prepare sweep parameters
+    const swapParam = {
+      assets: tokens.map(t => t.address),
+      minOutputAmounts,
+      tokenOut,
+      deadline
+    }
+
+    // 4. Execute sweep
+    return executeSweep?.({
+      args: [swapParam, permitData, signature],
+    })
+  }
+
+  return {
+    sweepAssets,
+    isApproving,
+    checkAndApproveTokens
+  }
+}
+
+// Example React component using the hook
+export function AssetScooper() {
+  const { address } = useAccount()
+  const { sweepAssets, isApproving } = useAssetScooper()
+  const [selectedTokens, setSelectedTokens] = useState([])
+
+  const handleSweep = async () => {
+    try {
+      const minOutputs = selectedTokens.map(() => 
+        parseUnits('0.01', 18) // Minimum expected output, adjust as needed
+      )
+      
+      await sweepAssets({
+        tokens: selectedTokens,
+        minOutputAmounts: minOutputs,
+        tokenOut: '0xUSDC_ADDRESS', // Replace with actual USDC address
+      })
+    } catch (error) {
+      console.error('Error sweeping assets:', error)
+    }
+  }
+
+  return (
+    <div>
+      <h2>Asset Scooper</h2>
+      {!address ? (
+        <p>Please connect your wallet</p>
+      ) : (
+        <>
+          {/* Add your token selection UI here */}
+          <button 
+            onClick={handleSweep}
+            disabled={isApproving || selectedTokens.length === 0}
+          >
+            {isApproving ? 'Approving...' : 'Sweep Selected Tokens'}
+          </button>
+        </>
+      )}
+    </div>
+  )
+}
+
+
+
+
+// Get token balances and allowances
+  const { data: tokenData } = useReadContracts({
+    contracts: selectedTokens.flatMap((token) => [
+      {
+        address: token.address as Address,
+        abi: erc20Abi,
+        functionName: "balanceOf",
+        args: [address as Address],
+      },
+      {
+        address: token.address as Address,
+        abi: erc20Abi,
+        functionName: "allowance",
+        args: [address as Address, permit2Address],
+      },
+    ]),
+    query: {
+      enabled: Boolean((address as Address) && selectedTokens.length),
+    },
+  });
+
+
+
+
+  // export async function permitAndSweepAssets(
+//   tokens: Token[],
+//   amount: bigint
+// ) {
+//   try {
+//     const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+
+//     // Get permit2 signature
+//     const permitData = await getPermit2Signature(
+//       tokenAddress,
+//       ASSETSCOOPER_CONTRACT_ADDRESS
+//     );
+
+//     if (!permitData || !permitData.signature!!) {
+//       throw new Error("Signature generation failed");
+//       return;
+//     }
+
+//     const { permitSingle, signature } = permitData;
+
+//     // Get wallet client for contract interaction
+//     const publicClient = getPublicClient(wagmiConfig);
+//     const walletClient = await getWalletClient(wagmiConfig);
+
+//     if (!walletClient) throw new Error("Wallet not connected");
+
+//     // Create contract instance
+//     const contract = getContract({
+//       address: ASSETSCOOPER_CONTRACT_ADDRESS,
+//       abi: ASSETSCOOPER_CONTRACT_ABI,
+//       client: {
+//         public: publicClient,
+//         wallet: walletClient,
+//       },
+//     });
+
+//     // Prepare parameters
+//     const swapParam = {
+//       assets: tokens.map((t) => t.address),
+//       minOutputAmounts: [amount],
+//       //   tokenOut: "0x..." as Address, // WETH or USDC address
+//       tokenOut: ETH_ADDRESS as Address,
+//       deadline: BigInt(toDeadline(PERMIT_SIG_EXPIRATION)),
+//     };
+
+//     const permitted = tokens.map((token, index) => ({
+//       token: token.address,
+//       amount: amount,
+//     }));
+
+//     const permitParam = {
+//       permitted,
+//       nonce: BigInt(permitSingle.details.nonce.toString()), // Convert to bigint
+//       deadline: BigInt(permitSingle.sigDeadline.toString()),
+//     };
+
+//     // Execute the sweep
+//     const hash = await contract.write.sweepAsset(
+//       [swapParam, permitParam, signature],
+//       {
+//         account: walletClient.account,
+//         chain: walletClient.chain,
+//       }
+//     );
+
+//     // Wait for transaction
+//     const receipt = await publicClient?.waitForTransactionReceipt({ hash });
+
+//     console.log("this is the recipt", receipt);
+
+//     return receipt;
+//   } catch (error) {
+//     console.error("Error in permitAndSweepAssets:", error);
+//     throw error;
+//   }
+// }

@@ -83,13 +83,14 @@ const ListContent: React.FC<ListContentProps> = ({
         <Box mt="30px">
           <Text color="#9E829F" fontSize="14px">
             No Tokens available, Please{" "}
-            <chakra.span
+            <Flex
+              as="span"
               color="#006DED"
               cursor="pointer"
               onClick={() => open({ view: "Connect" })}
             >
               connect wallet
-            </chakra.span>{" "}
+            </Flex>{" "}
           </Text>
         </Box>
       </Flex>

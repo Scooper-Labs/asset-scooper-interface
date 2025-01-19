@@ -3,9 +3,10 @@
 import React, { ReactNode } from "react";
 import {
   metadata,
-  WALLETCONNECT_CONFIG,
+  // WALLETCONNECT_CONFIG,
   WALLETCONNECT_PROJECT_ID,
 } from "@/constants/config";
+import { wagmiConfig } from "@/config/switchchain/reownkit";
 
 import { createWeb3Modal } from "@web3modal/wagmi/react";
 
@@ -22,7 +23,7 @@ if (!WALLETCONNECT_PROJECT_ID) throw new Error("Project ID is not defined");
 createWeb3Modal({
   metadata,
   //@ts-ignore
-  wagmiConfig: WALLETCONNECT_CONFIG,
+  wagmiConfig: wagmiConfig,
   projectId: WALLETCONNECT_PROJECT_ID,
   enableAnalytics: true, // Optional - defaults to your Cloud configuration
   themeMode: "light",
@@ -41,7 +42,7 @@ export default function Web3ModalAppKitProvider({
   initialState?: State;
 }) {
   return (
-    <WagmiProvider config={WALLETCONNECT_CONFIG} initialState={initialState}>
+    <WagmiProvider config={wagmiConfig} initialState={initialState}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </WagmiProvider>
   );

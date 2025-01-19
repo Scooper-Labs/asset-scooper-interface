@@ -1,6 +1,7 @@
 "use client";
 
 import ContainerWrapper from "../ContainerWrapper";
+import { useState } from "react";
 import {
   Box,
   Text,
@@ -17,6 +18,10 @@ import { memo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import ActivitiesModal from "../ActivitiesModal";
+import { ModalType, INavActions } from "./navigation/types";
+import { networks } from "@/config/switchchain/config";
+
+import { useWeb3Modal } from "@web3modal/wagmi/react";
 
 import LogoSvg from "@/assets/icons/LogoSVG.svg";
 import { tabs } from "@/assets/site";
@@ -24,13 +29,40 @@ import ConnectButton from "../Buttons/ConnectButton";
 import { CustomConnectButton } from "../Buttons/SmartWalletButton";
 import { useAccount } from "wagmi";
 import { COLORS } from "@/constants/theme";
+import Right from "./navigation/right";
 
 const NavBar = () => {
+  const { address, chainId, isConnected } = useAccount();
   const pathname = usePathname();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = useRef<HTMLButtonElement>(null);
 
-  const { isConnected } = useAccount();
+  const [modalType, setModalType] = useState<ModalType>();
+
+  const { open } = useWeb3Modal();
+
+  const connectedNetwork = networks.find((chain) => chain.chainId === chainId);
+  const network = connectedNetwork?.variant || "base";
+
+  const closeModal = () => setModalType(undefined);
+
+  const handleModal = (type: ModalType) => {
+    if (type === "wallet" && !address) {
+      return;
+    }
+
+    setModalType(type);
+  };
+
+  const actionItems: INavActions = [
+    {
+      text: undefined,
+      variant: "account",
+    },
+    {
+      variant: "network",
+    },
+  ];
 
   return (
     <Box
@@ -46,12 +78,7 @@ const NavBar = () => {
       }}
     >
       <ContainerWrapper>
-        <HStack
-          h={"55px"}
-          justify={"space-between"}
-          //         width={{ base: "100%", md: "100%", lg: "430px" }}
-          // height={{ base: "56px", md: "52px" }}
-        >
+        <HStack h={"55px"} justify={"space-between"}>
           <HStack>
             <HStack>
               <Link href={"/"} role="logo_link" prefetch={false}>
@@ -94,12 +121,23 @@ const NavBar = () => {
             </HStack>
           </HStack>
           <HStack>
+            {/* -------- Right Component is where the multichain network popover can be found -------- */}
+            {isConnected && (
+              <Right actionItems={actionItems} handleModal={handleModal} />
+            )}
+
             <ConnectButton onOpen={onOpen} />
+
             {!isConnected && <CustomConnectButton />}
           </HStack>
         </HStack>
 
-        <ActivitiesModal isOpen={isOpen} onClose={onClose} btnRef={btnRef} />
+        <ActivitiesModal
+          isOpen={isOpen}
+          onClose={onClose}
+          //@ts-ignore
+          btnRef={btnRef}
+        />
       </ContainerWrapper>
     </Box>
   );

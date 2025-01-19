@@ -24,23 +24,29 @@ export const TokenListProvider = createContext<ContextProps>({
 
 const TokenListContextProviders: FC<ProvidersProps> = ({ children }) => {
   const [tokens, setTokens] = useState<MoralisAssetClass[]>([]);
+
   const addTokenList = (newToken: MoralisAssetClass) => {
     setTokens((prev) => [...prev, newToken]);
   };
+
   const removeTokenList = (token: MoralisAssetClass) => {
     setTokens((prev) =>
       prev.filter((t) => !compareAddress(t.address, token.address))
     );
   };
+
   const isTokenSelected = (token: MoralisAssetClass) => {
     return tokens.some((t) => compareAddress(t.address, token.address));
   };
+
   function clearList() {
     setTokens([]);
   }
+
   function selectAll(tokens: MoralisAssetClass[]) {
     setTokens(tokens);
   }
+
   return (
     <TokenListProvider.Provider
       value={{

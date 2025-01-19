@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import {
   Checkbox,
   HStack,
@@ -62,7 +62,7 @@ function TokenSelectListRow({ token }: { token: MoralisAssetClass }) {
         </HStack>
       </Checkbox>
 
-      {/* bALANCE AND price panels*/}
+      {/* Balance and price panels*/}
 
       <VStack alignItems="end" gap="0">
         <Text fontWeight="700">

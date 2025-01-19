@@ -1,4 +1,5 @@
 "use client";
+
 import {
   ModalCloseButton,
   useDisclosure,
@@ -30,6 +31,7 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
   }, [address, isConnected]);
 
   const { sweepthreshHold } = useSweepThreshhold();
+
   const { ethPrice } = useEthPrice({
     address: ETH_ADDRESS,
   });
@@ -56,6 +58,7 @@ export function TokenSelector({ children }: { children?: ReactNode }) {
       >
         {children}
       </Box>
+
       <ModalComponent
         isOpen={isOpen}
         onClose={onClose}

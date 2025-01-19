@@ -15,6 +15,7 @@ import { MoralisAssetClass } from "@/utils/classes";
 import { ExtendedErrorType } from "../useAssetScooperWriteContract";
 import { StateContext, Types } from "@/provider/AppProvider";
 import { TransactionStatus } from "../approvals/useBatchApprovals";
+import { testTokens } from "./testToken";
 
 const PARTNER = "chucknorrisv6";
 const SLIPPAGE = 1;
@@ -28,71 +29,6 @@ interface TransactionParams {
   gas?: string;
   chainId: number;
 }
-
-export const testTokens: Token[] = [
-  {
-    address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-    chainId: 8453,
-    decimals: 6,
-    logoURI:
-      "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/network/base/0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913.jpg",
-    name: "USD Coin",
-    symbol: "USDC",
-    quoteUSD: 10.5,
-    userBalance: 123.45,
-    price: 10.0,
-    price_change_24h: 2.5,
-  },
-  {
-    address: "0x6985884C4392D348587B19cb9eAAf157F13271cd",
-    chainId: 8453,
-    decimals: 18,
-    logoURI:
-      "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/network/base/0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913.jpg",
-    name: "LayerZero",
-    symbol: "ZRO",
-    quoteUSD: 10.5,
-    userBalance: 123.45,
-    price: 10.0,
-    price_change_24h: 2.5,
-  },
-  {
-    address: "0x83764F62B9Fd5ae2dE43904dE7E45Ff47476e2B5",
-    chainId: 8453,
-    decimals: 9,
-    logoURI: "",
-    name: "BaseDoodleCat",
-    symbol: "$DOCAT",
-    quoteUSD: 10.5,
-    userBalance: 123.45,
-    price: 10.0,
-    price_change_24h: 2.5,
-  },
-  {
-    address: "0x0cBD6fAdcF8096cC9A43d90B45F65826102e3eCE",
-    chainId: 8453,
-    decimals: 18,
-    logoURI: "",
-    name: "CheckDot",
-    symbol: "CDT",
-    quoteUSD: 5.75,
-    userBalance: 78.9,
-    price: 5.0,
-    price_change_24h: -1.2,
-  },
-  {
-    address: "0x80B3455e1Db60b4Cba46Aba12E8b1E256dD64979",
-    chainId: 8453,
-    decimals: 18,
-    logoURI: "",
-    name: "Blue-Footed Booby",
-    symbol: "BOOBY",
-    quoteUSD: 15.25,
-    userBalance: 45.6,
-    price: 15.0,
-    price_change_24h: 3.8,
-  },
-];
 
 export const useParaSwap = () => {
   const { setMessage, setType } = useContext(StateContext);
