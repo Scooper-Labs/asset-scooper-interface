@@ -11,11 +11,11 @@ import {
   Button,
 } from "@chakra-ui/react";
 import React, { useEffect } from "react";
-import { Address, erc20Abi, parseUnits } from "viem";
+import { Address, erc20Abi, maxUint256 } from "viem";
 import { useAccount, useReadContract } from "wagmi";
 import { ClipLoader } from "react-spinners";
 import { RxReload } from "react-icons/rx";
-import { assetscooper_contract } from "@/constants/contractAddress";
+import { permit2_contract } from "@/constants/contractAddress";
 import { useApprove } from "@/hooks/useAssetScooperWriteContract";
 
 interface TokenRowProps {
@@ -30,8 +30,6 @@ const TokenRow: React.FC<TokenRowProps> = ({ token, refetch, onClose }) => {
     logoURI,
     address: tokenAddress,
     symbol,
-    userBalance,
-    decimals,
   } = token;
 
   const { address } = useAccount();
@@ -44,7 +42,7 @@ const TokenRow: React.FC<TokenRowProps> = ({ token, refetch, onClose }) => {
     abi: erc20Abi,
     address: tokenAddress as Address,
     functionName: "allowance",
-    args: address ? [address, assetscooper_contract] : undefined,
+    args: address ? [address, permit2_contract] : undefined,
   });
 
   const {
@@ -52,8 +50,8 @@ const TokenRow: React.FC<TokenRowProps> = ({ token, refetch, onClose }) => {
     isLoading: isPendingApproval,
     isSuccess,
   } = useApprove(tokenAddress as Address, [
-    assetscooper_contract,
-    parseUnits(userBalance.toString(), decimals),
+    permit2_contract,
+    maxUint256,
   ]);
 
   const handleApprove = async () => {
@@ -66,7 +64,7 @@ const TokenRow: React.FC<TokenRowProps> = ({ token, refetch, onClose }) => {
   };
 
   const isApproved =
-    !!allowance && allowance >= parseUnits(userBalance.toString(), decimals);
+    !!allowance && allowance > 0n;
   const isLoading = isAllowanceLoading || isPendingApproval;
 
   useEffect(() => {

@@ -1,5 +1,5 @@
 import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
-import { cookieStorage, createStorage } from "wagmi";
+import { cookieStorage, createStorage, http } from "wagmi";
 import {
   SITE_DESCRIPTION,
   SITE_ICON_URL,
@@ -8,6 +8,7 @@ import {
   SITE_URL,
 } from "@/utils/site";
 import { ETH_CHAINS } from "@/utils/network";
+import { base } from "viem/chains";
 
 // export const WALLETCONNECT_PROJECT_ID =
 //   process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "";
@@ -40,4 +41,9 @@ export const WALLETCONNECT_CONFIG = defaultWagmiConfig({
   storage: createStorage({
     storage: cookieStorage,
   }),
+  transports: {
+    [base.id]: http(
+      "https://base-mainnet.infura.io/v3/cf05af5bacf84b28aa67c6dea5d1d5c2"
+    ),
+  },
 });

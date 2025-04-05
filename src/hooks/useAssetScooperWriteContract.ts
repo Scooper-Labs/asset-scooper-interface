@@ -16,8 +16,6 @@ import { BaseError } from "@wagmi/core";
 import abi from "@/constants/abi/assetscooper.json";
 import { assetscooper_contract as assetscooper } from "@/constants/contractAddress";
 import { Types, StateContext } from "@/provider/AppProvider";
-import { waitForTransactionReceipt } from "@wagmi/core";
-import { WALLETCONNECT_CONFIG } from "@/constants/config";
 
 export type ExtendedErrorType = SimulateContractErrorType & {
   shortMessage?: string;
@@ -29,7 +27,7 @@ export function useSweepTokensSimulation(args: any[] = []) {
   const simulateRes = useSimulateContract({
     address: assetscooper,
     abi: abi,
-    functionName: "sweepTokens",
+    functionName: "sweepAssetWithoutETH",
     args,
     query: { enabled: false },
   });
@@ -81,8 +79,15 @@ export function useApprove(
 export function useSweepTokens(request?: SimulateContractReturnType) {
   const { setMessage, setType } = useContext(StateContext);
   const [txhash, setTxhash] = useState<`0x${string}`>("0x");
-  const { writeContractAsync, failureReason, reset, isPending } =
-    useWriteContract();
+  const {
+    writeContractAsync,
+    failureReason,
+    reset,
+    isPending,
+    error: err,
+  } = useWriteContract();
+
+  // console.log(err);
 
   const setError = (error: ExtendedErrorType) => {
     const message = error.shortMessage ? error.shortMessage : error.message;

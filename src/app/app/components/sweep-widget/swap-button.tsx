@@ -8,8 +8,8 @@ import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { erc20Abi, Address, formatUnits } from "viem";
 import ConfirmationModal from "../modals/confirmation";
 import {
-  assetscooper_contract,
   PARASWAP_TRANSFER_PROXY,
+  permit2_contract,
 } from "@/constants/contractAddress";
 import { COLORS } from "@/constants/theme";
 import { useSmartWallet } from "@/hooks/useSmartWallet";
@@ -47,7 +47,7 @@ function SweepButton() {
       address,
       isSmartWallet
         ? (PARASWAP_TRANSFER_PROXY as Address)
-        : (assetscooper_contract as Address),
+        : (permit2_contract as Address),
     ],
   }));
 
@@ -58,14 +58,14 @@ function SweepButton() {
   const computeTokenAllowances = () =>
     data
       ? data.every((allowance, index) => {
-          const userBalance = selectedTokens[index].userBalance;
-          const decimals = selectedTokens[index].decimals;
-          const _allowance = (allowance.result as bigint) ?? 0n;
+        const userBalance = selectedTokens[index].userBalance;
+        const decimals = selectedTokens[index].decimals;
+        const _allowance = (allowance.result as bigint) ?? 0n;
 
-          const allow =
-            Number(formatUnits(_allowance, decimals)) >= userBalance;
-          return allow;
-        })
+        const allow =
+          Number(formatUnits(_allowance, decimals)) >= userBalance;
+        return allow;
+      })
       : false;
 
   useEffect(() => {

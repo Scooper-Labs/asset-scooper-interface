@@ -1,4 +1,4 @@
-import { assetscooper_contract } from "@/constants/contractAddress";
+import { permit2_contract } from "@/constants/contractAddress";
 import { Token } from "@/lib/components/types";
 import { Address, encodeFunctionData, erc20Abi, parseUnits } from "viem";
 import { useCallsStatus, useSendCalls } from "wagmi/experimental";
@@ -15,7 +15,7 @@ export enum TransactionStatus {
 export const useBatchApprovals = ({
   tokens,
   amounts,
-  spender = assetscooper_contract as Address,
+  spender = permit2_contract as Address,
 }: {
   tokens: Token[];
   amounts: string[];

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import {
   Stack,
   Box,
@@ -15,12 +15,12 @@ import {
   Avatar,
 } from "@chakra-ui/react";
 import ApprovalModal from "./approval";
-import { PARASWAP_TRANSFER_PROXY } from "@/constants/contractAddress";
+import { assetscooper_contract, PARASWAP_TRANSFER_PROXY } from "@/constants/contractAddress";
 import {
   useSweepTokens,
   useSweepTokensSimulation,
 } from "@/hooks/useAssetScooperWriteContract";
-import { Address } from "viem";
+import { Address, parseUnits } from "viem";
 import { ETHToReceive } from "@/components/ETHToReceive";
 import { useSlippageTolerance } from "@/hooks/settings/slippage/useSlippage";
 import { SlippageToleranceStorageKey } from "@/hooks/settings/slippage/utils";
@@ -36,10 +36,28 @@ import { MoralisAssetClass } from "@/utils/classes";
 import { ClipLoader } from "react-spinners";
 import { SOCIAL_TELEGRAM } from "@/utils/site";
 import { TbMessage2Heart } from "react-icons/tb";
+import usePoolFees from "@/hooks/usePoolFees";
+import { PERMIT_BATCH_TRANSFER_FROM_TYPEHASH, TOKEN_PERMISSIONS_TYPEHASH, TokenOut, UNISWAP_V3_ROUTER, UPPER_BIT_MASK } from "@/constants";
+import { ethers, Contract } from "ethers";
+import V3SwapRouterAbi from "@/constants/abi/V3SwapRouter.json";
+import permit2Abi from "@/constants/abi/permit2.json";
+import { SignatureTransfer, PERMIT2_ADDRESS, PermitBatchTransferFrom, TokenPermissions } from '@uniswap/permit2-sdk'
+import { signTypedData } from '@uniswap/conedison/provider/signing.js'
+import { useAccount, useWriteContract } from "wagmi";
+import abi from "@/constants/abi/assetscooper.json";
 
 interface ConfirmationModalProps {
   tokensAllowanceStatus: boolean;
   refetch: () => void;
+}
+
+interface SwapParam {
+  assets: string[];
+  minOutputAmounts: bigint[];
+  callData: string[];
+  balances: bigint[];
+  tokenOut: string;
+  deadline: bigint
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
@@ -65,12 +83,16 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   const [previewState, setPreviewState] = useState<boolean>(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  const [signature, setSignature] = useState<string>();
+
   const { slippageTolerance } = useSlippageTolerance(
     SlippageToleranceStorageKey.Sweep
   );
 
   const { tokenList: selectedTokens, clearList } =
     useContext(TokenListProvider);
+
+  const { poolFees, loading } = usePoolFees(selectedTokens, TokenOut);
   const { isSmartWallet } = useSmartWallet();
 
   //Batch approvals for Smart Wallet
@@ -81,25 +103,206 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   });
 
   //min-out put for EOA swap, array of bigint 0s
-  const minAmountOut = selectedTokens.map((t) => 0n);
+  const minAmountOut: bigint[] = selectedTokens.map((t) => BigInt(0 * 10 ** 18));
 
-  //EOA swap
-  // const args = [selectedTokens.map((token) => token.address), minAmountOut];
+  const encodeSwapCalls: string[] = useMemo(() => {
+
+    const provider = new ethers.providers.JsonRpcProvider("https://base-mainnet.infura.io/v3/cf05af5bacf84b28aa67c6dea5d1d5c2")
+    const signer = provider.getSigner();
+    // Create contract instance for Uniswap V3 Swap Router
+    const swapRouter = new Contract(UNISWAP_V3_ROUTER, V3SwapRouterAbi, signer);
+
+    const calls: string[] = [];
+
+    for (let i = 0; i < selectedTokens.length; i++) {
+      const tokenIn: string = selectedTokens[i].address;
+      const poolFee: number = poolFees[tokenIn] || 3000; // Fetch pool fee dynamically
+      const amountIn: bigint = parseUnits(selectedTokens[i].userBalance.toString(), selectedTokens[i].decimals) || 0n;
+
+      const encodedCall: string = swapRouter.interface.encodeFunctionData(
+        "exactInputSingle",
+        [{
+          tokenIn: ethers.utils.getAddress(tokenIn.toLowerCase()),
+          tokenOut: ethers.utils.getAddress(TokenOut.toLowerCase()),
+          fee: poolFee,
+          recipient: assetscooper_contract,
+          amountIn: amountIn,
+          amountOutMinimum: 0,
+          sqrtPriceLimitX96: 0
+        }]
+      );
+
+      calls.push(encodedCall);
+    }
+
+    return calls;
+
+  }, [selectedTokens]);
+
+  const tokenPermissions: TokenPermissions[] = useMemo(() => {
+
+    const permissions: TokenPermissions[] = []
+
+    for (let i = 0; i < selectedTokens.length; i++) {
+      const token: string = selectedTokens[i].address;
+      const amount: bigint = parseUnits(selectedTokens[i].userBalance.toString(), selectedTokens[i].decimals) || 0n;
+
+      const permission: TokenPermissions = {
+        token,
+        amount,
+      }
+
+      permissions.push(permission);
+    }
+
+    return permissions
+
+  }, [selectedTokens]);
+
+  const stringifiedTokenPermissions: TokenPermissions[] = useMemo(() => {
+
+    const permissions: TokenPermissions[] = []
+
+    for (let i = 0; i < selectedTokens.length; i++) {
+      const token: string = selectedTokens[i].address;
+      const amount: bigint = parseUnits(selectedTokens[i].userBalance.toString(), selectedTokens[i].decimals) || 0n;
+
+      const permission: TokenPermissions = {
+        token,
+        amount: amount.toString(),
+      }
+
+      permissions.push(permission);
+    }
+
+    return permissions
+
+  }, [selectedTokens]);
+
+  const swapParam: SwapParam = useMemo(() => ({
+    assets: tokensWithLiquidity.map((token) => token.address),
+    minOutputAmounts: minAmountOut,
+    callData: encodeSwapCalls,
+    balances: selectedTokens?.map((value) => parseUnits(value.userBalance.toString(), value.decimals) || 0n),
+    tokenOut: ethers.utils.getAddress(TokenOut.toLowerCase()),
+    deadline: BigInt(Math.floor(Date.now() / 1000) + 60 * 10)
+  }), [tokensWithLiquidity, encodeSwapCalls, selectedTokens, minAmountOut])
+
+  // const hashedNonce = useMemo(() => {
+
+  //   const swapParamStringified = {
+  //     ...swapParam,
+  //     minOutputAmounts: swapParam.minOutputAmounts.map(String),
+  //     balances: swapParam.balances.map(String),
+  //     deadline: swapParam.deadline.toString()
+  //   };
+  //   const jsonString = JSON.stringify(swapParamStringified, Object.keys(swapParamStringified).sort());
+
+  //   const hash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(jsonString));
+
+  //   return BigInt(hash) % BigInt(2 ** 256);
+  // }, [swapParam])
+
+  const provider = useMemo(() => {
+    if (typeof window !== "undefined" && window.ethereum) {
+      return new ethers.providers.Web3Provider(window.ethereum);
+    } else {
+      console.error("Ethereum provider not found. Please install MetaMask.");
+      return null;
+    }
+  }, [window])
+
+  const { address } = useAccount()
+
+  const PermitBatchTransferFrom: PermitBatchTransferFrom = {
+    permitted: tokenPermissions,
+    spender: assetscooper_contract,
+    nonce: Math.floor(Math.random() * 1e15),
+    deadline: BigInt(Math.floor(Date.now() / 1000) + 60 * 10)
+  }
+
+  const stringifiedPermitBatchTransferFrom: PermitBatchTransferFrom = {
+    permitted: stringifiedTokenPermissions,
+    spender: assetscooper_contract,
+    nonce: (Math.floor(Math.random() * 1e15)).toString(),
+    deadline: (BigInt(Math.floor(Date.now() / 1000) + 60 * 10)).toString()
+  }
+
+  const transferDetails = selectedTokens?.map((value) => ({
+    to: assetscooper_contract,
+    requestedAmount: parseUnits(value.userBalance.toString(), value.decimals) || 0n
+  }))
+
   const args = [
-    tokensWithLiquidity.map((token) => token.address),
-    minAmountOut,
+    swapParam,
+    stringifiedPermitBatchTransferFrom,
+    transferDetails,
+    signature,
+    address
   ];
 
   const { data, resimulate, isPending } = useSweepTokensSimulation(args);
-  const { isLoading, isSuccess, sweepTokens } = useSweepTokens(data);
+  const { isLoading, sweepTokens } = useSweepTokens(data);
+
+  const { writeContract, error, isSuccess } = useWriteContract()
+
+  const verifySignature = async (
+    signature: string,
+    expectedSigner: string,
+    domain: any,
+    types: any,
+    values: any
+  ) => {
+    try {
+      const recoveredAddress = ethers.utils.verifyTypedData(domain, types, values, signature);
+
+      console.log("Recovered Signer:", recoveredAddress);
+      console.log("Expected Signer:", expectedSigner);
+
+      return recoveredAddress.toLowerCase() === expectedSigner.toLowerCase();
+    } catch (error) {
+      console.error("Signature verification failed:", error);
+      return false;
+    }
+  };
+
+  const handleSignature = async () => {
+    const {
+      domain,
+      types,
+      values,
+    } = SignatureTransfer.getPermitData(PermitBatchTransferFrom, PERMIT2_ADDRESS, 8453);
+    if (provider) {
+      const signer = provider.getSigner();
+      const signature = await signer._signTypedData(domain, types, values);
+      if (signature) {
+        verifySignature(signature, address as string, domain, types, values);
+        setSignature(signature)
+      }
+
+    }
+  }
 
   const handlesweep = async () => {
-    const _result = await resimulate();
-    await sweepTokens(_result);
-    if (isSuccess) {
-      clearList();
-      // onClose(); //close the modal
+    console.log(args)
+    try {
+      writeContract({
+        address: assetscooper_contract,
+        abi: abi,
+        functionName: "sweepAssetWithoutETH",
+        args,
+      })
+
+      if (isSuccess) {
+        clearList();
+      }
+
+    } catch (error) {
+      console.error("Error in handlesweep:", error);
+      return;
     }
+    // onClose(); //close the modal
+
   };
 
   const handleExecuteBatchSweep = () => {
@@ -120,9 +323,17 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     // );
   };
 
+  useEffect(() => {
+    if (signature) {
+      (async () => await handlesweep())()
+    }
+  }, [signature]);
+
+  console.log(error)
+
   //for EOA
   const isSweeping = isPending || isLoading;
-  const isDisabled = !tokensAllowanceStatus || isSweeping;
+  const isDisabled = isSweeping;
 
   //for smart wallet
   const isSweepingPatch = isBatchApprovalLoading || isExecuteLoading;
@@ -576,7 +787,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                     }
                     height="2.5rem"
                     borderRadius="8px"
-                    onClick={handlesweep}
+                    onClick={handleSignature}
                     isDisabled={isDisabled}
                     isLoading={isSweeping}
                     loadingText="Sweeping..."

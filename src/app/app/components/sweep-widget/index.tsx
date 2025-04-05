@@ -47,6 +47,7 @@ function SweepWidget() {
     address: ETH_ADDRESS,
   });
 
+
   useEffect(() => {
     if (address === undefined) {
       clearList();
@@ -136,9 +137,8 @@ function SweepWidget() {
           <TokenSelector>
             <Flex
               width="100%"
-              border={`1px solid ${
-                selectedTokens?.length === 0 ? "#E7BFE7" : "#0F04D7"
-              }`}
+              border={`1px solid ${selectedTokens?.length === 0 ? "#E7BFE7" : "#0F04D7"
+                }`}
               backgroundColor="#fff"
               justifyContent="space-between"
               padding="16px 12px"
