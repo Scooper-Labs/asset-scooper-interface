@@ -20,7 +20,7 @@ import {
   useSweepTokens,
   useSweepTokensSimulation,
 } from "@/hooks/useAssetScooperWriteContract";
-import { Address, parseUnits } from "viem";
+import { Address, parseUnits, TypedDataDomain } from "viem";
 import { ETHToReceive } from "@/components/ETHToReceive";
 import { useSlippageTolerance } from "@/hooks/settings/slippage/useSlippage";
 import { SlippageToleranceStorageKey } from "@/hooks/settings/slippage/utils";
@@ -37,13 +37,11 @@ import { ClipLoader } from "react-spinners";
 import { SOCIAL_TELEGRAM } from "@/utils/site";
 import { TbMessage2Heart } from "react-icons/tb";
 import usePoolFees from "@/hooks/usePoolFees";
-import { PERMIT_BATCH_TRANSFER_FROM_TYPEHASH, TOKEN_PERMISSIONS_TYPEHASH, TokenOut, UNISWAP_V3_ROUTER, UPPER_BIT_MASK } from "@/constants";
-import { ethers, Contract } from "ethers";
+import { TokenOut, UNISWAP_V3_ROUTER } from "@/constants";
+import { ethers, Contract, TypedDataField } from "ethers";
 import V3SwapRouterAbi from "@/constants/abi/V3SwapRouter.json";
-import permit2Abi from "@/constants/abi/permit2.json";
 import { SignatureTransfer, PERMIT2_ADDRESS, PermitBatchTransferFrom, TokenPermissions } from '@uniswap/permit2-sdk'
-import { signTypedData } from '@uniswap/conedison/provider/signing.js'
-import { useAccount, useWriteContract } from "wagmi";
+import { useAccount, useSignTypedData, useWriteContract } from "wagmi";
 import abi from "@/constants/abi/assetscooper.json";
 
 interface ConfirmationModalProps {
@@ -80,6 +78,15 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     MoralisAssetClass[]
   >([]);
 
+  const provider = useMemo(() => {
+    if (typeof window !== "undefined" && window.ethereum) {
+      return new ethers.providers.Web3Provider(window.ethereum);
+    } else {
+      console.error("Ethereum provider not found. Please install MetaMask.");
+      return null;
+    }
+  }, [window])
+
   const [previewState, setPreviewState] = useState<boolean>(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -94,6 +101,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
   const { poolFees, loading } = usePoolFees(selectedTokens, TokenOut);
   const { isSmartWallet } = useSmartWallet();
+  const { signTypedDataAsync } = useSignTypedData()
 
   //Batch approvals for Smart Wallet
   const { approveTTokens, isBatchApprovalLoading } = useBatchApprovals({
@@ -107,8 +115,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
   const encodeSwapCalls: string[] = useMemo(() => {
 
-    const provider = new ethers.providers.JsonRpcProvider("https://base-mainnet.infura.io/v3/cf05af5bacf84b28aa67c6dea5d1d5c2")
-    const signer = provider.getSigner();
+    // const provider = new ethers.providers.JsonRpcProvider("https://base-mainnet.infura.io/v3/cf05af5bacf84b28aa67c6dea5d1d5c2")
+    const signer = provider?.getSigner();
     // Create contract instance for Uniswap V3 Swap Router
     const swapRouter = new Contract(UNISWAP_V3_ROUTER, V3SwapRouterAbi, signer);
 
@@ -185,7 +193,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     callData: encodeSwapCalls,
     balances: selectedTokens?.map((value) => parseUnits(value.userBalance.toString(), value.decimals) || 0n),
     tokenOut: ethers.utils.getAddress(TokenOut.toLowerCase()),
-    deadline: BigInt(Math.floor(Date.now() / 1000) + 60 * 10)
+    deadline: BigInt(Math.floor(Date.now() / 1000) + 600 * 10)
   }), [tokensWithLiquidity, encodeSwapCalls, selectedTokens, minAmountOut])
 
   // const hashedNonce = useMemo(() => {
@@ -203,48 +211,46 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   //   return BigInt(hash) % BigInt(2 ** 256);
   // }, [swapParam])
 
-  const provider = useMemo(() => {
-    if (typeof window !== "undefined" && window.ethereum) {
-      return new ethers.providers.Web3Provider(window.ethereum);
-    } else {
-      console.error("Ethereum provider not found. Please install MetaMask.");
-      return null;
-    }
-  }, [window])
 
   const { address } = useAccount()
 
-  const PermitBatchTransferFrom: PermitBatchTransferFrom = {
+  const Permit: PermitBatchTransferFrom = {
     permitted: tokenPermissions,
     spender: assetscooper_contract,
     nonce: Math.floor(Math.random() * 1e15),
-    deadline: BigInt(Math.floor(Date.now() / 1000) + 60 * 10)
+    deadline: (Math.floor(Date.now() / 1000) + 600 * 10)
   }
 
-  const stringifiedPermitBatchTransferFrom: PermitBatchTransferFrom = {
+  const stringifiedPermit: PermitBatchTransferFrom = {
     permitted: stringifiedTokenPermissions,
     spender: assetscooper_contract,
     nonce: (Math.floor(Math.random() * 1e15)).toString(),
-    deadline: (BigInt(Math.floor(Date.now() / 1000) + 60 * 10)).toString()
+    deadline: (Math.floor(Date.now() / 1000) + 600 * 10).toString()
   }
 
   const transferDetails = selectedTokens?.map((value) => ({
     to: assetscooper_contract,
-    requestedAmount: parseUnits(value.userBalance.toString(), value.decimals) || 0n
+    requestedAmount: (parseUnits(value.userBalance.toString(), value.decimals) || 0n).toString()
   }))
 
   const args = [
     swapParam,
-    stringifiedPermitBatchTransferFrom,
+    stringifiedPermit,
     transferDetails,
     signature,
     address
   ];
 
+  console.log(signature)
+
   const { data, resimulate, isPending } = useSweepTokensSimulation(args);
   const { isLoading, sweepTokens } = useSweepTokens(data);
 
   const { writeContract, error, isSuccess } = useWriteContract()
+
+  const MAGIC_VALUE = '0x1626ba7e';
+
+  const UPPER_BIT_MASK = BigInt('0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
 
   const verifySignature = async (
     signature: string,
@@ -266,20 +272,95 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     }
   };
 
+  async function verify(
+    signature: string,
+    hash: string,
+    claimedSigner: string,
+    provider: any
+  ): Promise<boolean> {
+    const code = await provider?.getCode(claimedSigner);
+
+    // If EOA (not a contract)
+    if (code === '0x') {
+      if (signature.length !== 132 && signature.length !== 130) {
+        throw new Error('Invalid signature length');
+      }
+
+      let r: string, s: string, v: number;
+
+      if (signature.length === 132) {
+        r = signature.slice(0, 66);
+        s = signature.slice(66, 130);
+        v = parseInt(signature.slice(130, 132), 16);
+      } else {
+        // EIP-2098 (64 bytes)
+        const rRaw = signature.slice(0, 66);
+        const vsRaw = signature.slice(66, 130);
+        const vs = BigInt(vsRaw);
+        const sBigInt = vs & UPPER_BIT_MASK;
+        const vBit = vs >> BigInt(255);
+        v = Number(vBit) + 27;
+        r = rRaw;
+        s = '0x' + sBigInt.toString(16).padStart(64, '0');
+      }
+      if (!r.startsWith('0x')) r = '0x' + r;
+      if (!s.startsWith('0x')) s = '0x' + s;
+
+      try {
+        const recovered = ethers.utils.recoverAddress(hash, { r, s, v });
+        console.log("Recovered Signer:", recovered);
+        console.log("Expected Signer:", claimedSigner);
+        return recovered.toLowerCase() === claimedSigner.toLowerCase();
+      } catch (err) {
+        console.error('Signature verification failed:', err);
+        return false;
+      }
+    } else {
+      // Contract wallet (EIP-1271)
+      const contract = new ethers.Contract(claimedSigner, [
+        'function isValidSignature(bytes32 hash, bytes signature) external view returns (bytes4)'
+      ], provider);
+
+      try {
+        const magicValue = await contract.isValidSignature(hash, signature);
+        return magicValue === MAGIC_VALUE;
+      } catch (err) {
+        console.error('EIP-1271 contract verification failed:', err);
+        return false;
+      }
+    }
+  }
+
   const handleSignature = async () => {
+    const network = await provider?.getNetwork();
+    const chainId = network?.chainId;
+    console.log(chainId)
     const {
       domain,
       types,
       values,
-    } = SignatureTransfer.getPermitData(PermitBatchTransferFrom, PERMIT2_ADDRESS, 8453);
-    if (provider) {
-      const signer = provider.getSigner();
-      const signature = await signer._signTypedData(domain, types, values);
-      if (signature) {
-        verifySignature(signature, address as string, domain, types, values);
-        setSignature(signature)
-      }
-
+    } = SignatureTransfer.getPermitData(Permit, PERMIT2_ADDRESS, chainId || 1);
+    const signer = provider?.getSigner()
+    const signature = await signTypedDataAsync({
+      domain: domain as TypedDataDomain,
+      types: types as Record<string, TypedDataField[]>,
+      primaryType: 'PermitBatchTransferFrom',
+      message: values as Record<string, any>,
+    });
+    if (signature) {
+      const digest = ethers.utils._TypedDataEncoder.hash(
+        domain,
+        types,
+        values
+      );
+      await verify(
+        signature,
+        digest,
+        address as string,
+        signer?.provider
+      );
+      // verifySignature(signature, address as string, domain, types, values);
+      setSignature(signature)
     }
   }
 
@@ -288,7 +369,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     try {
       writeContract({
         address: assetscooper_contract,
-        abi: abi,
+        abi,
         functionName: "sweepAssetWithoutETH",
         args,
       })
