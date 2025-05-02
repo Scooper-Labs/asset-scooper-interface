@@ -43,7 +43,7 @@ export const WALLETCONNECT_CONFIG = defaultWagmiConfig({
   }),
   transports: {
     [base.id]: http(
-      "https://base-mainnet.infura.io/v3/cf05af5bacf84b28aa67c6dea5d1d5c2"
+      "https://base-rpc.publicnode.com"
     ),
   },
 });

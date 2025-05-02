@@ -184,13 +184,13 @@ export const useParaSwap = () => {
           srcAmount: srcAmountBN,
           networkID: Number(chainId),
         });
+        // console.log(_priceRoute, token);
 
         if (!_priceRoute) {
           tokensWithoutLiquidity.push(token);
           // return;
         } else if (_priceRoute.status === 200) {
           console.log("yess");
-          const { priceRoute, status } = _priceRoute;
           tokensWithLiquidity.push(token);
         } else {
           tokensWithoutLiquidity.push(token);

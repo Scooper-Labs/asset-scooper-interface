@@ -38,7 +38,7 @@ export const useEthPrice = ({ address }: UseEthPrice) => {
   }, [data]);
 
   return {
-    refetch: () => {},
+    refetch: () => { },
     isLoading,
     ethPrice,
   };

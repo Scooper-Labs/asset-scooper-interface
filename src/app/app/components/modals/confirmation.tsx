@@ -20,7 +20,7 @@ import {
   useSweepTokens,
   useSweepTokensSimulation,
 } from "@/hooks/useAssetScooperWriteContract";
-import { Address, parseUnits, TypedDataDomain } from "viem";
+import { Address, encodeFunctionData, formatEther, getAddress, parseUnits, TypedDataDomain, zeroAddress } from "viem";
 import { ETHToReceive } from "@/components/ETHToReceive";
 import { useSlippageTolerance } from "@/hooks/settings/slippage/useSlippage";
 import { SlippageToleranceStorageKey } from "@/hooks/settings/slippage/utils";
@@ -36,13 +36,15 @@ import { MoralisAssetClass } from "@/utils/classes";
 import { ClipLoader } from "react-spinners";
 import { SOCIAL_TELEGRAM } from "@/utils/site";
 import { TbMessage2Heart } from "react-icons/tb";
-import usePoolFees from "@/hooks/usePoolFees";
-import { TokenOut, UNISWAP_V3_ROUTER } from "@/constants";
-import { ethers, Contract, TypedDataField } from "ethers";
+import { TokenOut, UNISWAP_V3_FACTORY } from "@/constants";
+import { ethers, TypedDataField } from "ethers";
 import V3SwapRouterAbi from "@/constants/abi/V3SwapRouter.json";
+import V3FactoryAbi from "@/constants/abi/V3Factory.json";
+import uniswapAbi from "@/constants/abi/uniswap.json";
 import { SignatureTransfer, PERMIT2_ADDRESS, PermitBatchTransferFrom, TokenPermissions } from '@uniswap/permit2-sdk'
-import { useAccount, useSignTypedData, useWriteContract } from "wagmi";
-import abi from "@/constants/abi/assetscooper.json";
+import { useAccount, useSignTypedData } from "wagmi";
+import { readContract } from "@wagmi/core";
+import { WALLETCONNECT_CONFIG } from "@/constants/config";
 
 interface ConfirmationModalProps {
   tokensAllowanceStatus: boolean;
@@ -77,15 +79,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   const [tokensWithoutLiquidity, setTokensWithoutLiquidity] = React.useState<
     MoralisAssetClass[]
   >([]);
-
-  const provider = useMemo(() => {
-    if (typeof window !== "undefined" && window.ethereum) {
-      return new ethers.providers.Web3Provider(window.ethereum);
-    } else {
-      console.error("Ethereum provider not found. Please install MetaMask.");
-      return null;
-    }
-  }, [window])
+  const [encodedSwapCalls, setEncodedSwapCalls] = useState<string[]>([]);
 
   const [previewState, setPreviewState] = useState<boolean>(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -99,11 +93,9 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   const { tokenList: selectedTokens, clearList } =
     useContext(TokenListProvider);
 
-  const { poolFees, loading } = usePoolFees(selectedTokens, TokenOut);
   const { isSmartWallet } = useSmartWallet();
   const { signTypedDataAsync } = useSignTypedData()
-
-  //Batch approvals for Smart Wallet
+  // Batch approvals for Smart Wallet
   const { approveTTokens, isBatchApprovalLoading } = useBatchApprovals({
     tokens: selectedTokens,
     amounts: selectedTokens.map((item) => item.userBalance.toString()),
@@ -113,39 +105,40 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   //min-out put for EOA swap, array of bigint 0s
   const minAmountOut: bigint[] = selectedTokens.map((t) => BigInt(0 * 10 ** 18));
 
-  const encodeSwapCalls: string[] = useMemo(() => {
+  async function fetchPoolFee(tokenIn: string, tokenOut: string, tokenInIndex: number): Promise<number | null> {
+    const FEE_TIERS = [100, 500, 3000, 10000];
+    let bestFeeTier: number = 0;
+    let maxLiq: number = 0;
 
-    // const provider = new ethers.providers.JsonRpcProvider("https://base-mainnet.infura.io/v3/cf05af5bacf84b28aa67c6dea5d1d5c2")
-    const signer = provider?.getSigner();
-    // Create contract instance for Uniswap V3 Swap Router
-    const swapRouter = new Contract(UNISWAP_V3_ROUTER, V3SwapRouterAbi, signer);
+    for (const fee of FEE_TIERS) {
+      try {
+        const pool: Address = await readContract(WALLETCONNECT_CONFIG, {
+          address: UNISWAP_V3_FACTORY,
+          abi: V3FactoryAbi,
+          functionName: 'getPool',
+          args: [tokenIn, tokenOut, fee],
+        }) as Address
+        if (pool !== ethers.constants.AddressZero) {
+          const liquidity = await readContract(WALLETCONNECT_CONFIG, {
+            address: pool || zeroAddress,
+            abi: uniswapAbi,
+            functionName: 'liquidity',
+          }) as number
+          const liq: number = liquidity || 0;
 
-    const calls: string[] = [];
+          if (liq > maxLiq) {
+            maxLiq = liq;
+            bestFeeTier = fee;
+          }
+        }
+      } catch (error) {
+        console.error("Error calling getPool:", error);
+      }
 
-    for (let i = 0; i < selectedTokens.length; i++) {
-      const tokenIn: string = selectedTokens[i].address;
-      const poolFee: number = poolFees[tokenIn] || 3000; // Fetch pool fee dynamically
-      const amountIn: bigint = parseUnits(selectedTokens[i].userBalance.toString(), selectedTokens[i].decimals) || 0n;
-
-      const encodedCall: string = swapRouter.interface.encodeFunctionData(
-        "exactInputSingle",
-        [{
-          tokenIn: ethers.utils.getAddress(tokenIn.toLowerCase()),
-          tokenOut: ethers.utils.getAddress(TokenOut.toLowerCase()),
-          fee: poolFee,
-          recipient: assetscooper_contract,
-          amountIn: amountIn,
-          amountOutMinimum: 0,
-          sqrtPriceLimitX96: 0
-        }]
-      );
-
-      calls.push(encodedCall);
     }
 
-    return calls;
-
-  }, [selectedTokens]);
+    return bestFeeTier ? bestFeeTier : null;
+  }
 
   const tokenPermissions: TokenPermissions[] = useMemo(() => {
 
@@ -167,66 +160,23 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
   }, [selectedTokens]);
 
-  const stringifiedTokenPermissions: TokenPermissions[] = useMemo(() => {
-
-    const permissions: TokenPermissions[] = []
-
-    for (let i = 0; i < selectedTokens.length; i++) {
-      const token: string = selectedTokens[i].address;
-      const amount: bigint = parseUnits(selectedTokens[i].userBalance.toString(), selectedTokens[i].decimals) || 0n;
-
-      const permission: TokenPermissions = {
-        token,
-        amount: amount.toString(),
-      }
-
-      permissions.push(permission);
-    }
-
-    return permissions
-
-  }, [selectedTokens]);
-
   const swapParam: SwapParam = useMemo(() => ({
     assets: tokensWithLiquidity.map((token) => token.address),
     minOutputAmounts: minAmountOut,
-    callData: encodeSwapCalls,
+    callData: encodedSwapCalls,
     balances: selectedTokens?.map((value) => parseUnits(value.userBalance.toString(), value.decimals) || 0n),
-    tokenOut: ethers.utils.getAddress(TokenOut.toLowerCase()),
+    tokenOut: getAddress(TokenOut),
     deadline: BigInt(Math.floor(Date.now() / 1000) + 600 * 10)
-  }), [tokensWithLiquidity, encodeSwapCalls, selectedTokens, minAmountOut])
+  }), [tokensWithLiquidity, encodedSwapCalls, selectedTokens, minAmountOut])
 
-  // const hashedNonce = useMemo(() => {
+  const { address, chainId } = useAccount()
 
-  //   const swapParamStringified = {
-  //     ...swapParam,
-  //     minOutputAmounts: swapParam.minOutputAmounts.map(String),
-  //     balances: swapParam.balances.map(String),
-  //     deadline: swapParam.deadline.toString()
-  //   };
-  //   const jsonString = JSON.stringify(swapParamStringified, Object.keys(swapParamStringified).sort());
-
-  //   const hash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(jsonString));
-
-  //   return BigInt(hash) % BigInt(2 ** 256);
-  // }, [swapParam])
-
-
-  const { address } = useAccount()
-
-  const Permit: PermitBatchTransferFrom = {
+  const Permit: PermitBatchTransferFrom = useMemo(() => ({
     permitted: tokenPermissions,
     spender: assetscooper_contract,
-    nonce: Math.floor(Math.random() * 1e15),
-    deadline: (Math.floor(Date.now() / 1000) + 600 * 10)
-  }
-
-  const stringifiedPermit: PermitBatchTransferFrom = {
-    permitted: stringifiedTokenPermissions,
-    spender: assetscooper_contract,
-    nonce: (Math.floor(Math.random() * 1e15)).toString(),
-    deadline: (Math.floor(Date.now() / 1000) + 600 * 10).toString()
-  }
+    nonce: BigInt(Math.floor(Math.random() * 1e15)),
+    deadline: BigInt(Math.floor(Date.now() / 1000) + 600 * 10)
+  }), [tokenPermissions])
 
   const transferDetails = selectedTokens?.map((value) => ({
     to: assetscooper_contract,
@@ -235,155 +185,43 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
   const args = [
     swapParam,
-    stringifiedPermit,
+    Permit,
     transferDetails,
     signature,
     address
   ];
 
-  console.log(signature)
-
   const { data, resimulate, isPending } = useSweepTokensSimulation(args);
-  const { isLoading, sweepTokens } = useSweepTokens(data);
-
-  const { writeContract, error, isSuccess } = useWriteContract()
-
-  const MAGIC_VALUE = '0x1626ba7e';
-
-  const UPPER_BIT_MASK = BigInt('0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
-
-  const verifySignature = async (
-    signature: string,
-    expectedSigner: string,
-    domain: any,
-    types: any,
-    values: any
-  ) => {
-    try {
-      const recoveredAddress = ethers.utils.verifyTypedData(domain, types, values, signature);
-
-      console.log("Recovered Signer:", recoveredAddress);
-      console.log("Expected Signer:", expectedSigner);
-
-      return recoveredAddress.toLowerCase() === expectedSigner.toLowerCase();
-    } catch (error) {
-      console.error("Signature verification failed:", error);
-      return false;
-    }
-  };
-
-  async function verify(
-    signature: string,
-    hash: string,
-    claimedSigner: string,
-    provider: any
-  ): Promise<boolean> {
-    const code = await provider?.getCode(claimedSigner);
-
-    // If EOA (not a contract)
-    if (code === '0x') {
-      if (signature.length !== 132 && signature.length !== 130) {
-        throw new Error('Invalid signature length');
-      }
-
-      let r: string, s: string, v: number;
-
-      if (signature.length === 132) {
-        r = signature.slice(0, 66);
-        s = signature.slice(66, 130);
-        v = parseInt(signature.slice(130, 132), 16);
-      } else {
-        // EIP-2098 (64 bytes)
-        const rRaw = signature.slice(0, 66);
-        const vsRaw = signature.slice(66, 130);
-        const vs = BigInt(vsRaw);
-        const sBigInt = vs & UPPER_BIT_MASK;
-        const vBit = vs >> BigInt(255);
-        v = Number(vBit) + 27;
-        r = rRaw;
-        s = '0x' + sBigInt.toString(16).padStart(64, '0');
-      }
-      if (!r.startsWith('0x')) r = '0x' + r;
-      if (!s.startsWith('0x')) s = '0x' + s;
-
-      try {
-        const recovered = ethers.utils.recoverAddress(hash, { r, s, v });
-        console.log("Recovered Signer:", recovered);
-        console.log("Expected Signer:", claimedSigner);
-        return recovered.toLowerCase() === claimedSigner.toLowerCase();
-      } catch (err) {
-        console.error('Signature verification failed:', err);
-        return false;
-      }
-    } else {
-      // Contract wallet (EIP-1271)
-      const contract = new ethers.Contract(claimedSigner, [
-        'function isValidSignature(bytes32 hash, bytes signature) external view returns (bytes4)'
-      ], provider);
-
-      try {
-        const magicValue = await contract.isValidSignature(hash, signature);
-        return magicValue === MAGIC_VALUE;
-      } catch (err) {
-        console.error('EIP-1271 contract verification failed:', err);
-        return false;
-      }
-    }
-  }
+  const { isLoading, sweepTokens, isSuccess } = useSweepTokens(data);
 
   const handleSignature = async () => {
-    const network = await provider?.getNetwork();
-    const chainId = network?.chainId;
-    console.log(chainId)
-    const {
-      domain,
-      types,
-      values,
-    } = SignatureTransfer.getPermitData(Permit, PERMIT2_ADDRESS, chainId || 1);
-    const signer = provider?.getSigner()
-    const signature = await signTypedDataAsync({
-      domain: domain as TypedDataDomain,
-      types: types as Record<string, TypedDataField[]>,
-      primaryType: 'PermitBatchTransferFrom',
-      message: values as Record<string, any>,
-    });
-    if (signature) {
-      const digest = ethers.utils._TypedDataEncoder.hash(
+    try {
+      const {
         domain,
         types,
-        values
-      );
-      await verify(
-        signature,
-        digest,
-        address as string,
-        signer?.provider
-      );
-      // verifySignature(signature, address as string, domain, types, values);
-      setSignature(signature)
+        values,
+      } = SignatureTransfer.getPermitData(Permit, PERMIT2_ADDRESS, chainId || 8453);
+      const signature = await signTypedDataAsync({
+        domain: domain as TypedDataDomain,
+        types: types as Record<string, TypedDataField[]>,
+        primaryType: 'PermitBatchTransferFrom',
+        message: values as Record<string, any>,
+      });
+      if (signature) {
+        setSignature(signature)
+      }
+    } catch (error) {
+      console.log(error)
     }
   }
 
   const handlesweep = async () => {
-    console.log(args)
-    try {
-      writeContract({
-        address: assetscooper_contract,
-        abi,
-        functionName: "sweepAssetWithoutETH",
-        args,
-      })
-
-      if (isSuccess) {
-        clearList();
-      }
-
-    } catch (error) {
-      console.error("Error in handlesweep:", error);
-      return;
+    const _result = await resimulate();
+    await sweepTokens(_result);
+    if (isSuccess) {
+      clearList();
+      // onClose(); //close the modal
     }
-    // onClose(); //close the modal
-
   };
 
   const handleExecuteBatchSweep = () => {
@@ -396,12 +234,6 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       await getTokensWithLiquidity();
     setTokensWithLiquidity(tokensWithLiquidity);
     setTokensWithoutLiquidity(tokensWithoutLiquidity);
-    // console.log(
-    //   "tokensWithLiquidity",
-    //   tokensWithLiquidity,
-    //   "tokensWithoutLiquidity",
-    //   tokensWithoutLiquidity
-    // );
   };
 
   useEffect(() => {
@@ -409,8 +241,6 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       (async () => await handlesweep())()
     }
   }, [signature]);
-
-  console.log(error)
 
   //for EOA
   const isSweeping = isPending || isLoading;
@@ -421,6 +251,45 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   const isSweepingBatch =
     isExecuteLoading || transactionStatus === TransactionStatus.PENDING;
   const isDisabledBatch = !tokensAllowanceStatus || isSweepingBatch;
+
+  useEffect(() => {
+    const encodeCalls = async () => {
+      if (!selectedTokens.length) return;
+
+      const calls: string[] = [];
+
+      for (let i = 0; i < selectedTokens.length; i++) {
+        const tokenIn = getAddress(selectedTokens[i].address);
+        const tokenOut = getAddress(TokenOut);
+        const poolFee = (await fetchPoolFee(tokenIn, tokenOut, i)) || 3000;
+        const amountIn: bigint = parseUnits(
+          selectedTokens[i].userBalance.toString(),
+          selectedTokens[i].decimals
+        ) || 0n;
+
+        const encodedCall = encodeFunctionData({
+          abi: V3SwapRouterAbi,
+          functionName: 'exactInputSingle',
+          args: [{
+            tokenIn,
+            tokenOut,
+            fee: poolFee,
+            recipient: assetscooper_contract,
+            amountIn,
+            amountOutMinimum: 0n,
+            sqrtPriceLimitX96: 0n,
+          }],
+        });
+
+        calls.push(encodedCall);
+      }
+
+      setEncodedSwapCalls(calls);
+    };
+
+    encodeCalls();
+  }, [selectedTokens]);
+
 
   return (
     <>

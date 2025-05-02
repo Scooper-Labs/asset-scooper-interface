@@ -141,6 +141,7 @@ function meetsThreshold(
   price: number,
   sweepthreshHold: string
 ) {
+
   const noETH = data?.filter(
     (token) => token.symbol !== "ETH" && token.symbol !== "WETH"
   );

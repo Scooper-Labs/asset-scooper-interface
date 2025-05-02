@@ -87,7 +87,9 @@ export function useSweepTokens(request?: SimulateContractReturnType) {
     error: err,
   } = useWriteContract();
 
-  // console.log(err);
+  if (err) {
+    console.log(err);
+  }
 
   const setError = (error: ExtendedErrorType) => {
     const message = error.shortMessage ? error.shortMessage : error.message;

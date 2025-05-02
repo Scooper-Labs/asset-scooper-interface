@@ -38,8 +38,6 @@ export const useBalances = ({ address }: UseBalances) => {
     }
   }, [data, address]);
 
-  // console.log(data, "this is data");
-
   return {
     data,
     isLoading,
@@ -51,5 +49,7 @@ export const useBalances = ({ address }: UseBalances) => {
 };
 
 function cleanSpam(data: MoralisAssetClass[]) {
-  return data?.filter((asset) => asset.isSpam === false);
+  return data?.filter(
+    (asset) => asset.isSpam === false && asset.userBalance >= 1
+  );
 }
