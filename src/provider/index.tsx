@@ -5,22 +5,20 @@ import ChakraProvider from "./chakra";
 import TokenListProvider from "./tokenListProvider";
 import ApolloClientProvider from "./apolloProvider";
 import Web3ModalAppKitProvider from "./web3Provider";
-import { State } from "wagmi";
-
 export const RootProvider = ({
-  children,
-  initialState,
+	children,
+	cookies,
 }: {
-  children: ReactNode;
-  initialState?: State;
+	children: ReactNode;
+	cookies: string | null;
 }) => {
-  return (
-    <Web3ModalAppKitProvider initialState={initialState}>
-      <TokenListProvider>
-        <ChakraProvider>
-          <ApolloClientProvider>{children}</ApolloClientProvider>
-        </ChakraProvider>
-      </TokenListProvider>
-    </Web3ModalAppKitProvider>
-  );
+	return (
+		<Web3ModalAppKitProvider cookies={cookies}>
+			<TokenListProvider>
+				<ChakraProvider>
+					<ApolloClientProvider>{children}</ApolloClientProvider>
+				</ChakraProvider>
+			</TokenListProvider>
+		</Web3ModalAppKitProvider>
+	);
 };

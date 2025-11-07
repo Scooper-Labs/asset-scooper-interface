@@ -4,9 +4,9 @@ import { Button } from "@chakra-ui/react";
 import { useContext, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { useReadContracts } from "wagmi";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { erc20Abi, Address, formatUnits } from "viem";
 import ConfirmationModal from "../modals/confirmation";
+import { useAppKit } from "@reown/appkit/react";
 import {
   assetscooper_contract,
   PARASWAP_TRANSFER_PROXY,
@@ -30,7 +30,7 @@ interface AllowanceResultFalse {
 type AllowanceRes = AllowanceResultTrue | AllowanceResultFalse;
 
 function SweepButton() {
-  const { open } = useWeb3Modal();
+   const { open, close } = useAppKit();
   const { isSmartWallet } = useSmartWallet();
   const { tokenList: selectedTokens } = useContext(TokenListProvider);
 

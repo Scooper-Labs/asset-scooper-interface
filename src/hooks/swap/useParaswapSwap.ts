@@ -310,7 +310,7 @@ export const useParaSwap = () => {
         },
         {
           onSuccess(data) {
-            const batchId = data;
+            const batchId = data.id;
             setBatchCallId(batchId);
             refetchTokenBalance();
           },

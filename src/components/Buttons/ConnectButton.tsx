@@ -6,10 +6,7 @@ import { truncateAddress } from "@/utils/walletUtils";
 import { useAccount } from "wagmi";
 import { COLORS } from "@/constants/theme";
 import { IoIosArrowDown } from "react-icons/io";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
-import { Basenames } from "./Basename";
-import { ETH_CHAINS } from "@/utils/network";
-import { Name } from "@coinbase/onchainkit/identity";
+import { useAppKit } from "@reown/appkit/react";
 
 export default function ConnectButtonRainbow({
   onOpen,
@@ -17,7 +14,7 @@ export default function ConnectButtonRainbow({
   onOpen: () => void;
 }) {
   const { address } = useAccount();
-  const { open } = useWeb3Modal();
+  const { open, close } = useAppKit();
 
   return address ? (
     <CustomConnectButton onOpen={onOpen} address={address} />

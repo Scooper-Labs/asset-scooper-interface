@@ -1,12 +1,13 @@
-import {
-  mainnet,
-  arbitrum,
-  base,
-  linea,
-  polygon,
-  optimism,
-  scroll,
-} from "viem/chains";
+// import {
+//   mainnet,
+//   arbitrum,
+//   base,
+//   linea,
+//   polygon,
+//   optimism,
+//   scroll,
+// } from "viem/chains";
+import { base } from "@reown/appkit/networks";
 import { Chain } from "viem/chains";
 
 let chains = [base] as [Chain, ...Chain[]];

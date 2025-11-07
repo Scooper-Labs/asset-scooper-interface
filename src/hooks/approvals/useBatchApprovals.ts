@@ -63,7 +63,7 @@ export const useBatchApprovals = ({
       {
         onSuccess(data) {
           // Set batch approve call ID to track the transaction
-          const batchId = data;
+          const batchId = data.id;
           setBatchApproveCallId(batchId);
         },
         onError(error) {
